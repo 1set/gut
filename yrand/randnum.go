@@ -5,8 +5,8 @@ import (
 	"math/big"
 )
 
-// IntRange returns a random int64 number [min, max).
-func IntRange(min, max int64) (n int64, err error) {
+// Int64Range returns a random int64 number [min, max).
+func Int64Range(min, max int64) (n int64, err error) {
 	if min >= max {
 		return 0, MinMaxRangeError
 	}
