@@ -45,3 +45,9 @@ func TestInt64Range(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkInt64Range(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Int64Range(int64(-100), int64(1000))
+	}
+}
