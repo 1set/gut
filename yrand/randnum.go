@@ -10,7 +10,9 @@ func Int64Range(min, max int64) (n int64, err error) {
 	if min >= max {
 		return 0, MinMaxRangeError
 	}
-	result, err := rand.Int(rand.Reader, big.NewInt(max-min))
+
+	num := new(big.Int).SetUint64(uint64(max - min))
+	result, err := rand.Int(rand.Reader, num)
 	if err != nil {
 		return 0, err
 	}
