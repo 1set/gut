@@ -7,14 +7,16 @@ import (
 
 // Int64Range returns a random int64 number [min, max).
 func Int64Range(min, max int64) (n int64, err error) {
+	n = 0
 	if min >= max {
-		return 0, MinMaxRangeError
+		err = MinMaxRangeError
+		return
 	}
 
-	num := new(big.Int).SetUint64(uint64(max - min))
-	result, err := rand.Int(rand.Reader, num)
-	if err != nil {
-		return 0, err
+	randMax := new(big.Int).SetUint64(uint64(max - min))
+	randNum, err := rand.Int(rand.Reader, randMax)
+	if err == nil {
+		n = randNum.Int64() + min
 	}
-	return result.Int64() + min, nil
+	return
 }
