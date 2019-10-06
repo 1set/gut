@@ -17,8 +17,9 @@ doc:
 build:
 	$(GOCMD) build -v ./$(PACKAGE)
 test:
-	$(GOTEST) -v ./$(PACKAGE)
+	$(GOTEST) -race -v ./$(PACKAGE)
 bench:
 	$(GOTEST) -parallel=4 -benchmem -bench=. ./$(PACKAGE)
 cover:
 	$(GOTEST) -cover -covermode=count ./$(PACKAGE)
+all: build test cover bench doc
