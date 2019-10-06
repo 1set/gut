@@ -1,15 +1,21 @@
+// Package yrand is yet another wrapper package of cryptographically secure random number generator.
 package yrand
 
 import (
 	"crypto/rand"
+	"errors"
 	"math/big"
+)
+
+var (
+	minMaxRangeError = errors.New("Min should be less than max.")
 )
 
 // Int64Range returns a random int64 number [min, max).
 func Int64Range(min, max int64) (n int64, err error) {
 	n = 0
 	if min >= max {
-		err = MinMaxRangeError
+		err = minMaxRangeError
 		return
 	}
 
