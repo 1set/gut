@@ -17,8 +17,6 @@ doc:
 build:
 	time $(GOCMD) build -v ./$(PACKAGE)
 test:
-	time $(GOTEST) -race ./$(PACKAGE)
-testv:
 	time $(GOTEST) -race -v ./$(PACKAGE)
 bench:
 	$(GOTEST) -parallel=4 -benchmem -bench=. ./$(PACKAGE)

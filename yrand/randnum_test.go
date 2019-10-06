@@ -51,4 +51,3 @@ func BenchmarkInt64Range(b *testing.B) {
 		Int64Range(int64(-100), int64(1000))
 	}
 }
-
