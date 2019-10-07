@@ -20,6 +20,8 @@ func TestStringBase62(t *testing.T) {
 		{"set limit=16", 16, 16, false},
 		{"set limit=20", 20, 20, false},
 		{"set limit=40", 40, 40, false},
+		{"set limit=1000", 1000, 1000, false},
+		{"set limit=100000", 100000, 100000, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
