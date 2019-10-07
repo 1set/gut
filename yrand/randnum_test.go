@@ -5,10 +5,6 @@ import (
 	"testing"
 )
 
-func isEqualFloat(a, b, tol float64) bool {
-	return math.Abs(a-b) <= tol
-}
-
 func TestInt64Range(t *testing.T) {
 	type args struct {
 		min int64
@@ -209,4 +205,8 @@ func BenchmarkFloat32(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Float32()
 	}
+}
+
+func isEqualFloat(a, b, tol float64) bool {
+	return math.Abs(a-b) <= tol
 }
