@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	errMinMaxRange = errors.New("Min should be less than max.")
+	errMinMaxRange = errors.New("min should be less than max")
 )
 
 // Int64Range returns a random int64 number in [min, max).
