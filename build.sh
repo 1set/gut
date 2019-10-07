@@ -2,7 +2,7 @@
 
 CHOICE="$1"
 
-set -eux
+set -eu
 
 COUNT=0
 for FOLDER in ./y*

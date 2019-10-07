@@ -1,6 +1,7 @@
 package yrand
 
 import (
+	"math"
 	"testing"
 )
 
@@ -55,7 +56,9 @@ func BenchmarkInt64Range(b *testing.B) {
 }
 
 func TestFloat64(t *testing.T) {
-	for i := 0; i < 1000; i++ {
+	count := 100000
+	total := 0.0
+	for i := 0; i < count; i++ {
 		gotN, err := Float64()
 		if err != nil {
 			t.Errorf("Float64() got error = %v", err)
@@ -64,6 +67,13 @@ func TestFloat64(t *testing.T) {
 		if !(0 <= gotN && gotN < 1) {
 			t.Errorf("Float64() got N = %v", gotN)
 		}
+
+		total += gotN
+	}
+
+	avg := total / float64(count)
+	if !(isEqualFloat(avg, 0.5, 0.01)) {
+		t.Errorf("Float64() got unexpected average = %v", avg)
 	}
 }
 
@@ -71,4 +81,8 @@ func BenchmarkFloat64(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Float64()
 	}
+}
+
+func isEqualFloat(a, b, tol float64) bool {
+	return math.Abs(a-b) <= tol
 }
