@@ -51,3 +51,22 @@ func BenchmarkInt64Range(b *testing.B) {
 		Int64Range(int64(-100), int64(1000))
 	}
 }
+
+func TestFloat64(t *testing.T) {
+	for i := 0; i < 1000; i++ {
+		gotN, err := Float64()
+		if err != nil {
+			t.Errorf("Float64() got error = %v", err)
+			return
+		}
+		if !(0 <= gotN && gotN < 1) {
+			t.Errorf("Float64() got N = %v", gotN)
+		}
+	}
+}
+
+func BenchmarkFloat64(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Float64()
+	}
+}
