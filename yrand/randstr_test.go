@@ -7,7 +7,7 @@ import (
 func TestString(t *testing.T) {
 	type args struct {
 		alphabet string
-		limit    int
+		length   int
 	}
 	tests := []struct {
 		name       string
@@ -15,20 +15,20 @@ func TestString(t *testing.T) {
 		wantLength int
 		wantErr    bool
 	}{
-		{"negative limit value", args{"ABC", -2}, 0, true},
-		{"zero limit value", args{"ABC", 0}, 0, true},
+		{"negative length value", args{"ABC", -2}, 0, true},
+		{"zero length value", args{"ABC", 0}, 0, true},
 		{"empty alphabet", args{"", 5}, 0, true},
 		{"alphabet of single char", args{"1", 5}, 0, true},
-		{"alphabet of 3 and limit of 1", args{"ABC", 1}, 1, false},
-		{"alphabet of 3 and limit of 2", args{"ABC", 2}, 2, false},
-		{"alphabet of 5 and limit of 8", args{"ABCDE", 8}, 8, false},
-		{"alphabet of 5 and limit of 40", args{"ABCDE", 40}, 40, false},
-		{"alphabet of 5 and limit of 1000", args{"ABCDE", 1000}, 1000, false},
-		{"alphabet of 8 and limit of 100000", args{"ABCDEFGH", 100000}, 100000, false},
+		{"alphabet of 3 and length of 1", args{"ABC", 1}, 1, false},
+		{"alphabet of 3 and length of 2", args{"ABC", 2}, 2, false},
+		{"alphabet of 5 and length of 8", args{"ABCDE", 8}, 8, false},
+		{"alphabet of 5 and length of 40", args{"ABCDE", 40}, 40, false},
+		{"alphabet of 5 and length of 1000", args{"ABCDE", 1000}, 1000, false},
+		{"alphabet of 8 and length of 100000", args{"ABCDEFGH", 100000}, 100000, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotS, err := String(tt.args.alphabet, tt.args.limit)
+			gotS, err := String(tt.args.alphabet, tt.args.length)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("String() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -53,17 +53,17 @@ func TestStringBase36(t *testing.T) {
 		wantLength int
 		wantErr    bool
 	}{
-		{"negative limit value", -1, 0, true},
-		{"zero limit value", 0, 0, true},
-		{"set limit=1", 1, 1, false},
-		{"set limit=2", 2, 2, false},
-		{"set limit=8", 8, 8, false},
-		{"set limit=10", 10, 10, false},
-		{"set limit=16", 16, 16, false},
-		{"set limit=20", 20, 20, false},
-		{"set limit=40", 40, 40, false},
-		{"set limit=1000", 1000, 1000, false},
-		{"set limit=100000", 100000, 100000, false},
+		{"negative length value", -1, 0, true},
+		{"zero length value", 0, 0, true},
+		{"length of 1", 1, 1, false},
+		{"length of 2", 2, 2, false},
+		{"length of 8", 8, 8, false},
+		{"length of 10", 10, 10, false},
+		{"length of 16", 16, 16, false},
+		{"length of 20", 20, 20, false},
+		{"length of 40", 40, 40, false},
+		{"length of 1000", 1000, 1000, false},
+		{"length of 100000", 100000, 100000, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -92,17 +92,17 @@ func TestStringBase62(t *testing.T) {
 		wantLength int
 		wantErr    bool
 	}{
-		{"negative limit value", -1, 0, true},
-		{"zero limit value", 0, 0, true},
-		{"set limit=1", 1, 1, false},
-		{"set limit=2", 2, 2, false},
-		{"set limit=8", 8, 8, false},
-		{"set limit=10", 10, 10, false},
-		{"set limit=16", 16, 16, false},
-		{"set limit=20", 20, 20, false},
-		{"set limit=40", 40, 40, false},
-		{"set limit=1000", 1000, 1000, false},
-		{"set limit=100000", 100000, 100000, false},
+		{"negative length value", -1, 0, true},
+		{"zero length value", 0, 0, true},
+		{"length of 1", 1, 1, false},
+		{"length of 2", 2, 2, false},
+		{"length of 8", 8, 8, false},
+		{"length of 10", 10, 10, false},
+		{"length of 16", 16, 16, false},
+		{"length of 20", 20, 20, false},
+		{"length of 40", 40, 40, false},
+		{"length of 1000", 1000, 1000, false},
+		{"length of 100000", 100000, 100000, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
