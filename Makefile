@@ -19,7 +19,7 @@ build:
 test:
 	$(GOTEST) -race -v ./$(PACKAGE)
 bench:
-	$(GOTEST) -parallel=4 -benchmem -bench=. ./$(PACKAGE)
+	$(GOTEST) -parallel=4 -run="none" -benchtime="2s" -benchmem -bench=. ./$(PACKAGE)
 cover:
 	$(GOTEST) -cover -covermode=count ./$(PACKAGE)
 all: build test cover bench doc
