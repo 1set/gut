@@ -160,15 +160,15 @@ func TestFloat64(t *testing.T) {
 	total := 0.0
 	for i := 0; i < count; i++ {
 		gotN, err := Float64()
+		total += gotN
 		if err != nil {
 			t.Errorf("Float64() got error = %v", err)
 			return
 		}
 		if !(0 <= gotN && gotN < 1) {
 			t.Errorf("Float64() got N = %v", gotN)
+			return
 		}
-
-		total += gotN
 	}
 
 	avg := total / float64(count)
@@ -180,5 +180,33 @@ func TestFloat64(t *testing.T) {
 func BenchmarkFloat64(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Float64()
+	}
+}
+
+func TestFloat32(t *testing.T) {
+	count := 100000
+	total := float32(0.0)
+	for i := 0; i < count; i++ {
+		gotN, err := Float32()
+		total += gotN
+		if err != nil {
+			t.Errorf("Float32() got error = %v", err)
+			return
+		}
+		if !(0 <= gotN && gotN < 1) {
+			t.Errorf("Float32() got N = %v", gotN)
+			return
+		}
+	}
+
+	avg := total / float32(count)
+	if !(isEqualFloat(float64(avg), 0.5, 0.01)) {
+		t.Errorf("Float32() got unexpected average = %v", avg)
+	}
+}
+
+func BenchmarkFloat32(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Float32()
 	}
 }

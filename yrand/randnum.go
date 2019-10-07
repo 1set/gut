@@ -49,3 +49,9 @@ func Float64() (n float64, err error) {
 	}
 	return
 }
+
+// Float32 returns a random float32 number in [0.0, 1.0).
+func Float32() (n float32, err error) {
+	num, err := Float64()
+	return float32(num), err
+}

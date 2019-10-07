@@ -18,7 +18,7 @@ do
         make build PACKAGE="$PACKAGE"
         make bench PACKAGE="$PACKAGE"
         make cover PACKAGE="$PACKAGE"
-        # make doc PACKAGE="$PACKAGE"
+        make doc PACKAGE="$PACKAGE"
         ;;
     ci)
         make build PACKAGE="$PACKAGE"
