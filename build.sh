@@ -32,7 +32,7 @@ do
     esac
     echo ""
 
-    ((COUNT++))
+    COUNT=$((COUNT+1))
 done
 
 printf "====== Handled %d package(s) ======\n" "$COUNT"
