@@ -28,23 +28,20 @@ func String(alphabet string, length int) (s string, err error) {
 
 	numBig := new(big.Int)
 	bytes := make([]byte, 8)
-
 	sb := strings.Builder{}
 	sb.Grow(length)
-	left := length
-	for left > 0 {
+
+	for left := length; left > 0; {
 		_, err = rand.Read(bytes)
 		if err != nil {
 			return
 		}
 
 		numBig.SetBytes(bytes)
-		num := numBig.Uint64()
-		for num > 0 && left > 0 {
+		for num := numBig.Uint64(); num > 0 && left > 0; left-- {
 			rm := int(num % base)
-			num = num / base
+			num /= base
 			sb.WriteByte(alphabet[rm])
-			left--
 		}
 	}
 
