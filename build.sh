@@ -2,7 +2,7 @@
 
 CHOICE="$1"
 
-set -eu
+set -eux
 
 COUNT=0
 for FOLDER in ./y*
@@ -27,7 +27,7 @@ do
         ;;
     *)
         printf "unknown build option: [%s]\n" "$CHOICE"
-        exit 2
+        exit 1
         ;;
     esac
     echo ""
