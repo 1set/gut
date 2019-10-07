@@ -46,6 +46,45 @@ func BenchmarkString(b *testing.B) {
 	}
 }
 
+func TestStringBase26(t *testing.T) {
+	tests := []struct {
+		name       string
+		length     int
+		wantLength int
+		wantErr    bool
+	}{
+		{"negative length value", -1, 0, true},
+		{"zero length value", 0, 0, true},
+		{"length of 1", 1, 1, false},
+		{"length of 2", 2, 2, false},
+		{"length of 8", 8, 8, false},
+		{"length of 10", 10, 10, false},
+		{"length of 16", 16, 16, false},
+		{"length of 20", 20, 20, false},
+		{"length of 40", 40, 40, false},
+		{"length of 1000", 1000, 1000, false},
+		{"length of 100000", 100000, 100000, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotS, err := StringBase26(tt.length)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("StringBase26() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if len(gotS) != tt.wantLength {
+				t.Errorf("StringBase26() gotS = %v, len = %v, want %v", gotS, len(gotS), tt.wantLength)
+			}
+		})
+	}
+}
+
+func BenchmarkStringBase26(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		StringBase26(16)
+	}
+}
+
 func TestStringBase36(t *testing.T) {
 	tests := []struct {
 		name       string
