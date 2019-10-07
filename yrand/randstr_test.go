@@ -34,3 +34,9 @@ func TestStringBase62(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkStringBase62(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		StringBase62(16)
+	}
+}
