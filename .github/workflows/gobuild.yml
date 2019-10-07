@@ -4,13 +4,19 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.vm-os }}
+    strategy:
+      max-parallel: 4
+      matrix:
+        vm-os: [ubuntu-latest, macOS-latest]
+        go-version: [1.9, 1.12, 1.13]
+
     steps:
 
-    - name: Set up Go 1.13
+    - name: Set up Go ${{ matrix.go-version }}
       uses: actions/setup-go@v1
       with:
-        go-version: 1.13
+        go-version: ${{ matrix.go-version }}
       id: go
 
     - name: Check out code into the Go module directory
@@ -25,4 +31,4 @@ jobs:
         fi
 
     - name: Build
-      run: ./build.sh
+      run: ./build.sh ci

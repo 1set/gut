@@ -26,3 +26,14 @@ func Int64Range(min, max int64) (n int64, err error) {
 	}
 	return
 }
+
+// Float64 returns a random float64 number in [0.0, 1.0).
+func Float64() (n float64, err error) {
+	n = 0
+	const max = 1 << 53
+	randNum, err := rand.Int(rand.Reader, big.NewInt(max))
+	if err == nil {
+		n = float64(randNum.Int64()) / max
+	}
+	return
+}
