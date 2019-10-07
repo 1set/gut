@@ -46,9 +46,6 @@ func String(alphabet string, length int) (s string, err error) {
 	}
 
 	s = sb.String()
-	if len(s) > length {
-		s = s[:length]
-	}
 	return
 }
 
