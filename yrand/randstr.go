@@ -9,8 +9,8 @@ import (
 
 var (
 	errStringAlphabet = errors.New("length of alphabet should be greater than one")
-	errStringLimit = errors.New("limit of string should be positive")
-	alphabetBase62 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	errStringLimit    = errors.New("limit of string should be positive")
+	alphabetBase62    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
 // String returns a random string of given length and composed of given chars only.
