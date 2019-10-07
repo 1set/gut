@@ -1,9 +1,10 @@
 #!/bin/bash
 
+CHOICE="$1"
+
 set -eu
 
 COUNT=0
-
 for FOLDER in ./y*
 do
     PACKAGE="${FOLDER##*/}"
@@ -11,10 +12,24 @@ do
         continue
     fi
 
-    printf "###### Working on package '%s' ######\n" "$PACKAGE"
-    make build PACKAGE="$PACKAGE"
-    make test PACKAGE="$PACKAGE"
-    make bench PACKAGE="$PACKAGE"
+    printf "###### Working on package '%s': %s ######\n" "$PACKAGE" "$CHOICE"
+    case "$CHOICE" in
+    all)
+        make build PACKAGE="$PACKAGE"
+        make bench PACKAGE="$PACKAGE"
+        make cover PACKAGE="$PACKAGE"
+        # make doc PACKAGE="$PACKAGE"
+        ;;
+    ci)
+        make build PACKAGE="$PACKAGE"
+        make test PACKAGE="$PACKAGE"
+        make bench PACKAGE="$PACKAGE"
+        ;;
+    *)
+        printf "unknown build option: [%s]\n" "$CHOICE"
+        exit 2
+        ;;
+    esac
     echo ""
 
     ((COUNT++))

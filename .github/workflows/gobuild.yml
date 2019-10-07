@@ -30,4 +30,4 @@ jobs:
         fi
 
     - name: Build
-      run: ./build.sh
+      run: ./build.sh ci
