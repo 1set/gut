@@ -27,6 +27,18 @@ func Int64Range(min, max int64) (n int64, err error) {
 	return
 }
 
+// Int32Range returns a random int32 number in [min, max).
+func Int32Range(min, max int32) (n int32, err error) {
+	num, err := Int64Range(int64(min), int64(max))
+	return int32(num), err
+}
+
+// IntRange returns a random int number in [min, max).
+func IntRange(min, max int) (n int, err error) {
+	num, err := Int64Range(int64(min), int64(max))
+	return int(num), err
+}
+
 // Float64 returns a random float64 number in [0.0, 1.0).
 func Float64() (n float64, err error) {
 	n = 0
