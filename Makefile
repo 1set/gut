@@ -15,9 +15,9 @@ default:
 doc:
 	$(GODOC) -all ./$(PACKAGE)
 build:
-	time $(GOCMD) build -v ./$(PACKAGE)
+	$(GOCMD) build -v ./$(PACKAGE)
 test:
-	time $(GOTEST) -race -v ./$(PACKAGE)
+	$(GOTEST) -race -v ./$(PACKAGE)
 bench:
 	$(GOTEST) -parallel=4 -benchmem -bench=. ./$(PACKAGE)
 cover:

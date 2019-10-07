@@ -4,6 +4,8 @@ CHOICE="$1"
 
 set -eu
 
+printf "====== Begin at %s, Mode: %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$CHOICE"
+
 COUNT=0
 for FOLDER in ./y*
 do
@@ -12,7 +14,7 @@ do
         continue
     fi
 
-    printf "###### Working on package '%s': %s ######\n" "$PACKAGE" "$CHOICE"
+    printf "\n###### Working on package '%s' ######\n" "$PACKAGE"
     case "$CHOICE" in
     all)
         make build PACKAGE="$PACKAGE"
@@ -26,13 +28,12 @@ do
         make bench PACKAGE="$PACKAGE"
         ;;
     *)
-        printf "unknown build option: [%s]\n" "$CHOICE"
+        printf "Unknown build option: [%s]\n" "$CHOICE"
         exit 1
         ;;
     esac
-    echo ""
 
     COUNT=$((COUNT+1))
 done
 
-printf "====== Handled %d package(s) ======\n" "$COUNT"
+printf "\n====== End at %s, Packages: %d ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$COUNT"
