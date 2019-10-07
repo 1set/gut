@@ -1,19 +1,23 @@
 #!/bin/bash
 
-PACKAGES=(yrand)
-
 set -eu
 
-for i in "${!PACKAGES[@]}"
+COUNT=0
+
+for FOLDER in ./y*
 do
-    PACKAGE="${PACKAGES[$i]}"
+    PACKAGE="${FOLDER##*/}"
     if [ ! -d "$PACKAGE" ]; then
-        printf "###### Directory '%s' not existing ######\n" "$PACKAGE"
-        exit 1
+        continue
     fi
 
-    printf "\n###### Working on package '%s' ######\n" "$PACKAGE"
+    printf "###### Working on package '%s' ######\n" "$PACKAGE"
     make build PACKAGE="$PACKAGE"
     make test PACKAGE="$PACKAGE"
     make bench PACKAGE="$PACKAGE"
+    echo ""
+
+    ((COUNT++))
 done
+
+printf "====== Handled %d package(s) ======\n" "$COUNT"
