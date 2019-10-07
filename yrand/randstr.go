@@ -7,22 +7,26 @@ import (
 	"strings"
 )
 
-var alphabetDigit = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
 var (
+	errStringAlphabet = errors.New("length of alphabet should be greater than one")
 	errStringLimit = errors.New("limit of string should be positive")
+	alphabetBase62 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
-func StringBase62(limit int) (s string, err error) {
+// String returns a random string of given length and composed of given chars only.
+func String(alphabet string, limit int) (s string, err error) {
+	base := uint64(len(alphabet))
+	if base <= 1 {
+		err = errStringAlphabet
+		return
+	}
 	if limit <= 0 {
 		err = errStringLimit
 		return
 	}
 
-	base := uint64(len(alphabetDigit))
 	numBig := new(big.Int)
 	bytes := make([]byte, 8)
-
 	sb := strings.Builder{}
 	for sb.Len() < limit {
 		_, err = rand.Read(bytes)
@@ -36,7 +40,7 @@ func StringBase62(limit int) (s string, err error) {
 		for num > 0 {
 			rm := int(num % base)
 			num = num / base
-			sb.WriteByte(alphabetDigit[rm])
+			sb.WriteByte(alphabet[rm])
 		}
 	}
 
@@ -44,6 +48,10 @@ func StringBase62(limit int) (s string, err error) {
 	if len(s) > limit {
 		s = s[:limit]
 	}
-
 	return
+}
+
+// StringBase62 returns a random string of given length and composed of a-zA-Z0-9 chars only.
+func StringBase62(limit int) (s string, err error) {
+	return String(alphabetBase62, limit)
 }
