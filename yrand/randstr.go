@@ -15,7 +15,7 @@ var (
 	alphabetBase62    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
-// String returns a random string of given length and composed of given chars only.
+// String returns a random string of given length with given chars only.
 func String(alphabet string, length int) (s string, err error) {
 	base := uint64(len(alphabet))
 	if base <= 1 {
@@ -50,17 +50,17 @@ func String(alphabet string, length int) (s string, err error) {
 	return
 }
 
-// StringLetters returns a random string of given length and composed of A-Z chars only.
+// StringLetters returns a random string of given length with A-Z chars only.
 func StringLetters(length int) (s string, err error) {
 	return String(alphabetLetters, length)
 }
 
-// StringBase36 returns a random string of given length and composed of A-Z0-9 chars only.
+// StringBase36 returns a random string of given length with A-Z0-9 chars only.
 func StringBase36(length int) (s string, err error) {
 	return String(alphabetBase36, length)
 }
 
-// StringBase62 returns a random string of given length and composed of a-zA-Z0-9 chars only.
+// StringBase62 returns a random string of given length with a-zA-Z0-9 chars only.
 func StringBase62(length int) (s string, err error) {
 	return String(alphabetBase62, length)
 }
