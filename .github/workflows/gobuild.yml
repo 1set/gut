@@ -25,11 +25,7 @@ jobs:
     - name: Get dependencies
       shell: bash
       run: |
-        export GOBIN=$(go env GOPATH)/bin
-        export PATH=$PATH:$GOBIN
-        mkdir -p $GOBIN
         go get -v -t -d ./...
-        go get -v github.com/mattn/goveralls
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
@@ -42,5 +38,9 @@ jobs:
     - name: Coveralls
       shell: bash
       run: |
+        export GOBIN=$(go env GOPATH)/bin
+        export PATH=$PATH:$GOBIN
+        mkdir -p $GOBIN
         go env
+        go get -v github.com/mattn/goveralls
         goveralls -show -repotoken ${{ secrets.coveralls_token }}
