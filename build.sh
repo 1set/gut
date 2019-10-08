@@ -27,6 +27,7 @@ do
         make build PACKAGE="$PACKAGE"
         make test PACKAGE="$PACKAGE"
         make bench PACKAGE="$PACKAGE"
+        make cover PACKAGE="$PACKAGE"
         ;;
     *)
         printf "Unknown build option: [%s]\n" "$CHOICE"

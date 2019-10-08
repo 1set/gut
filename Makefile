@@ -21,5 +21,5 @@ test:
 bench:
 	$(GOTEST) -parallel=4 -run="none" -benchtime="2s" -benchmem -bench=. ./$(PACKAGE)
 cover:
-	$(GOTEST) -cover -covermode=count ./$(PACKAGE)
+	$(GOTEST) -cover -covermode=count -coverprofile=coverage.out ./$(PACKAGE)
 all: build test cover bench doc
