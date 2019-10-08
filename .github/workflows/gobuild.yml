@@ -46,7 +46,6 @@ jobs:
 
     - name: Upload report to Code Climate
       shell: bash
-      if: startsWith(matrix.vm-os, 'ubuntu')
       run: |
         curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > cc-test-reporter
         chmod +x ./cc-test-reporter
@@ -56,3 +55,4 @@ jobs:
         ./cc-test-reporter upload-coverage
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.cc_report_id }}
+      if: startsWith(matrix.vm-os, 'ubuntu')
