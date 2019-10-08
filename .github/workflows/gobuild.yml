@@ -23,7 +23,7 @@ jobs:
       uses: actions/checkout@v1
       with:
         fetch-depth: 1
-        path: ${{ HOME }}/go/src
+        path: ${{ github.home }}/go/src
 
     - name: Get dependencies
       shell: bash
