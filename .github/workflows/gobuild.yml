@@ -23,7 +23,7 @@ jobs:
       uses: actions/checkout@v1
       with:
         fetch-depth: 1
-        path: /home/runner/go/src/github.com/an63/gut
+        path: go/src/github.com/an63/gut
 
     - name: Get dependencies
       shell: bash
