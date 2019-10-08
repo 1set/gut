@@ -25,6 +25,7 @@ jobs:
     - name: Get dependencies
       run: |
         go get -v -t -d ./...
+        go get -v github.com/mattn/goveralls
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
@@ -35,5 +36,5 @@ jobs:
 
     - name: Coveralls
       run: |
-        go get github.com/mattn/goveralls
+        go env
         goveralls -show -repotoken ${{ secrets.coveralls_token }}
