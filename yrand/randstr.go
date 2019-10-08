@@ -10,7 +10,7 @@ import (
 var (
 	errStringAlphabet = errors.New("length of alphabet should be greater than one")
 	errStringLength   = errors.New("length of string should be positive")
-	alphabetBase26    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	alphabetLetters   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	alphabetBase36    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	alphabetBase62    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
@@ -50,9 +50,9 @@ func String(alphabet string, length int) (s string, err error) {
 	return
 }
 
-// StringBase26 returns a random string of given length and composed of A-Z chars only.
-func StringBase26(length int) (s string, err error) {
-	return String(alphabetBase26, length)
+// StringLetters returns a random string of given length and composed of A-Z chars only.
+func StringLetters(length int) (s string, err error) {
+	return String(alphabetLetters, length)
 }
 
 // StringBase36 returns a random string of given length and composed of A-Z0-9 chars only.
