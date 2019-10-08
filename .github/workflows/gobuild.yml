@@ -22,8 +22,7 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v1
       with:
-        fetch-depth: 1
-        path: go/src/github.com/an63/gut
+        fetch-depth: 2
 
     - name: Get dependencies
       shell: bash
@@ -37,14 +36,3 @@ jobs:
     - name: Build
       shell: bash
       run: ./build.sh ci
-
-    - name: Coveralls
-      shell: bash
-      run: |
-        export GOPATH=$HOME/work/gut/go
-        export GOBIN=$(go env GOPATH)/bin
-        export PATH=$PATH:$GOPATH:$GOBIN
-        mkdir -p $GOBIN
-        go env
-        go get -v github.com/mattn/goveralls
-        goveralls -show -service=github-action -repotoken ${{ secrets.coveralls_token }}
