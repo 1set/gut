@@ -23,7 +23,7 @@ func ExampleInt64Range() {
 // This example simulates coin toss experiments
 func ExampleFloat64() {
 	head, tail := 0, 0
-	count := 500000
+	count := 100000
 	for i := 0; i < count; i++ {
 		n, err := yrand.Float64()
 		if err != nil {
@@ -38,8 +38,8 @@ func ExampleFloat64() {
 		}
 	}
 
-	fmt.Printf("%.2f", float64(head)/float64(tail))
-	// Output: 1.00
+	fmt.Printf("%.1f", float64(head)/float64(tail))
+	// Output: 1.0
 }
 
 // This example generates a random string of 20 A-Z0-9 chars.
