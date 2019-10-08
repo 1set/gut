@@ -21,6 +21,9 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+        path: ${{ HOME }}/go/src
 
     - name: Get dependencies
       shell: bash
@@ -38,6 +41,8 @@ jobs:
     - name: Coveralls
       shell: bash
       run: |
+        pwd
+        echo $HOME
         export GOBIN=$(go env GOPATH)/bin
         export PATH=$PATH:$GOBIN
         mkdir -p $GOBIN
