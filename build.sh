@@ -24,6 +24,7 @@ do
         make doc PACKAGE="$PACKAGE"
         ;;
     ci)
+        go env
         make build PACKAGE="$PACKAGE"
         make test PACKAGE="$PACKAGE"
         make bench PACKAGE="$PACKAGE"

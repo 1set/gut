@@ -22,4 +22,5 @@ bench:
 	$(GOTEST) -parallel=4 -run="none" -benchtime="2s" -benchmem -bench=. ./$(PACKAGE)
 cover:
 	$(GOTEST) -race -cover -covermode=atomic -coverprofile=coverage.out ./$(PACKAGE)
+	cat coverage.out >> coverage.txt
 all: build test cover bench doc
