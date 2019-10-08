@@ -43,4 +43,4 @@ jobs:
         mkdir -p $GOBIN
         go env
         go get -v github.com/mattn/goveralls
-        goveralls -show -repotoken ${{ secrets.coveralls_token }}
+        goveralls -show -service=github-action -repotoken ${{ secrets.coveralls_token }}
