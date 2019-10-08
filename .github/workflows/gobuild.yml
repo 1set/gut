@@ -45,7 +45,7 @@ jobs:
         echo $HOME
         echo $GITHUB_WORKSPACE
         echo "== Done =="
-        export GOPATH=$GITHUB_WORKSPACE/go
+        export GOPATH=/home/runner/work/gut/go
         export GOBIN=$(go env GOPATH)/bin
         export PATH=$PATH:$GOPATH:$GOBIN
         mkdir -p $GOBIN
