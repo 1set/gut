@@ -33,8 +33,7 @@ jobs:
     - name: Build
       run: ./build.sh ci
 
-    - name: Coveralls GitHub Action
-      uses: coverallsapp/github-action@v1.0.1
-      with:
-        github-token: ${{ secrets.github_token }}
-        parallel: true
+    - name: Coveralls
+      run: |
+        go get github.com/mattn/goveralls
+        goveralls -show -repotoken ${{ secrets.coveralls_token }}
