@@ -19,3 +19,15 @@ func ExampleInt64Range() {
 
 	// Output: true
 }
+
+// This example generates a random string composed 20 A-Z0-9 chars.
+func ExampleStringBase36() {
+	s, err := yrand.StringBase36(20)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(len(s))
+
+	// Output: 20
+}
