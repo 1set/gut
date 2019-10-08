@@ -19,6 +19,15 @@ jobs:
         go-version: ${{ matrix.go-version }}
       id: go
 
+    - name: Set up environment
+      shell: bash
+      run: |
+        export GOPATH=$HOME/work/gut/go
+        export GOBIN=$(go env GOPATH)/bin
+        export PATH=$PATH:$GOPATH:$GOBIN
+        mkdir -p $GOBIN
+        go env
+
     - name: Check out code into the Go module directory
       uses: actions/checkout@v1
       with:
@@ -41,14 +50,6 @@ jobs:
     - name: Coveralls
       shell: bash
       run: |
-        pwd
-        echo $HOME
-        echo $GITHUB_WORKSPACE
-        echo "== Done =="
-        export GOPATH=/home/runner/work/gut/go
-        export GOBIN=$(go env GOPATH)/bin
-        export PATH=$PATH:$GOPATH:$GOBIN
-        mkdir -p $GOBIN
         go env
         go get -v github.com/mattn/goveralls
         goveralls -show -service=github-action -repotoken ${{ secrets.coveralls_token }}
