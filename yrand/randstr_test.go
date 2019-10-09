@@ -43,7 +43,9 @@ func TestString(t *testing.T) {
 
 func BenchmarkString(b *testing.B) {
 	for i := 0; i < b.N; i++ {
+		//StringV1("abcABC123", 16)
 		String("abcABC123", 16)
+		//RunesV1("abcABC123", 16)
 	}
 }
 
@@ -86,6 +88,7 @@ func TestRunes(t *testing.T) {
 func BenchmarkRunes(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		//Runes("苟利国家生死以岂因祸福避趋之", 16)
+		//RunesV1("苟利国家生死以𐍈😓", 16)
 		Runes("苟利国家生死以𐍈😓", 16)
 		//Runes("😳😴😵💪🏿💫", 16)
 		//Runes("🌈", 16)
