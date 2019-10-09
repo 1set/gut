@@ -11,6 +11,8 @@ import (
 var (
 	errStringAlphabet = errors.New("length of alphabet should be greater than one")
 	errStringLength   = errors.New("length of string should be positive")
+	errIterateMax     = errors.New("max value should be greater than one")
+	errIterateCount   = errors.New("count should be positive")
 	alphabetLetters   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	alphabetBase36    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	alphabetBase62    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -68,6 +70,13 @@ func Runes(alphabet string, length int) (s string, err error) {
 }
 
 func iterateRandomNumbers(count int, max uint64, callback func(num uint64)) (err error) {
+	if count <= 0 {
+		return errIterateCount
+	}
+	if max <= 1 {
+		return errIterateMax
+	}
+
 	randBig := new(big.Int)
 	randBytes := make([]byte, 8)
 
