@@ -10,8 +10,13 @@ COUNT=0
 for FOLDER in ./y*
 do
     PACKAGE="${FOLDER##*/}"
-    if [ ! -d "$PACKAGE" ]; then
+    if [[ ! -d "$PACKAGE" ]]; then
         continue
+    fi
+
+    if [[ "ci" == "$CHOICE" && 0 -eq $COUNT ]]; then
+        printf "\n###### Go Environment ######\n"
+        go env
     fi
 
     printf "\n###### Working on package '%s' ######\n" "$PACKAGE"
@@ -24,7 +29,6 @@ do
         make doc PACKAGE="$PACKAGE"
         ;;
     ci)
-        go env
         make build PACKAGE="$PACKAGE"
         make test PACKAGE="$PACKAGE"
         make bench PACKAGE="$PACKAGE"
