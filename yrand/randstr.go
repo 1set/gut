@@ -15,7 +15,7 @@ var (
 	alphabetBase62    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
-// String returns a random string of given length with given chars only.
+// String returns a random string of given length with given ASCII chars only.
 func String(alphabet string, length int) (s string, err error) {
 	base := uint64(len(alphabet))
 	if base <= 1 {
@@ -43,6 +43,43 @@ func String(alphabet string, length int) (s string, err error) {
 			rm := int(num % base)
 			num /= base
 			sb.WriteByte(alphabet[rm])
+		}
+	}
+
+	s = sb.String()
+	return
+}
+
+// Runes returns a random string of given length with given Unicode chars only.
+func Runes(alphabet string, length int) (s string, err error) {
+	runes := []rune(alphabet)
+	base := uint64(len(runes))
+	//base := uint64(utf8.RuneCountInString(alphabet))
+	if base <= 1 {
+		err = errStringAlphabet
+		return
+	}
+	if length <= 0 {
+		err = errStringLength
+		return
+	}
+
+	numBig := new(big.Int)
+	bytes := make([]byte, 8)
+	sb := strings.Builder{}
+	sb.Grow(length)
+
+	for left := length; left > 0; {
+		_, err = rand.Read(bytes)
+		if err != nil {
+			return
+		}
+
+		numBig.SetBytes(bytes)
+		for num := numBig.Uint64(); num > 0 && left > 0; left-- {
+			rm := int(num % base)
+			num /= base
+			sb.WriteRune(runes[rm])
 		}
 	}
 
