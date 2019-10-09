@@ -49,7 +49,7 @@ func BenchmarkString(b *testing.B) {
 func BenchmarkRunes(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		//Runes("苟利国家生死以岂因祸福避趋之", 16)
-		Runes("苟利国家生死以岂因", 16)
+		Runes("苟利国家生死以𐍈😓", 16)
 	}
 }
 
