@@ -34,8 +34,7 @@ func String(alphabet string, length int) (s string, err error) {
 	sb.Grow(length)
 
 	for left := length; left > 0; {
-		_, err = rand.Read(randBytes)
-		if err != nil {
+		if _, err = rand.Read(randBytes); err != nil {
 			return
 		}
 
@@ -70,8 +69,7 @@ func Runes(alphabet string, length int) (s string, err error) {
 	sb.Grow(length * 4)
 
 	for left := length; left > 0; {
-		_, err = rand.Read(randBytes)
-		if err != nil {
+		if _, err = rand.Read(randBytes); err != nil {
 			return
 		}
 
