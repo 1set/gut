@@ -23,7 +23,7 @@ func ExampleInt64Range() {
 // This example simulates coin toss experiments
 func ExampleFloat64() {
 	head, tail := 0, 0
-	count := 100000
+	count := 50000
 	for i := 0; i < count; i++ {
 		n, err := yrand.Float64()
 		if err != nil {
