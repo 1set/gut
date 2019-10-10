@@ -72,3 +72,11 @@ func TestIterateRandomNumbers(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkIterateRandomNumbers(b *testing.B) {
+	noop := func(foo uint64) {
+	}
+	for i := 0; i < b.N; i++ {
+		iterateRandomNumbers(16, 62, noop)
+	}
+}
