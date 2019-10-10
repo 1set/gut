@@ -54,6 +54,11 @@ func BenchmarkIsEqualFloat(b *testing.B) {
 func TestIterateRandomNumbers(t *testing.T) {
 	noop := func(foo uint64) {
 	}
+	numbers := make([]uint64, 0)
+	recordNumbers := func(num uint64) {
+		numbers = append(numbers, num)
+	}
+
 	type args struct {
 		count    int
 		max      uint64
@@ -67,11 +72,27 @@ func TestIterateRandomNumbers(t *testing.T) {
 		{"invalid count=0", args{0, 2, noop}, true},
 		{"invalid max=1", args{8, 1, noop}, true},
 		{"nil callback", args{8, 2, nil}, true},
+		{"count=8 and max=2", args{8, 2, recordNumbers}, false},
+		{"count=8 and max=8", args{8, 8, recordNumbers}, false},
+		{"count=100 and max=16", args{100, 16, recordNumbers}, false},
+		{"count=10000 and max=32", args{10000, 32, recordNumbers}, false},
+		{"count=1000000 and max=32", args{1000000, 32, recordNumbers}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			numbers = make([]uint64, 0)
 			if err := iterateRandomNumbers(tt.args.count, tt.args.max, tt.args.callback); (err != nil) != tt.wantErr {
 				t.Errorf("iterateRandomNumbers() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr {
+				if len(numbers) != tt.args.count {
+					t.Errorf("iterateRandomNumbers() number count: %v, expect: %v", len(numbers), tt.args.count)
+				}
+				for _, v := range numbers {
+					if !(v < tt.args.max) {
+						t.Errorf("iterateRandomNumbers() number should be in [0, %v), got: %v", tt.args.max, v)
+					}
+				}
 			}
 		})
 	}
