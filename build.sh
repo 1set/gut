@@ -22,6 +22,7 @@ do
     printf "\n###### Working on package '%s' ######\n" "$PACKAGE"
     case "$CHOICE" in
     all)
+        make fmt PACKAGE="$PACKAGE"
         make build PACKAGE="$PACKAGE"
         make test PACKAGE="$PACKAGE"
         make bench PACKAGE="$PACKAGE"
@@ -35,6 +36,7 @@ do
         make cover PACKAGE="$PACKAGE"
         ;;
     dev)
+        make fmt PACKAGE="$PACKAGE"
         make test_quiet PACKAGE="$PACKAGE"
         make cover PACKAGE="$PACKAGE"
         make bench PACKAGE="$PACKAGE"

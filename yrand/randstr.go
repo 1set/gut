@@ -16,14 +16,13 @@ var (
 
 // String returns a random string of given length with given ASCII chars only.
 func String(alphabet string, length int) (s string, err error) {
-	if length <= 0 {
-		err = errStringLength
-		return
-	}
-
 	base := uint64(len(alphabet))
 	if base <= 1 {
 		err = errStringAlphabet
+	} else if length <= 0 {
+		err = errStringLength
+	}
+	if err != nil {
 		return
 	}
 
@@ -41,14 +40,13 @@ func String(alphabet string, length int) (s string, err error) {
 
 // Runes returns a random string of given length with given Unicode chars only.
 func Runes(alphabet string, length int) (s string, err error) {
-	if length <= 0 {
-		err = errStringLength
-		return
-	}
-
 	base := uint64(utf8.RuneCountInString(alphabet))
 	if base <= 1 {
 		err = errStringAlphabet
+	} else if length <= 0 {
+		err = errStringLength
+	}
+	if err != nil {
 		return
 	}
 
