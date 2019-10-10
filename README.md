@@ -12,4 +12,4 @@ Yet another collection of Go utilities & tools.
 
 ## Packages
 
-* [`yrand`](https://godoc.org/github.com/an63/gut/yrand): yet another wrapper of "crypto/rand" with func like "math/rand"
+-   [`yrand`](https://godoc.org/github.com/an63/gut/yrand): yet another wrapper of "crypto/rand" with func like "math/rand"
