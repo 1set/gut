@@ -19,13 +19,14 @@ func isEqualFloat(a, b, tolerance float64) bool {
 
 func iterateRandomNumbers(count int, max uint64, callback func(num uint64)) (err error) {
 	if count <= 0 {
-		return errIterateCount
+		err = errIterateCount
+	} else if max <= 1 {
+		err = errIterateMax
+	} else if callback == nil {
+		err = errIterateCallback
 	}
-	if max <= 1 {
-		return errIterateMax
-	}
-	if callback == nil {
-		return errIterateCallback
+	if err != nil {
+		return
 	}
 
 	randBig := new(big.Int)
