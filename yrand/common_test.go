@@ -52,6 +52,8 @@ func BenchmarkIsEqualFloat(b *testing.B) {
 }
 
 func TestIterateRandomNumbers(t *testing.T) {
+	noop := func(foo uint64) {
+	}
 	type args struct {
 		count    int
 		max      uint64
@@ -62,7 +64,9 @@ func TestIterateRandomNumbers(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{"invalid count=0", args{0, 2, noop}, true},
+		{"invalid max=1", args{8, 1, noop}, true},
+		{"nil callback", args{8, 2, nil}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

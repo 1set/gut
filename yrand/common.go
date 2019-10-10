@@ -2,8 +2,15 @@ package yrand
 
 import (
 	"crypto/rand"
+	"errors"
 	"math"
 	"math/big"
+)
+
+var (
+	errIterateMax      = errors.New("max value should be greater than one")
+	errIterateCount    = errors.New("count should be positive")
+	errIterateCallback = errors.New("callback should not be nil")
 )
 
 func isEqualFloat(a, b, tolerance float64) bool {
@@ -16,6 +23,9 @@ func iterateRandomNumbers(count int, max uint64, callback func(num uint64)) (err
 	}
 	if max <= 1 {
 		return errIterateMax
+	}
+	if callback == nil {
+		return errIterateCallback
 	}
 
 	randBig := new(big.Int)
