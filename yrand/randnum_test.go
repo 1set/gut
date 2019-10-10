@@ -1,7 +1,6 @@
 package yrand
 
 import (
-	"math"
 	"testing"
 )
 
@@ -205,8 +204,4 @@ func BenchmarkFloat32(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Float32()
 	}
-}
-
-func isEqualFloat(a, b, tol float64) bool {
-	return math.Abs(a-b) <= tol
 }

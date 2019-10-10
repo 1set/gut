@@ -1,9 +1,7 @@
 package yrand
 
 import (
-	"crypto/rand"
 	"errors"
-	"math/big"
 	"strings"
 	"unicode/utf8"
 )
@@ -11,8 +9,6 @@ import (
 var (
 	errStringAlphabet = errors.New("length of alphabet should be greater than one")
 	errStringLength   = errors.New("length of string should be positive")
-	errIterateMax     = errors.New("max value should be greater than one")
-	errIterateCount   = errors.New("count should be positive")
 	alphabetLetters   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	alphabetBase36    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	alphabetBase62    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -65,32 +61,6 @@ func Runes(alphabet string, length int) (s string, err error) {
 
 	if err = iterateRandomNumbers(length, base, writeBack); err == nil {
 		s = sb.String()
-	}
-	return
-}
-
-func iterateRandomNumbers(count int, max uint64, callback func(num uint64)) (err error) {
-	if count <= 0 {
-		return errIterateCount
-	}
-	if max <= 1 {
-		return errIterateMax
-	}
-
-	randBig := new(big.Int)
-	randBytes := make([]byte, 8)
-
-	for left := count; left > 0; {
-		if _, err = rand.Read(randBytes); err != nil {
-			return
-		}
-
-		randBig.SetBytes(randBytes)
-		for num := randBig.Uint64(); num > 0 && left > 0; left-- {
-			rm := num % max
-			num /= max
-			callback(rm)
-		}
 	}
 	return
 }

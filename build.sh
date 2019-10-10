@@ -34,6 +34,11 @@ do
         make bench PACKAGE="$PACKAGE"
         make cover PACKAGE="$PACKAGE"
         ;;
+    dev)
+        make test_quiet PACKAGE="$PACKAGE"
+        make cover PACKAGE="$PACKAGE"
+        make bench PACKAGE="$PACKAGE"
+        ;;
     *)
         printf "Unknown build option: [%s]\n" "$CHOICE"
         exit 1

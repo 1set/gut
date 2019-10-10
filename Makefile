@@ -18,6 +18,8 @@ build:
 	$(GOCMD) build -v ./$(PACKAGE)
 test:
 	$(GOTEST) -race -v ./$(PACKAGE)
+test_quiet:
+	$(GOTEST) -race ./$(PACKAGE)
 bench:
 	$(GOTEST) -parallel=4 -run="none" -benchtime="2s" -benchmem -bench=. ./$(PACKAGE)
 cover:
