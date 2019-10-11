@@ -28,11 +28,11 @@ func String(alphabet string, length int) (s string, err error) {
 
 	sb := strings.Builder{}
 	sb.Grow(length)
-	writeBack := func(num uint64) {
-		sb.WriteByte(alphabet[int(num)])
+	writeByteBack := func(num uint64) error {
+		return sb.WriteByte(alphabet[int(num)])
 	}
 
-	if err = iterateRandomNumbers(length, base, writeBack); err == nil {
+	if err = iterateRandomNumbers(length, base, writeByteBack); err == nil {
 		s = sb.String()
 	}
 	return
@@ -53,11 +53,12 @@ func Runes(alphabet string, length int) (s string, err error) {
 	sb := strings.Builder{}
 	sb.Grow(length * 4)
 	abRunes := []rune(alphabet)
-	writeBack := func(num uint64) {
-		sb.WriteRune(abRunes[int(num)])
+	writeRuneBack := func(num uint64) error {
+		_, e := sb.WriteRune(abRunes[int(num)])
+		return e
 	}
 
-	if err = iterateRandomNumbers(length, base, writeBack); err == nil {
+	if err = iterateRandomNumbers(length, base, writeRuneBack); err == nil {
 		s = sb.String()
 	}
 	return
