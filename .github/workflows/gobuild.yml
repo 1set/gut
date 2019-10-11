@@ -61,7 +61,7 @@ jobs:
         ./cc-test-reporter upload-coverage
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.cc_report_id }}
-      if: false && startsWith(matrix.vm-os, 'ubuntu')
+      if: startsWith(matrix.vm-os, 'ubuntu')
 
     - name: Upload report to DeepSource
       shell: bash
@@ -70,3 +70,4 @@ jobs:
         ./bin/deepsource report --analyzer test-coverage --key go --value-file ./coverage.txt
       env:
         DEEPSOURCE_DSN: ${{ secrets.deepsource_dsn }}
+      if: startsWith(matrix.vm-os, 'ubuntu')
