@@ -17,7 +17,7 @@ func isEqualFloat(a, b, tolerance float64) bool {
 	return math.Abs(a-b) <= tolerance
 }
 
-func iterateRandomNumbers(count int, max uint64, callback func(num uint64) error) (err error) {
+func iterateRandomNumbers(count int, max uint64, callback func(uint64) error) (err error) {
 	if count <= 0 {
 		err = errIterateCount
 	} else if max <= 1 {

@@ -64,7 +64,7 @@ func TestIterateRandomNumbers(t *testing.T) {
 	type args struct {
 		count    int
 		max      uint64
-		callback func(num uint64) error
+		callback func(uint64) error
 	}
 	tests := []struct {
 		name    string
