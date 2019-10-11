@@ -52,17 +52,19 @@ func BenchmarkIsEqualFloat(b *testing.B) {
 }
 
 func TestIterateRandomNumbers(t *testing.T) {
-	noop := func(foo uint64) {
+	noop := func(foo uint64) error {
+		return nil
 	}
 	numbers := make([]uint64, 0)
-	recordNumbers := func(num uint64) {
+	recordNumbers := func(num uint64) error {
 		numbers = append(numbers, num)
+		return nil
 	}
 
 	type args struct {
 		count    int
 		max      uint64
-		callback func(num uint64)
+		callback func(num uint64) error
 	}
 	tests := []struct {
 		name    string
@@ -99,7 +101,8 @@ func TestIterateRandomNumbers(t *testing.T) {
 }
 
 func BenchmarkIterateRandomNumbers(b *testing.B) {
-	noop := func(foo uint64) {
+	noop := func(foo uint64) error {
+		return nil
 	}
 	for i := 0; i < b.N; i++ {
 		iterateRandomNumbers(16, 62, noop)

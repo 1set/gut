@@ -8,6 +8,8 @@
 [![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability-percentage/an63/gut)](https://codeclimate.com/github/an63/gut)
 [![Codecov](https://img.shields.io/codecov/c/gh/an63/gut)](https://codecov.io/gh/an63/gut)
 
+[![DeepSource](https://static.deepsource.io/deepsource-badge-light.svg)](https://deepsource.io/gh/an63/gut/?ref=repository-badge)
+
 Yet another collection of Go utilities & tools.
 
 ## Packages
