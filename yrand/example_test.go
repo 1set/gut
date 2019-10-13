@@ -20,6 +20,29 @@ func ExampleInt64Range() {
 	// Output: true 6
 }
 
+// This example chooses a random fish from a given list.
+func ExampleIntRange() {
+	fishes := []string{
+		"Ahi",
+		"Basa",
+		"Kajiki",
+		"Mahi Mahi",
+		"Monchong",
+		"Salmon",
+		"Tilapia",
+		"Tuna",
+	}
+	idx, err := yrand.IntRange(0, len(fishes))
+	if err != nil {
+		fmt.Println("got error:", err)
+		return
+	}
+
+	s := fishes[idx]
+	fmt.Println(len(s) > 0)
+	// Output: true
+}
+
 // This example simulates coin toss experiments
 func ExampleFloat64() {
 	head, tail := 0, 0
