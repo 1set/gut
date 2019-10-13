@@ -84,6 +84,8 @@ func TestChoiceInt(t *testing.T) {
 		wantErr bool
 	}{
 		{"nil list", args{nil}, 0, true},
+		{"empty list", args{[]int{}}, 0, true},
+		{"single item list", args{[]int{100}}, 100, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -110,6 +112,8 @@ func TestChoiceString(t *testing.T) {
 		wantErr bool
 	}{
 		{"nil list", args{nil}, "", true},
+		{"empty list", args{[]string{}}, "", true},
+		{"single item list", args{[]string{"Good"}}, "Good", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -150,8 +154,8 @@ func numSlice2String(num []int) (s string) {
 }
 
 func factorial(n int) int {
-	res := int(1)
-	for i := int(2); i <= n; i++ {
+	res := 1
+	for i := 2; i <= n; i++ {
 		res *= i
 	}
 	return res
