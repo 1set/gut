@@ -27,8 +27,8 @@ func TestShuffle(t *testing.T) {
 		{"n = 4", 4, factorial(4), false},
 		{"n = 5", 5, factorial(5), false},
 		{"n = 6", 6, factorial(6), false},
-		//{"n = 7", 7, factorial(7), false},
-		//{"n = 8", 8, factorial(8), false},
+		{"n = 7", 7, factorial(7), false},
+		{"n = 8", 8, factorial(8), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
