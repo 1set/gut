@@ -55,6 +55,18 @@ func Uint64Range(min, max uint64) (n uint64, err error) {
 	return
 }
 
+// Uint32Range returns a random uint32 number in [min, max).
+func Uint32Range(min, max uint32) (n uint32, err error) {
+	num, err := Uint64Range(uint64(min), uint64(max))
+	return uint32(num), err
+}
+
+// UintRange returns a random uint number in [min, max).
+func UintRange(min, max uint) (n uint, err error) {
+	num, err := Uint64Range(uint64(min), uint64(max))
+	return uint(num), err
+}
+
 // Float64 returns a random float64 number in [0.0, 1.0).
 func Float64() (n float64, err error) {
 	return getRandomFloat(1 << 53)
