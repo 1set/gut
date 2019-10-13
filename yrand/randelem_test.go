@@ -27,8 +27,8 @@ func TestShuffle(t *testing.T) {
 		{"n = 4", 4, factorial(4), false},
 		{"n = 5", 5, factorial(5), false},
 		{"n = 6", 6, factorial(6), false},
-		{"n = 7", 7, factorial(7), false},
-		{"n = 8", 8, factorial(8), false},
+		//{"n = 7", 7, factorial(7), false},
+		//{"n = 8", 8, factorial(8), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -115,6 +115,14 @@ func TestChoiceInt(t *testing.T) {
 	}
 }
 
+func BenchmarkChoiceInt(b *testing.B) {
+	int1000, _ := rangeInt(1000)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		ChoiceInt(int1000)
+	}
+}
+
 func TestChoiceString(t *testing.T) {
 	str100, _ := rangeString(100)
 	str500000, _ := rangeString(500000)
@@ -152,6 +160,14 @@ func TestChoiceString(t *testing.T) {
 				t.Errorf("ChoiceString() gotS = %v, want %v", gotS, tt.wantS)
 			}
 		})
+	}
+}
+
+func BenchmarkChoiceString(b *testing.B) {
+	str1000, _ := rangeString(1000)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		ChoiceString(str1000)
 	}
 }
 
