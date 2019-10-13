@@ -62,7 +62,7 @@ func TestShuffle(t *testing.T) {
 					t.Errorf("Shuffle() error = %v, wantErr %v", err, tt.wantErr)
 				}
 				if str := numSlice2String(num); len(str) > 0 {
-					counters[str] += 1
+					counters[str]++
 				}
 			}
 			if actual := len(counters); actual != tt.expected {
