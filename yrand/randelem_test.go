@@ -7,28 +7,6 @@ import (
 	"testing"
 )
 
-func BenchmarkShuffleNoop(b *testing.B) {
-	count := 1000
-	noopNoop := func(i, j int) {}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		Shuffle(count, noopNoop)
-	}
-}
-
-func BenchmarkShuffleWithSlice(b *testing.B) {
-	count := 1000
-	num, _ := rangeInt(count)
-	swapFunc := func(i, j int) {
-		num[i], num[j] = num[j], num[i]
-	}
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		Shuffle(count, swapFunc)
-	}
-}
-
 func TestShuffle(t *testing.T) {
 	num, _ := rangeInt(0)
 	swapFunc := func(i, j int) {
@@ -68,6 +46,80 @@ func TestShuffle(t *testing.T) {
 			}
 			if actual := len(counters); actual != tt.expected {
 				t.Errorf("Shuffle() order count: %v, expected: %v", actual, tt.expected)
+			}
+		})
+	}
+}
+
+func BenchmarkShuffleNoop(b *testing.B) {
+	count := 1000
+	noopNoop := func(i, j int) {}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		Shuffle(count, noopNoop)
+	}
+}
+
+func BenchmarkShuffleWithSlice(b *testing.B) {
+	count := 1000
+	num, _ := rangeInt(count)
+	swapFunc := func(i, j int) {
+		num[i], num[j] = num[j], num[i]
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		Shuffle(count, swapFunc)
+	}
+}
+
+func TestChoiceInt(t *testing.T) {
+	type args struct {
+		list []int
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantN   int
+		wantErr bool
+	}{
+		{"nil list", args{nil}, 0, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotN, err := ChoiceInt(tt.args.list)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ChoiceInt() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotN != tt.wantN {
+				t.Errorf("ChoiceInt() gotN = %v, want %v", gotN, tt.wantN)
+			}
+		})
+	}
+}
+
+func TestChoiceString(t *testing.T) {
+	type args struct {
+		list []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantS   string
+		wantErr bool
+	}{
+		{"nil list", args{nil}, "", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotS, err := ChoiceString(tt.args.list)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ChoiceString() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotS != tt.wantS {
+				t.Errorf("ChoiceString() gotS = %v, want %v", gotS, tt.wantS)
 			}
 		})
 	}
