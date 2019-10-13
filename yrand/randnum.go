@@ -19,9 +19,9 @@ func Int64Range(min, max int64) (n int64, err error) {
 		return
 	}
 
+	randNum := new(big.Int)
 	randMax := new(big.Int).SetUint64(uint64(max - min))
-	randNum, err := rand.Int(rand.Reader, randMax)
-	if err == nil {
+	if randNum, err = rand.Int(rand.Reader, randMax); err == nil {
 		n = randNum.Int64() + min
 	}
 	return
@@ -52,8 +52,8 @@ func Float32() (n float32, err error) {
 
 func getRandomFloat(prec int64) (n float64, err error) {
 	n = 0
-	randNum, err := rand.Int(rand.Reader, big.NewInt(prec))
-	if err == nil {
+	randNum := new(big.Int)
+	if randNum, err = rand.Int(rand.Reader, big.NewInt(prec)); err == nil {
 		n = float64(randNum.Int64()) / float64(prec)
 	}
 	return
