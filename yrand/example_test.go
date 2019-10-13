@@ -54,6 +54,23 @@ func ExampleStringBase36() {
 	// Output: 20
 }
 
+// This example randomizes the order of a list of numbers.
+func ExampleShuffle() {
+	num := []int{2, 3, 5, 7, 11, 13, 17, 19, 23, 29}
+	swapFunc := func(i, j int) {
+		num[i], num[j] = num[j], num[i]
+	}
+
+	count := len(num)
+	if err := yrand.Shuffle(count, swapFunc); err != nil {
+		fmt.Println("got error:", err)
+		return
+	}
+
+	fmt.Println(len(num) == count)
+	// Output: true
+}
+
 // This example chooses a random food from a given list.
 func ExampleChoiceString() {
 	foods := []string{
@@ -73,22 +90,5 @@ func ExampleChoiceString() {
 	}
 
 	fmt.Println(len(s) > 0)
-	// Output: true
-}
-
-// This example randomizes the order of a list of numbers.
-func ExampleShuffle() {
-	num := []int{2, 3, 5, 7, 11, 13, 17, 19, 23, 29}
-	swapFunc := func(i, j int) {
-		num[i], num[j] = num[j], num[i]
-	}
-
-	count := len(num)
-	if err := yrand.Shuffle(count, swapFunc); err != nil {
-		fmt.Println("got error:", err)
-		return
-	}
-
-	fmt.Println(len(num) == count)
 	// Output: true
 }
