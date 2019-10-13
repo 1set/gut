@@ -42,9 +42,7 @@ func Shuffle(n int, swap func(i, j int)) (err error) {
 // ChoiceInt returns a random element from the non-empty slice of int.
 func ChoiceInt(list []int) (n int, err error) {
 	var idx int
-	if count := len(list); count <= 0 {
-		err = errChoiceEmpty
-	} else if idx, err = IntRange(0, count); err == nil {
+	if idx, err = randomIndex(len(list)); err == nil {
 		n = list[idx]
 	}
 	return
@@ -53,10 +51,17 @@ func ChoiceInt(list []int) (n int, err error) {
 // ChoiceString returns a random element from the non-empty slice of string.
 func ChoiceString(list []string) (s string, err error) {
 	var idx int
-	if count := len(list); count <= 0 {
-		err = errChoiceEmpty
-	} else if idx, err = IntRange(0, count); err == nil {
+	if idx, err = randomIndex(len(list)); err == nil {
 		s = list[idx]
+	}
+	return
+}
+
+func randomIndex(max int) (idx int, err error) {
+	if max <= 0 {
+		err = errChoiceEmpty
+	} else {
+		idx, err = IntRange(0, max)
 	}
 	return
 }
