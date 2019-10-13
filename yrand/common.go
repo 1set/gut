@@ -11,6 +11,7 @@ var (
 	errIterateMax      = errors.New("max value should be greater than one")
 	errIterateCount    = errors.New("count should be positive")
 	errIterateCallback = errors.New("callback should not be nil")
+	errChoiceEmpty     = errors.New("slice should not be empty")
 )
 
 func isEqualFloat(a, b, tolerance float64) bool {
@@ -45,6 +46,15 @@ func iterateRandomNumbers(count int, max uint64, callback func(uint64) error) (e
 				return
 			}
 		}
+	}
+	return
+}
+
+func randomIndex(max int) (idx int, err error) {
+	if max <= 0 {
+		err = errChoiceEmpty
+	} else {
+		idx, err = IntRange(0, max)
 	}
 	return
 }

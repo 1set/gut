@@ -8,7 +8,6 @@ import (
 
 var (
 	errShuffleNegative = errors.New("n should be non-negative")
-	errChoiceEmpty     = errors.New("slice should not be empty")
 )
 
 // Shuffle randomizes the order of elements. n is the number of elements. swap swaps the elements with indexes i and j.
@@ -53,15 +52,6 @@ func ChoiceString(list []string) (s string, err error) {
 	var idx int
 	if idx, err = randomIndex(len(list)); err == nil {
 		s = list[idx]
-	}
-	return
-}
-
-func randomIndex(max int) (idx int, err error) {
-	if max <= 0 {
-		err = errChoiceEmpty
-	} else {
-		idx, err = IntRange(0, max)
 	}
 	return
 }
