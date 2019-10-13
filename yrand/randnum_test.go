@@ -150,6 +150,143 @@ func BenchmarkIntRange(b *testing.B) {
 	}
 }
 
+func TestUint64Range(t *testing.T) {
+	type args struct {
+		min uint64
+		max uint64
+	}
+
+	tests := []struct {
+		name       string
+		args       args
+		wantNRange args
+		wantErr    bool
+	}{
+		{"invalid min and max", args{uint64(20), uint64(10)}, args{uint64(0), uint64(1)}, true},
+		{"same min and max", args{uint64(10), uint64(10)}, args{uint64(0), uint64(1)}, true},
+		{"always same number", args{uint64(1000), uint64(1001)}, args{uint64(1000), uint64(1001)}, false},
+		{"choose from 0/1", args{uint64(0), uint64(2)}, args{uint64(0), uint64(2)}, false},
+		{"between [0, 100)", args{uint64(0), uint64(100)}, args{uint64(0), uint64(100)}, false},
+		{"between [0, 10000)", args{uint64(0), uint64(10000)}, args{uint64(0), uint64(10000)}, false},
+		{"between [0, 100000000)", args{uint64(0), uint64(100000000)}, args{uint64(0), uint64(100000000)}, false},
+		{"between [0, 2147483647)", args{uint64(0), uint64(2147483647)}, args{uint64(0), uint64(2147483647)}, false},
+		{"between [0, 2147483648)", args{uint64(0), uint64(2147483648)}, args{uint64(0), uint64(2147483648)}, false},
+		{"between [0, 2147483649)", args{uint64(0), uint64(2147483649)}, args{uint64(0), uint64(2147483649)}, false},
+		{"between [0, 9223372036854775807)", args{uint64(0), uint64(9223372036854775807)}, args{uint64(0), uint64(9223372036854775807)}, false},
+		{"between [0, 18446744073709551615)", args{uint64(0), uint64(18446744073709551615)}, args{uint64(0), uint64(18446744073709551615)}, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotN, err := Uint64Range(tt.args.min, tt.args.max)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Uint64Range() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !(tt.wantNRange.min <= gotN && gotN < tt.wantNRange.max) {
+				t.Errorf("Uint64Range() gotN = %v, want %v", gotN, tt.wantNRange)
+			}
+		})
+	}
+}
+
+func BenchmarkUint64Range(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Uint64Range(uint64(2), uint64(2147483659))
+	}
+}
+
+func TestUint32Range(t *testing.T) {
+	type args struct {
+		min uint32
+		max uint32
+	}
+
+	tests := []struct {
+		name       string
+		args       args
+		wantNRange args
+		wantErr    bool
+	}{
+		{"invalid min and max", args{uint32(20), uint32(10)}, args{uint32(0), uint32(1)}, true},
+		{"same min and max", args{uint32(10), uint32(10)}, args{uint32(0), uint32(1)}, true},
+		{"always same number", args{uint32(1000), uint32(1001)}, args{uint32(1000), uint32(1001)}, false},
+		{"choose from 0/1", args{uint32(0), uint32(2)}, args{uint32(0), uint32(2)}, false},
+		{"between [0, 100)", args{uint32(0), uint32(100)}, args{uint32(0), uint32(100)}, false},
+		{"between [0, 10000)", args{uint32(0), uint32(10000)}, args{uint32(0), uint32(10000)}, false},
+		{"between [0, 100000000)", args{uint32(0), uint32(100000000)}, args{uint32(0), uint32(100000000)}, false},
+		{"between [0, 2147483647)", args{uint32(0), uint32(2147483647)}, args{uint32(0), uint32(2147483647)}, false},
+		{"between [0, 2147483648)", args{uint32(0), uint32(2147483648)}, args{uint32(0), uint32(2147483648)}, false},
+		{"between [0, 2147483649)", args{uint32(0), uint32(2147483649)}, args{uint32(0), uint32(2147483649)}, false},
+		{"between [0, 4294967295)", args{uint32(0), uint32(4294967295)}, args{uint32(0), uint32(4294967295)}, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotN, err := Uint32Range(tt.args.min, tt.args.max)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Uint32Range() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !(tt.wantNRange.min <= gotN && gotN < tt.wantNRange.max) {
+				t.Errorf("Uint32Range() gotN = %v, want %v", gotN, tt.wantNRange)
+			}
+		})
+	}
+}
+
+func BenchmarkUint32Range(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Uint32Range(uint32(2), uint32(2147483659))
+	}
+}
+
+func TestUintRange(t *testing.T) {
+	type args struct {
+		min uint
+		max uint
+	}
+
+	tests := []struct {
+		name       string
+		args       args
+		wantNRange args
+		wantErr    bool
+	}{
+		{"invalid min and max", args{uint(20), uint(10)}, args{uint(0), uint(1)}, true},
+		{"same min and max", args{uint(10), uint(10)}, args{uint(0), uint(1)}, true},
+		{"always same number", args{uint(1000), uint(1001)}, args{uint(1000), uint(1001)}, false},
+		{"choose from 0/1", args{uint(0), uint(2)}, args{uint(0), uint(2)}, false},
+		{"between [0, 100)", args{uint(0), uint(100)}, args{uint(0), uint(100)}, false},
+		{"between [0, 10000)", args{uint(0), uint(10000)}, args{uint(0), uint(10000)}, false},
+		{"between [0, 100000000)", args{uint(0), uint(100000000)}, args{uint(0), uint(100000000)}, false},
+		{"between [0, 2147483647)", args{uint(0), uint(2147483647)}, args{uint(0), uint(2147483647)}, false},
+		{"between [0, 2147483648)", args{uint(0), uint(2147483648)}, args{uint(0), uint(2147483648)}, false},
+		{"between [0, 2147483649)", args{uint(0), uint(2147483649)}, args{uint(0), uint(2147483649)}, false},
+		{"between [0, 9223372036854775807)", args{uint(0), uint(9223372036854775807)}, args{uint(0), uint(9223372036854775807)}, false},
+		{"between [0, 18446744073709551615)", args{uint(0), uint(18446744073709551615)}, args{uint(0), uint(18446744073709551615)}, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotN, err := UintRange(tt.args.min, tt.args.max)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UintRange() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !(tt.wantNRange.min <= gotN && gotN < tt.wantNRange.max) {
+				t.Errorf("UintRange() gotN = %v, want %v", gotN, tt.wantNRange)
+			}
+		})
+	}
+}
+
+func BenchmarkUintRange(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		UintRange(uint(2), uint(2147483659))
+	}
+}
+
 func TestFloat64(t *testing.T) {
 	count := 100000
 	total := 0.0
