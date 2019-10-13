@@ -150,6 +150,52 @@ func BenchmarkIntRange(b *testing.B) {
 	}
 }
 
+func TestUint64Range(t *testing.T) {
+	type args struct {
+		min uint64
+		max uint64
+	}
+
+	tests := []struct {
+		name       string
+		args       args
+		wantNRange args
+		wantErr    bool
+	}{
+		{"invalid min and max", args{uint64(20), uint64(10)}, args{uint64(0), uint64(1)}, true},
+		{"same min and max", args{uint64(10), uint64(10)}, args{uint64(0), uint64(1)}, true},
+		{"always same number", args{uint64(1000), uint64(1001)}, args{uint64(1000), uint64(1001)}, false},
+		{"choose from 0/1", args{uint64(0), uint64(2)}, args{uint64(0), uint64(2)}, false},
+		{"between [0, 100)", args{uint64(0), uint64(100)}, args{uint64(0), uint64(100)}, false},
+		{"between [0, 10000)", args{uint64(0), uint64(10000)}, args{uint64(0), uint64(10000)}, false},
+		{"between [0, 100000000)", args{uint64(0), uint64(100000000)}, args{uint64(0), uint64(100000000)}, false},
+		{"between [0, 2147483647)", args{uint64(0), uint64(2147483647)}, args{uint64(0), uint64(2147483647)}, false},
+		{"between [0, 2147483648)", args{uint64(0), uint64(2147483648)}, args{uint64(0), uint64(2147483648)}, false},
+		{"between [0, 2147483649)", args{uint64(0), uint64(2147483649)}, args{uint64(0), uint64(2147483649)}, false},
+		{"between [0, 9223372036854775807)", args{uint64(0), uint64(9223372036854775807)}, args{uint64(0), uint64(9223372036854775807)}, false},
+		{"between [0, 18446744073709551615)", args{uint64(0), uint64(18446744073709551615)}, args{uint64(0), uint64(18446744073709551615)}, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotN, err := Uint64Range(tt.args.min, tt.args.max)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Uint64Range() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !(tt.wantNRange.min <= gotN && gotN < tt.wantNRange.max) {
+				t.Errorf("Uint64Range() gotN = %v, want %v", gotN, tt.wantNRange)
+			}
+		})
+	}
+}
+
+func BenchmarkUint64Range(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Uint64Range(uint64(2), uint64(2147483659))
+	}
+}
+
 func TestFloat64(t *testing.T) {
 	count := 100000
 	total := 0.0
