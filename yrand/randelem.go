@@ -2,11 +2,19 @@ package yrand
 
 import (
 	"crypto/rand"
+	"errors"
 	"math/big"
 )
 
+var (
+	errShuffleNegative = errors.New("n should be non-negative")
+)
+
+// Shuffle randomizes the order of elements. n is the number of elements. swap swaps the elements with indexes i and j.
 func Shuffle(n int, swap func(i, j int)) (err error) {
-	if n < 1 {
+	if n < 0 {
+		return errShuffleNegative
+	} else if n <= 1 {
 		return
 	}
 

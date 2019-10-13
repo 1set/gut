@@ -40,6 +40,7 @@ func TestShuffle(t *testing.T) {
 		expected int
 		wantErr  bool
 	}{
+		{"n = -7", -7, 0, true},
 		{"n = 0", 0, 0, false},
 		{"n = 1", 1, factorial(1), false},
 		{"n = 2", 2, factorial(2), false},
@@ -52,7 +53,7 @@ func TestShuffle(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			times := tt.expected * 20
+			times := 1 + tt.expected*20
 			counters := map[string]int{}
 			for i := 0; i < times; i++ {
 				num, _ = rangeInt(tt.n)
