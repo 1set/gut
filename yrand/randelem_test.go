@@ -1,6 +1,7 @@
 package yrand
 
 import (
+	"errors"
 	"strconv"
 	"strings"
 	"testing"
@@ -74,8 +75,7 @@ func TestShuffle(t *testing.T) {
 
 func rangeInt(max int) (sl []int, err error) {
 	if max < 0 {
-		// TODO: use serious error later
-		return nil, errIterateCallback
+		return nil, errors.New("max should be non-negative")
 	}
 
 	sl = make([]int, 0, max)
