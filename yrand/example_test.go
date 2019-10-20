@@ -9,14 +9,13 @@ import (
 // This example generates a random 6-digit PIN.
 func ExampleInt64Range() {
 	min, max := int64(0), int64(1000000)
-	num, err := yrand.Int64Range(min, max)
+	pin, err := yrand.Int64Range(min, max)
 	if err != nil {
 		fmt.Println("got error:", err)
 		return
 	}
-	pin := fmt.Sprintf("%06d", num)
 
-	fmt.Println("PIN:", pin)
+	fmt.Printf("PIN: %06d\n", pin)
 }
 
 // This example chooses a random fish from a given list.
@@ -58,20 +57,18 @@ func ExampleFloat64() {
 		}
 	}
 
-	fmt.Println("Heads:", head)
-	fmt.Println("Tails:", tail)
-	fmt.Printf("Rate:  %.2f", float64(head)/float64(tail))
+	fmt.Printf("Head: %d\nTail: %d\nRate: %.3f", head, tail, float64(head)/float64(tail))
 }
 
 // This example generates a random string of 20 A-Z0-9 chars.
 func ExampleStringBase36() {
-	s, err := yrand.StringBase36(20)
+	key, err := yrand.StringBase36(20)
 	if err != nil {
 		fmt.Println("got error:", err)
 		return
 	}
 
-	fmt.Println("Key:", s)
+	fmt.Println("Key:", key)
 }
 
 // This example randomizes the order of a list of numbers.
@@ -80,8 +77,8 @@ func ExampleShuffle() {
 	swapFunc := func(i, j int) {
 		num[i], num[j] = num[j], num[i]
 	}
-
 	fmt.Println("before:", num)
+
 	count := len(num)
 	if err := yrand.Shuffle(count, swapFunc); err != nil {
 		fmt.Println("got error:", err)
@@ -102,11 +99,11 @@ func ExampleChoiceString() {
 		"Loco Moco",
 		"Manapua",
 	}
-	s, err := yrand.ChoiceString(foods)
+	food, err := yrand.ChoiceString(foods)
 	if err != nil {
 		fmt.Println("got error:", err)
 		return
 	}
 
-	fmt.Println("I 🍴", s)
+	fmt.Println("I 🍴", food)
 }
