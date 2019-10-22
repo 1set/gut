@@ -38,8 +38,7 @@ do
     dev)
         make fmt PACKAGE="$PACKAGE"
         make testdev PACKAGE="$PACKAGE"
-        make cover PACKAGE="$PACKAGE"
-        make bench PACKAGE="$PACKAGE"
+        make benchdev PACKAGE="$PACKAGE"
         ;;
     *)
         printf "Unknown build option: [%s]\n" "$CHOICE"
