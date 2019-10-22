@@ -31,6 +31,9 @@ func TestShuffle(t *testing.T) {
 		{"n = 8", 8, factorial(8), false},
 	}
 	for _, tt := range tests {
+		if testing.Short() && tt.n >= 5 {
+			t.Skipf("skipping large case '%v' in short mode", tt.name)
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			times := 1 + tt.expected*20
 			counters := map[string]int{}
@@ -98,6 +101,9 @@ func TestChoiceInt(t *testing.T) {
 		{"list of 500000 - not", int500000, true, 600000, false, false},
 	}
 	for _, tt := range tests {
+		if testing.Short() && len(tt.list) >= 500 {
+			t.Skipf("skipping large case '%v' in short mode", tt.name)
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			gotN, err := ChoiceInt(tt.list)
 			if (err != nil) != tt.wantErr {
@@ -146,6 +152,9 @@ func TestChoiceString(t *testing.T) {
 		{"list of 500000 - not", str500000, true, "600000", false, false},
 	}
 	for _, tt := range tests {
+		if testing.Short() && len(tt.list) >= 500 {
+			t.Skipf("skipping large case '%v' in short mode", tt.name)
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			gotS, err := ChoiceString(tt.list)
 			if (err != nil) != tt.wantErr {

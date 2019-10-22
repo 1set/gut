@@ -21,10 +21,12 @@ build:
 	$(GOCMD) build -v ./$(PACKAGE)
 test:
 	$(GOTEST) -race -v ./$(PACKAGE)
-test_quiet:
-	$(GOTEST) -race ./$(PACKAGE)
+testdev:
+	$(GOTEST) -race -short -cover -covermode=atomic -count 1 ./$(PACKAGE)
 bench:
 	$(GOTEST) -parallel=4 -run="none" -benchtime="2s" -benchmem -bench=. ./$(PACKAGE)
+benchdev:
+	$(GOTEST) -parallel=8 -run="none" -benchtime="1s" -benchmem -bench=. ./$(PACKAGE)
 cover:
 	$(GOTEST) -race -cover -covermode=atomic -coverprofile=coverage.out ./$(PACKAGE)
 	cat coverage.out >> coverage.txt
