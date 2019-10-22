@@ -37,7 +37,7 @@ do
         ;;
     dev)
         make fmt PACKAGE="$PACKAGE"
-        make test_quiet PACKAGE="$PACKAGE"
+        make testdev PACKAGE="$PACKAGE"
         make cover PACKAGE="$PACKAGE"
         make bench PACKAGE="$PACKAGE"
         ;;

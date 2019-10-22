@@ -31,6 +31,9 @@ func TestShuffle(t *testing.T) {
 		{"n = 8", 8, factorial(8), false},
 	}
 	for _, tt := range tests {
+		if testing.Short() && tt.n >= 5 {
+			t.Skipf("skipping '%v' in short mode", tt.name)
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			times := 1 + tt.expected*20
 			counters := map[string]int{}
