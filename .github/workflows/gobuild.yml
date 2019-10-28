@@ -53,14 +53,16 @@ jobs:
     - name: Upload report to Codacy
       shell: bash
       run: |
-        go env
         echo "=== Before ==="
+        go env
         echo $GOPATH
         echo $GOBIN
         echo $PATH
+        export GOPATH=$(go env GOPATH)
         export GOBIN=$GOPATH/bin
         export PATH=$PATH:$GOBIN
         echo "=== After ==="
+        go env
         echo $GOPATH
         echo $GOBIN
         echo $PATH
