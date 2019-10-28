@@ -53,8 +53,9 @@ jobs:
     - name: Upload report to Codacy
       shell: bash
       run: |
-        go get github.com/schrej/godacov
-        godacov -t $CODACY_PROJECT_TOKEN -r ./coverage.txt -c $GITHUB_SHA
+        curl -Ls -o codacy-coverage-reporter "$(curl -Ls https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets | map({name, browser_download_url} | select(.name | contains("codacy-coverage-reporter-linux"))) | .[0].browser_download_url')"
+        chmod +x codacy-coverage-reporter
+        ./codacy-coverage-reporter report -l Go -r ./coverage.txt
       env:
         CODACY_PROJECT_TOKEN: ${{ secrets.codacy_token }}
       if: startsWith(matrix.vm-os, 'ubuntu')
