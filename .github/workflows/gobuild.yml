@@ -13,12 +13,12 @@ jobs:
     runs-on: ${{ matrix.vm-os }}
     strategy:
       max-parallel: 10
+      fail-fast: false
       matrix:
         vm-os: [ubuntu-latest, macOS-latest]
         go-version: [1.12.10, 1.13.3]
 
     steps:
-
     - name: Set up Go ${{ matrix.go-version }}
       uses: actions/setup-go@v1
       with:
@@ -44,10 +44,22 @@ jobs:
       run: ./build.sh ci
 
     - name: Upload report to Codecov
-      uses: codecov/codecov-action@v1.0.2
+      uses: codecov/codecov-action@v1.0.3
       with:
         token: ${{secrets.codecov_token}}
         file: ./coverage.txt
+      if: startsWith(matrix.vm-os, 'ubuntu')
+
+    - name: Upload report to Codacy
+      shell: bash
+      run: |
+        export GOPATH=$(go env GOPATH)
+        export GOBIN=$GOPATH/bin
+        export PATH=$PATH:$GOBIN
+        go get github.com/schrej/godacov
+        godacov -t $CODACY_PROJECT_TOKEN -r ./coverage.txt -c $GITHUB_SHA
+      env:
+        CODACY_PROJECT_TOKEN: ${{ secrets.codacy_token }}
       if: startsWith(matrix.vm-os, 'ubuntu')
 
     - name: Upload report to Code Climate
