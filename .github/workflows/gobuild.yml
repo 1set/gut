@@ -44,10 +44,19 @@ jobs:
       run: ./build.sh ci
 
     - name: Upload report to Codecov
-      uses: codecov/codecov-action@v1.0.2
+      uses: codecov/codecov-action@v1.0.3
       with:
         token: ${{secrets.codecov_token}}
         file: ./coverage.txt
+      if: startsWith(matrix.vm-os, 'ubuntu')
+
+    - name: Upload report to Codacy
+      shell: bash
+      run: |
+        go get github.com/schrej/godacov
+        godacov -t $CODACY_PROJECT_TOKEN -r ./coverage.txt -c $GITHUB_SHA
+      env:
+        CODACY_PROJECT_TOKEN: ${{ secrets.codacy_token }}
       if: startsWith(matrix.vm-os, 'ubuntu')
 
     - name: Upload report to Code Climate
