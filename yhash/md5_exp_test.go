@@ -4,7 +4,11 @@ import (
 	"testing"
 )
 
-var path = "/Users/vej/Desktop/20191030/hash_test/empty.txt"
+//var path = "/Users/vej/Desktop/20191030/hash_test/empty.txt"
+//var path = "/Users/vej/Desktop/20191030/hash_test/oneline.txt"
+//var path = "/Users/vej/Desktop/20191030/hash_test/188k.jpg"
+//var path = "/Users/vej/Desktop/20191030/hash_test/4m.jpg"
+var path = "/Users/vej/Desktop/20191030/hash_test/576m.mp4"
 
 func BenchmarkMD5v1(b *testing.B) {
 	for i := 0; i < b.N; i++ {
