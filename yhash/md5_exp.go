@@ -92,7 +92,7 @@ func MD5v4(filename string) (string, error) {
 }
 
 func MD5v5(filename string) (string, error) {
-	f, err := os.Open("file.txt")
+	f, err := os.Open(filename)
 	if err != nil {
 		return "", err
 	}
