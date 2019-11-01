@@ -112,6 +112,19 @@ func TestStringBytes(t *testing.T) {
 				{"4k bytes", bytes4k, "ba182851504af83589df0acd6ba850754d02cf61bff1ecd97ad810c34cfcdf79", false},
 			},
 		},
+		{
+			name:   "SHA384",
+			method: BytesSHA384,
+			cases: []hashTestCase{
+				{"nil", nil, "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b", false},
+				{"empty", []byte{}, "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b", false},
+				{"one zero", []byte{0}, "bec021b4f368e3069134e012c2b4307083d3a9bdd206e24e5f0d86e13d6636655933ec2b413465966817a9c208a11717", false},
+				{"one byte", []byte{88}, "754fe9beaa91bb7ae98bee55168e16c7b1f3c5aa54ccf83c28db3384633cace48639beee8cd005e3ebb6b95dd43c95b7", false},
+				{"two bytes", []byte{88, 89}, "e82e4ac84aee08256eba503c33d3e3ed2b147c62074e2f3e6dd6a66709785463fbc2f49ec2f31d97fc9f1d2a65070e4c", false},
+				{"three bytes", []byte{88, 89, 90}, "165f03f9bc00245fff1fa8febef2bc786eca3e11773b88f705d88ba3ccc26b63afb535029013bf682602ffc0eaaab482", false},
+				{"4k bytes", bytes4k, "4f0f52037db97d7c3cdc3f2c58d479ea212f2e2456a9a64335922e6942ad4237bb79c18d4a6fe212810ad3019c6ef9ec", false},
+			},
+		},
 	}
 	for _, ts := range tests {
 		for _, tt := range ts.cases {

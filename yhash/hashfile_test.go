@@ -185,6 +185,19 @@ func TestFileHash(t *testing.T) {
 				{"another small binary", "", "4d16089410a483860214a39730859e6b5a8a8b8e970911c79dd44ff331edde40", false},
 			},
 		},
+		{
+			name:   "SHA384",
+			method: FileSHA384,
+			cases: []hashTestCase{
+				{"file not found", "__FILE__NOT__EXIST__", "", true},
+				{"empty file", "", "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b", false},
+				{"one-line text file", "", "99514329186b2f6ae4a1329e7ee6c610a729636335174ac6b740f9028396fcc803d0e93863a7c3d90f86beee782f4f3f", false},
+				{"large text file", "", "b72c19d514ca52d6ed0bea994c705523c0e2de0eca61a1f0cfd2589f06d12436c69b5b26b83aacb5217626e6c7a2fc98", false},
+				{"xlarge text file", "", "929e8e1eff9b533ac203dc042a40cb54a63eda04e2b6430903daee5d1bab4206b520b0a57c31303955d98cb36e7906d1", false},
+				{"small binary file", "", "2e76b983134df83f43fbacb576992f07f87d8cd0620892ba19f8dde2a94ed904abda6d1fac5c5c7dda32dd99c387eb39", false},
+				{"another small binary", "", "1e0b8234559cbc8658851b6414810ee3a0b84222e3d49675a89eca50534419dccd3703410dedf13a6a0d9fde91451ed4", false},
+			},
+		},
 	}
 	for _, ts := range tests {
 		for _, tt := range ts.cases {

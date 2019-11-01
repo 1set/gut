@@ -99,6 +99,17 @@ func TestStringHash(t *testing.T) {
 				{"long string", strings.Repeat("Good", 70), "8b2428387ef532986b095492ce1afb949f797a125af101d655a5684c9fda6e8e", false},
 			},
 		},
+		{
+			name:   "SHA384",
+			method: StringSHA384,
+			cases: []hashTestCase{
+				{"empty string", "", "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b", false},
+				{"one-char string", "C", "7860d388ac9e470c83d65c4b0b66bdd00e6c96fbadc78882174e020fab9793a6221724b3df9a2ec99f9395d9a410b9ed", false},
+				{"str=123456789", "123456789", "eb455d56d2c1a69de64e832011f3393d45f3fa31d6842f21af92d2fe469c499da5e3179847334a18479c8d1dedea1be3", false},
+				{"str=你好(*´▽｀)ノノ", "你好(*´▽｀)ノノ", "7727682eb706834077dbe0b5c2497f32510dbfef2d82dec305a6241c14bcabbeeef18b908c426315a5e9671f91e7108d", false},
+				{"long string", strings.Repeat("Good", 70), "f7541651e7b249c7a8f99566ad119b2d303d63b1a447989f8c552ef7a1dd1e204421fb5b7bde30b61b00a31958786d60", false},
+			},
+		},
 	}
 	for _, ts := range tests {
 		for _, tt := range ts.cases {
