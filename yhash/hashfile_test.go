@@ -16,6 +16,7 @@ func TestMain(m *testing.M) {
 }
 
 var filePathMap = make(map[string]string)
+var benchmarkFilePath string
 
 func setup() {
 	tempFileContents := map[string]string{
@@ -45,6 +46,7 @@ func setup() {
 			_ = file.Close()
 		}
 	}
+	benchmarkFilePath = filePathMap["large text file"]
 }
 
 func teardown() {
@@ -54,50 +56,68 @@ func teardown() {
 }
 
 func BenchmarkFileMD5(b *testing.B) {
-	path, found := "", false
-	if path, found = filePathMap["large text file"]; !found {
+	if len(benchmarkFilePath) == 0 {
 		b.Errorf("FileMD5() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		FileMD5(path)
+		_, _ = FileMD5(benchmarkFilePath)
 	}
 }
 
 func BenchmarkFileSHA1(b *testing.B) {
-	path, found := "", false
-	if path, found = filePathMap["large text file"]; !found {
+	if len(benchmarkFilePath) == 0 {
 		b.Errorf("FileSHA1() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		FileSHA1(path)
+		_, _ = FileSHA1(benchmarkFilePath)
 	}
 }
 
 func BenchmarkFileSHA224(b *testing.B) {
-	path, found := "", false
-	if path, found = filePathMap["large text file"]; !found {
+	if len(benchmarkFilePath) == 0 {
 		b.Errorf("FileSHA224() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		FileSHA224(path)
+		_, _ = FileSHA224(benchmarkFilePath)
 	}
 }
 
 func BenchmarkFileSHA256(b *testing.B) {
-	path, found := "", false
-	if path, found = filePathMap["large text file"]; !found {
+	if len(benchmarkFilePath) == 0 {
 		b.Errorf("FileSHA256() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		FileSHA256(path)
+		_, _ = FileSHA256(benchmarkFilePath)
+	}
+}
+
+func BenchmarkFileSHA384(b *testing.B) {
+	if len(benchmarkFilePath) == 0 {
+		b.Errorf("FileSHA384() got no file for benchmark")
+		return
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = FileSHA384(benchmarkFilePath)
+	}
+}
+
+func BenchmarkFileSHA512(b *testing.B) {
+	if len(benchmarkFilePath) == 0 {
+		b.Errorf("FileSHA512() got no file for benchmark")
+		return
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = FileSHA512(benchmarkFilePath)
 	}
 }
 
@@ -163,6 +183,32 @@ func TestFileHash(t *testing.T) {
 				{"xlarge text file", "", "79ba34c7b43e2b6e4262ad966e2ba599ff53d553bd10fd73bbce096fd3ffa28f", false},
 				{"small binary file", "", "dcecab1355b5c2b9ecef281322bf265ac5840b4688748586e9632b473a5fe56b", false},
 				{"another small binary", "", "4d16089410a483860214a39730859e6b5a8a8b8e970911c79dd44ff331edde40", false},
+			},
+		},
+		{
+			name:   "SHA384",
+			method: FileSHA384,
+			cases: []hashTestCase{
+				{"file not found", "__FILE__NOT__EXIST__", "", true},
+				{"empty file", "", "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b", false},
+				{"one-line text file", "", "99514329186b2f6ae4a1329e7ee6c610a729636335174ac6b740f9028396fcc803d0e93863a7c3d90f86beee782f4f3f", false},
+				{"large text file", "", "b72c19d514ca52d6ed0bea994c705523c0e2de0eca61a1f0cfd2589f06d12436c69b5b26b83aacb5217626e6c7a2fc98", false},
+				{"xlarge text file", "", "929e8e1eff9b533ac203dc042a40cb54a63eda04e2b6430903daee5d1bab4206b520b0a57c31303955d98cb36e7906d1", false},
+				{"small binary file", "", "2e76b983134df83f43fbacb576992f07f87d8cd0620892ba19f8dde2a94ed904abda6d1fac5c5c7dda32dd99c387eb39", false},
+				{"another small binary", "", "1e0b8234559cbc8658851b6414810ee3a0b84222e3d49675a89eca50534419dccd3703410dedf13a6a0d9fde91451ed4", false},
+			},
+		},
+		{
+			name:   "SHA512",
+			method: FileSHA512,
+			cases: []hashTestCase{
+				{"file not found", "__FILE__NOT__EXIST__", "", true},
+				{"empty file", "", "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e", false},
+				{"one-line text file", "", "2c74fd17edafd80e8447b0d46741ee243b7eb74dd2149a0ab1b9246fb30382f27e853d8585719e0e67cbda0daa8f51671064615d645ae27acb15bfb1447f459b", false},
+				{"large text file", "", "ebbf86826b75d9283f4ad559d4a9a5f61e9de13095279dfda43a5c83b78251fa5eb642dfecb732f21052789912e6efe3e1b2b89ebb725820ed9148818f536f8a", false},
+				{"xlarge text file", "", "3aa8d4b6bcaeb74f4d0d7bdc0fe227865efac852a2b8edcb629230c9a8bb01eefc35de318a0d9d09f0a4bb1f8718e2fcaa511ec44e02d4f8d2354dc3edf045e0", false},
+				{"small binary file", "", "a85e09c3b5dbb560f4e03ba880047dbc8b4999a64c1f54fbfbca17ee0bcbed3bc6708d699190b56668e464a59358d6b534c3963a1329ba01db21075ef5bedace", false},
+				{"another small binary", "", "025eee01d2ab71d80d20c9aa461f83f6413cd9bf20d9ce9ff201d025b43f7df10609ef8d207fa31c8aa708653650bd80a3af5830f495f114e1d5d3cd909bb4d7", false},
 			},
 		},
 	}

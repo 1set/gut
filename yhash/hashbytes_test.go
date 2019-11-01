@@ -14,25 +14,37 @@ func init() {
 
 func BenchmarkBytesMD5(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		BytesMD5(bytes4k)
+		_, _ = BytesMD5(bytes4k)
 	}
 }
 
 func BenchmarkBytesSHA1(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		BytesSHA1(bytes4k)
+		_, _ = BytesSHA1(bytes4k)
 	}
 }
 
 func BenchmarkBytesSHA224(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		BytesSHA224(bytes4k)
+		_, _ = BytesSHA224(bytes4k)
 	}
 }
 
 func BenchmarkBytesSHA256(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		BytesSHA256(bytes4k)
+		_, _ = BytesSHA256(bytes4k)
+	}
+}
+
+func BenchmarkBytesSHA384(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = BytesSHA384(bytes4k)
+	}
+}
+
+func BenchmarkBytesSHA512(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = BytesSHA512(bytes4k)
 	}
 }
 
@@ -98,6 +110,32 @@ func TestStringBytes(t *testing.T) {
 				{"two bytes", []byte{88, 89}, "c07a3de039fbc0914689549f041eae295d621de7f7f647fd863f6d2f8db2080e", false},
 				{"three bytes", []byte{88, 89, 90}, "ade099751d2ea9f3393f0f32d20c6b980dd5d3b0989dea599b966ae0d3cd5a1e", false},
 				{"4k bytes", bytes4k, "ba182851504af83589df0acd6ba850754d02cf61bff1ecd97ad810c34cfcdf79", false},
+			},
+		},
+		{
+			name:   "SHA384",
+			method: BytesSHA384,
+			cases: []hashTestCase{
+				{"nil", nil, "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b", false},
+				{"empty", []byte{}, "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b", false},
+				{"one zero", []byte{0}, "bec021b4f368e3069134e012c2b4307083d3a9bdd206e24e5f0d86e13d6636655933ec2b413465966817a9c208a11717", false},
+				{"one byte", []byte{88}, "754fe9beaa91bb7ae98bee55168e16c7b1f3c5aa54ccf83c28db3384633cace48639beee8cd005e3ebb6b95dd43c95b7", false},
+				{"two bytes", []byte{88, 89}, "e82e4ac84aee08256eba503c33d3e3ed2b147c62074e2f3e6dd6a66709785463fbc2f49ec2f31d97fc9f1d2a65070e4c", false},
+				{"three bytes", []byte{88, 89, 90}, "165f03f9bc00245fff1fa8febef2bc786eca3e11773b88f705d88ba3ccc26b63afb535029013bf682602ffc0eaaab482", false},
+				{"4k bytes", bytes4k, "4f0f52037db97d7c3cdc3f2c58d479ea212f2e2456a9a64335922e6942ad4237bb79c18d4a6fe212810ad3019c6ef9ec", false},
+			},
+		},
+		{
+			name:   "SHA512",
+			method: BytesSHA512,
+			cases: []hashTestCase{
+				{"nil", nil, "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e", false},
+				{"empty", []byte{}, "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e", false},
+				{"one zero", []byte{0}, "b8244d028981d693af7b456af8efa4cad63d282e19ff14942c246e50d9351d22704a802a71c3580b6370de4ceb293c324a8423342557d4e5c38438f0e36910ee", false},
+				{"one byte", []byte{88}, "3173f0564ab9462b0978a765c1283f96f05ac9e9f8361ee1006dc905c153d85bf0e4c45622e5e990abcf48fb5192ad34722e8d6a723278b39fef9e4f9fc62378", false},
+				{"two bytes", []byte{88, 89}, "be50868b08abc38408269a76330c39e12119dd7e1581ff0910addc8de4e8f7f47874b494e33b8972448bd6c2cd329278b5dc439c555b12d3fad29a1f2dc28571", false},
+				{"three bytes", []byte{88, 89, 90}, "5f6bb0f20b1d682c099d6b7a487c83b2b399fa8587d3ce801909f91539589683a447fb382be91691362c7625cd909a0e07bf0389e2081f2c3af56ecdf93ea987", false},
+				{"4k bytes", bytes4k, "846b1834529bb78aa3ec393c82d38e0bc4be39490f16a44f9d4a01a11e6bb064551dda5f1dc315af788e388bbf7da5d44ff675ec9049c069f6398dd20636ec69", false},
 			},
 		},
 	}

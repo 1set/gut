@@ -5,35 +5,41 @@ import (
 	"testing"
 )
 
+var benchmarkContent = strings.Repeat("Angel", 1000)
+
 func BenchmarkStringMD5(b *testing.B) {
-	var content = strings.Repeat("Angel", 10)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		StringMD5(content)
+		_, _ = StringMD5(benchmarkContent)
 	}
 }
 
 func BenchmarkStringSHA1(b *testing.B) {
-	var content = strings.Repeat("Angel", 10)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		StringSHA1(content)
+		_, _ = StringSHA1(benchmarkContent)
 	}
 }
 
 func BenchmarkStringSHA224(b *testing.B) {
-	var content = strings.Repeat("Angel", 10)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		StringSHA224(content)
+		_, _ = StringSHA224(benchmarkContent)
 	}
 }
 
 func BenchmarkStringSHA256(b *testing.B) {
-	var content = strings.Repeat("Angel", 10)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		StringSHA256(content)
+		_, _ = StringSHA256(benchmarkContent)
+	}
+}
+
+func BenchmarkStringSHA384(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = StringSHA384(benchmarkContent)
+	}
+}
+
+func BenchmarkStringSHA512(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = StringSHA512(benchmarkContent)
 	}
 }
 
@@ -91,6 +97,28 @@ func TestStringHash(t *testing.T) {
 				{"str=123456789", "123456789", "15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225", false},
 				{"str=你好(*´▽｀)ノノ", "你好(*´▽｀)ノノ", "140340b962fada1ba3ed7fbc28f14f58fad155d450ca7d9c6b82f9817c9f7275", false},
 				{"long string", strings.Repeat("Good", 70), "8b2428387ef532986b095492ce1afb949f797a125af101d655a5684c9fda6e8e", false},
+			},
+		},
+		{
+			name:   "SHA384",
+			method: StringSHA384,
+			cases: []hashTestCase{
+				{"empty string", "", "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b", false},
+				{"one-char string", "C", "7860d388ac9e470c83d65c4b0b66bdd00e6c96fbadc78882174e020fab9793a6221724b3df9a2ec99f9395d9a410b9ed", false},
+				{"str=123456789", "123456789", "eb455d56d2c1a69de64e832011f3393d45f3fa31d6842f21af92d2fe469c499da5e3179847334a18479c8d1dedea1be3", false},
+				{"str=你好(*´▽｀)ノノ", "你好(*´▽｀)ノノ", "7727682eb706834077dbe0b5c2497f32510dbfef2d82dec305a6241c14bcabbeeef18b908c426315a5e9671f91e7108d", false},
+				{"long string", strings.Repeat("Good", 70), "f7541651e7b249c7a8f99566ad119b2d303d63b1a447989f8c552ef7a1dd1e204421fb5b7bde30b61b00a31958786d60", false},
+			},
+		},
+		{
+			name:   "SHA512",
+			method: StringSHA512,
+			cases: []hashTestCase{
+				{"empty string", "", "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e", false},
+				{"one-char string", "C", "3d637ae63d59522dd3cb1b81c1ad67e56d46185b0971e0bc7dd2d8ad3b26090acb634c252fc6a63b3766934314ea1a6e59fa0c8c2bc027a7b6a460b291cd4dfb", false},
+				{"str=123456789", "123456789", "d9e6762dd1c8eaf6d61b3c6192fc408d4d6d5f1176d0c29169bc24e71c3f274ad27fcd5811b313d681f7e55ec02d73d499c95455b6b5bb503acf574fba8ffe85", false},
+				{"str=你好(*´▽｀)ノノ", "你好(*´▽｀)ノノ", "e65feb8ccef3f84215b9605b5cc3b50c5e447a09e95c2c8da3eac14a2641b0e8cf8cb7995db54145ccd9655f77203a62c1de4ae6dff60bd752eb2f3f8df25464", false},
+				{"long string", strings.Repeat("Good", 70), "3d396d883ec6ebfce3296910e69d11bed38b7f430a0b765015c5a88a6a50c9f015f83fb35f32dfdd591e05ad583bb62694c4c938f7c71d27018eb4b1b018213e", false},
 			},
 		},
 	}
