@@ -21,8 +21,8 @@ func setup() {
 		"empty file":         "",
 		"one-line text file": "Hello World",
 		"large text file":    strings.Repeat("Stop managing your time. Start managing your focus. ", 10000),
+		"xlarge text file":   strings.Repeat("Do or do not, there is no try. ", 1000000),
 	}
-
 	for title, content := range testFileContents {
 		name := strings.ReplaceAll(title, " ", "_")
 		if file, err := ioutil.TempFile("", name); err == nil {
@@ -51,6 +51,7 @@ func TestFileMD5(t *testing.T) {
 		{"empty file", "", "d41d8cd98f00b204e9800998ecf8427e", false},
 		{"one-line text file", "", "b10a8db164e0754105b7a99be72e3fe5", false},
 		{"large text file", "", "3094ffc905b6a832d68ca27c86d52dc0", false},
+		{"xlarge text file", "", "0d9d7d9349c970fbf71b46698c5d1165", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
