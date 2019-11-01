@@ -14,25 +14,25 @@ func init() {
 
 func BenchmarkBytesMD5(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		BytesMD5(bytes4k)
+		_, _ = BytesMD5(bytes4k)
 	}
 }
 
 func BenchmarkBytesSHA1(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		BytesSHA1(bytes4k)
+		_, _ = BytesSHA1(bytes4k)
 	}
 }
 
 func BenchmarkBytesSHA224(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		BytesSHA224(bytes4k)
+		_, _ = BytesSHA224(bytes4k)
 	}
 }
 
 func BenchmarkBytesSHA256(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		BytesSHA256(bytes4k)
+		_, _ = BytesSHA256(bytes4k)
 	}
 }
 

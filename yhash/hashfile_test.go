@@ -61,7 +61,7 @@ func BenchmarkFileMD5(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		FileMD5(path)
+		_, _ = FileMD5(path)
 	}
 }
 
@@ -73,7 +73,7 @@ func BenchmarkFileSHA1(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		FileSHA1(path)
+		_, _ = FileSHA1(path)
 	}
 }
 
@@ -85,7 +85,7 @@ func BenchmarkFileSHA224(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		FileSHA224(path)
+		_, _ = FileSHA224(path)
 	}
 }
 
@@ -97,7 +97,7 @@ func BenchmarkFileSHA256(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		FileSHA256(path)
+		_, _ = FileSHA256(path)
 	}
 }
 

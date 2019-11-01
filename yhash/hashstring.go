@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
+	"crypto/sha512"
 )
 
 // StringMD5 returns MD5 checksum of the given string.
@@ -29,5 +30,17 @@ func StringSHA224(content string) (str string, err error) {
 // StringSHA256 returns SHA256 checksum of the given string.
 func StringSHA256(content string) (str string, err error) {
 	hash := sha256.New()
+	return calculateStringHash(&hash, content)
+}
+
+// StringSHA384 returns SHA384 checksum of the given string.
+func StringSHA384(content string) (str string, err error) {
+	hash := sha512.New384()
+	return calculateStringHash(&hash, content)
+}
+
+// StringSHA512 returns SHA512 checksum of the given string.
+func StringSHA512(content string) (str string, err error) {
+	hash := sha512.New()
 	return calculateStringHash(&hash, content)
 }

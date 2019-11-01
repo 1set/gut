@@ -9,7 +9,7 @@ func BenchmarkStringMD5(b *testing.B) {
 	var content = strings.Repeat("Angel", 10)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		StringMD5(content)
+		_, _ = StringMD5(content)
 	}
 }
 
@@ -17,7 +17,7 @@ func BenchmarkStringSHA1(b *testing.B) {
 	var content = strings.Repeat("Angel", 10)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		StringSHA1(content)
+		_, _ = StringSHA1(content)
 	}
 }
 
@@ -25,7 +25,7 @@ func BenchmarkStringSHA224(b *testing.B) {
 	var content = strings.Repeat("Angel", 10)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		StringSHA224(content)
+		_, _ = StringSHA224(content)
 	}
 }
 
@@ -33,7 +33,7 @@ func BenchmarkStringSHA256(b *testing.B) {
 	var content = strings.Repeat("Angel", 10)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		StringSHA256(content)
+		_, _ = StringSHA256(content)
 	}
 }
 
