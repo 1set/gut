@@ -133,6 +133,28 @@ func TestStringHash(t *testing.T) {
 				{"long string", strings.Repeat("Good", 70), "3d396d883ec6ebfce3296910e69d11bed38b7f430a0b765015c5a88a6a50c9f015f83fb35f32dfdd591e05ad583bb62694c4c938f7c71d27018eb4b1b018213e", false},
 			},
 		},
+		{
+			name:   "SHA512_224",
+			method: StringSHA512_224,
+			cases: []hashTestCase{
+				{"empty string", "", "6ed0dd02806fa89e25de060c19d3ac86cabb87d6a0ddd05c333b84f4", false},
+				{"one-char string", "C", "3d3cf3c31a76ad3b7c8d99f325e75a740c8878971cefd3659016129e", false},
+				{"str=123456789", "123456789", "f2a68a474bcbea375e9fc62eaab7b81fefbda64bb1c72d72e7c27314", false},
+				{"str=你好(*´▽｀)ノノ", "你好(*´▽｀)ノノ", "bfe1cd9624cf97d9de3710e1bd9a0d52f158fccc99f4e9cfeb94eac7", false},
+				{"long string", strings.Repeat("Good", 70), "e695ec53df09548c3c64933a704615a30bd756a6750cecfdc53c35f5", false},
+			},
+		},
+		{
+			name:   "SHA512_256",
+			method: StringSHA512_256,
+			cases: []hashTestCase{
+				{"empty string", "", "c672b8d1ef56ed28ab87c3622c5114069bdd3ad7b8f9737498d0c01ecef0967a", false},
+				{"one-char string", "C", "34b99f8dde1ba273c0a28cf5b2e4dbe497f8cb2453de0c8ba6d578c9431a62cb", false},
+				{"str=123456789", "123456789", "1877345237853a31ad79e14c1fcb0ddcd3df9973b61af7f906e4b4d052cc9416", false},
+				{"str=你好(*´▽｀)ノノ", "你好(*´▽｀)ノノ", "69cd771a348ac00c2866c444a8daa32ceab35683a8171dadc3858baac14adabc", false},
+				{"long string", strings.Repeat("Good", 70), "47655077f958003f7fd26b2ed1e95d4d889f7de4ae7915aba6578b64fe4f0837", false},
+			},
+		},
 	}
 	for _, ts := range tests {
 		for _, tt := range ts.cases {

@@ -233,6 +233,32 @@ func TestFileHash(t *testing.T) {
 				{"another small binary", "", "025eee01d2ab71d80d20c9aa461f83f6413cd9bf20d9ce9ff201d025b43f7df10609ef8d207fa31c8aa708653650bd80a3af5830f495f114e1d5d3cd909bb4d7", false},
 			},
 		},
+		{
+			name:   "SHA512_224",
+			method: FileSHA512_224,
+			cases: []hashTestCase{
+				{"file not found", "__FILE__NOT__EXIST__", "", true},
+				{"empty file", "", "6ed0dd02806fa89e25de060c19d3ac86cabb87d6a0ddd05c333b84f4", false},
+				{"one-line text file", "", "feca41095c80a571ae782f96bcef9ab81bdf0182509a6844f32c4c17", false},
+				{"large text file", "", "0bf0af89471ebec215018e6596d38dce46ac66f000ca1786aad03490", false},
+				{"xlarge text file", "", "08374eff5a420bc96e7dc3fd596c601cae8ccbec1b380e094a392574", false},
+				{"small binary file", "", "3ccd36a41c16eb62949ee655b6b02109e2ae3d6e5dbe8508f10d5a13", false},
+				{"another small binary", "", "5a31ba516b588cbdb6d76ff1c760b3a11691049ef6c36d071ba9b8e5", false},
+			},
+		},
+		{
+			name:   "SHA512_256",
+			method: FileSHA512_256,
+			cases: []hashTestCase{
+				{"file not found", "__FILE__NOT__EXIST__", "", true},
+				{"empty file", "", "c672b8d1ef56ed28ab87c3622c5114069bdd3ad7b8f9737498d0c01ecef0967a", false},
+				{"one-line text file", "", "ff20018851481c25bfc2e5d0c1e1fa57dac2a237a1a96192f99a10da47aa5442", false},
+				{"large text file", "", "0dbf2b5e21defb850acd8088eb025349e7aa2c8638d0eac4a221cb0103e0a82c", false},
+				{"xlarge text file", "", "912567be7c2b0b9dfdc71cd086672689a67bb53ee0c7c32b4b45a331f01ba195", false},
+				{"small binary file", "", "36dd5d7e2ec22d11864bcf18e27f3f2ee26ae027e123f4eed0280c8e30bd6694", false},
+				{"another small binary", "", "6b47bf188df953bed6353a90872b3fae8451d96843a0879706df58598779b124", false},
+			},
+		},
 	}
 	for _, ts := range tests {
 		for _, tt := range ts.cases {
