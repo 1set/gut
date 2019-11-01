@@ -5,6 +5,10 @@ import (
 )
 
 func TestBytesMD5(t *testing.T) {
+	bytes3000 := make([]byte, 0, 3000)
+	for i := 0; i < 1000; i++ {
+		bytes3000 = append(bytes3000, 0x41, 0x42, 0x43)
+	}
 	tests := []struct {
 		name    string
 		data    []byte
@@ -17,6 +21,7 @@ func TestBytesMD5(t *testing.T) {
 		{"one byte", []byte{88}, "02129bb861061d1a052c592e2dc6b383", false},
 		{"two bytes", []byte{88, 89}, "74c53bcd3dcb2bb79993b2fec37d362a", false},
 		{"three bytes", []byte{88, 89, 90}, "e65075d550f9b5bf9992fa1d71a131be", false},
+		{"3k bytes", bytes3000, "0c101c2013f996d63f1f01450a4c73e9", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -33,7 +38,7 @@ func TestBytesMD5(t *testing.T) {
 }
 
 func BenchmarkBytesMD5(b *testing.B) {
-	n := 1000
+	n := 3000
 	data := make([]byte, 0, n)
 	for i := 0; i < n; i++ {
 		data = append(data, byte(i%120))
@@ -45,6 +50,10 @@ func BenchmarkBytesMD5(b *testing.B) {
 }
 
 func TestBytesSHA1(t *testing.T) {
+	bytes3000 := make([]byte, 0, 3000)
+	for i := 0; i < 1000; i++ {
+		bytes3000 = append(bytes3000, 0x41, 0x42, 0x43)
+	}
 	tests := []struct {
 		name    string
 		data    []byte
@@ -57,6 +66,7 @@ func TestBytesSHA1(t *testing.T) {
 		{"one byte", []byte{88}, "c032adc1ff629c9b66f22749ad667e6beadf144b", false},
 		{"two bytes", []byte{88, 89}, "034f1965ccdbdf9e642feeb9858da5096b6d1a9a", false},
 		{"three bytes", []byte{88, 89, 90}, "717c4ecc723910edc13dd2491b0fae91442619da", false},
+		{"3k bytes", bytes3000, "7cdb527beffa8ad0ffea8b0d6d6a997aa505cd27", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -73,7 +83,7 @@ func TestBytesSHA1(t *testing.T) {
 }
 
 func BenchmarkBytesSHA1(b *testing.B) {
-	n := 1000
+	n := 3000
 	data := make([]byte, 0, n)
 	for i := 0; i < n; i++ {
 		data = append(data, byte(i%120))
