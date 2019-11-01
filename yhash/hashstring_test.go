@@ -37,6 +37,22 @@ func BenchmarkStringSHA256(b *testing.B) {
 	}
 }
 
+func BenchmarkStringSHA384(b *testing.B) {
+	var content = strings.Repeat("Angel", 10)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = StringSHA384(content)
+	}
+}
+
+func BenchmarkStringSHA512(b *testing.B) {
+	var content = strings.Repeat("Angel", 10)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = StringSHA512(content)
+	}
+}
+
 func TestStringHash(t *testing.T) {
 	type hashTestCase struct {
 		name    string

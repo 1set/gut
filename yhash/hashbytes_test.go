@@ -36,6 +36,18 @@ func BenchmarkBytesSHA256(b *testing.B) {
 	}
 }
 
+func BenchmarkBytesSHA384(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = BytesSHA384(bytes4k)
+	}
+}
+
+func BenchmarkBytesSHA512(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = BytesSHA512(bytes4k)
+	}
+}
+
 func TestStringBytes(t *testing.T) {
 	type hashTestCase struct {
 		name    string
