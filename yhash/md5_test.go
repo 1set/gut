@@ -14,7 +14,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-var filePathMap = make(map[string]string, 0)
+var filePathMap = make(map[string]string)
 
 func setup() {
 	testFileContents := map[string]string{
