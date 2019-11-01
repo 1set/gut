@@ -43,6 +43,18 @@ func BenchmarkStringSHA512(b *testing.B) {
 	}
 }
 
+func BenchmarkStringSHA512_224(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = StringSHA512_224(benchmarkContent)
+	}
+}
+
+func BenchmarkStringSHA512_256(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = StringSHA512_256(benchmarkContent)
+	}
+}
+
 func TestStringHash(t *testing.T) {
 	type hashTestCase struct {
 		name    string

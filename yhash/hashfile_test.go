@@ -121,6 +121,28 @@ func BenchmarkFileSHA512(b *testing.B) {
 	}
 }
 
+func BenchmarkFileSHA512_224(b *testing.B) {
+	if len(benchmarkFilePath) == 0 {
+		b.Errorf("FileSHA512_224() got no file for benchmark")
+		return
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = FileSHA512_224(benchmarkFilePath)
+	}
+}
+
+func BenchmarkFileSHA512_256(b *testing.B) {
+	if len(benchmarkFilePath) == 0 {
+		b.Errorf("FileSHA512_256() got no file for benchmark")
+		return
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = FileSHA512_256(benchmarkFilePath)
+	}
+}
+
 func TestFileHash(t *testing.T) {
 	type hashTestCase struct {
 		name     string
