@@ -202,3 +202,53 @@ func BenchmarkFileSHA224(b *testing.B) {
 		FileSHA224(path)
 	}
 }
+
+func TestFileSHA256(t *testing.T) {
+	tests := []struct {
+		name     string
+		filePath string
+		want     string
+		wantErr  bool
+	}{
+		{"file not found", "__FILE__NOT__EXIST__", "", true},
+		{"empty file", "", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", false},
+		{"one-line text file", "", "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e", false},
+		{"large text file", "", "0b05758ca33d8a49752a05b695824785b0ba56689d478250eb9f6b7b9057e6f8", false},
+		{"xlarge text file", "", "79ba34c7b43e2b6e4262ad966e2ba599ff53d553bd10fd73bbce096fd3ffa28f", false},
+		{"small binary file", "", "dcecab1355b5c2b9ecef281322bf265ac5840b4688748586e9632b473a5fe56b", false},
+		{"another small binary", "", "4d16089410a483860214a39730859e6b5a8a8b8e970911c79dd44ff331edde40", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			filePath := tt.filePath
+			if len(tt.filePath) == 0 {
+				var found bool
+				if filePath, found = filePathMap[tt.name]; !found {
+					t.Errorf("FileSHA256() got no file for case '%v'", tt.name)
+					return
+				}
+			}
+
+			got, err := FileSHA256(filePath)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FileSHA256() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("FileSHA256() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func BenchmarkFileSHA256(b *testing.B) {
+	path, found := "", false
+	if path, found = filePathMap["large text file"]; !found {
+		b.Errorf("FileSHA256() got no file for benchmark")
+		return
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		FileSHA256(path)
+	}
+}

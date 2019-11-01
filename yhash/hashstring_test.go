@@ -109,3 +109,38 @@ func BenchmarkStringSHA224(b *testing.B) {
 		StringSHA224(content)
 	}
 }
+
+func TestStringSHA256(t *testing.T) {
+	tests := []struct {
+		name    string
+		content string
+		wantStr string
+		wantErr bool
+	}{
+		{"empty string", "", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", false},
+		{"one-char string", "C", "6b23c0d5f35d1b11f9b683f0b0a617355deb11277d91ae091d399c655b87940d", false},
+		{"str=123456789", "123456789", "15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225", false},
+		{"str=你好(*´▽｀)ノノ", "你好(*´▽｀)ノノ", "140340b962fada1ba3ed7fbc28f14f58fad155d450ca7d9c6b82f9817c9f7275", false},
+		{"long string", strings.Repeat("Good", 70), "8b2428387ef532986b095492ce1afb949f797a125af101d655a5684c9fda6e8e", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotStr, err := StringSHA256(tt.content)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("StringSHA256() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotStr != tt.wantStr {
+				t.Errorf("StringSHA256() gotStr = %v, want %v", gotStr, tt.wantStr)
+			}
+		})
+	}
+}
+
+func BenchmarkStringSHA256(b *testing.B) {
+	var content = strings.Repeat("Angel", 10)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		StringSHA256(content)
+	}
+}

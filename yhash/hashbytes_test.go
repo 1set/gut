@@ -116,3 +116,38 @@ func BenchmarkBytesSHA224(b *testing.B) {
 		BytesSHA224(bytes4k)
 	}
 }
+
+func TestBytesSHA256(t *testing.T) {
+	tests := []struct {
+		name    string
+		data    []byte
+		wantStr string
+		wantErr bool
+	}{
+		{"nil", nil, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", false},
+		{"empty", []byte{}, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", false},
+		{"one zero", []byte{0}, "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d", false},
+		{"one byte", []byte{88}, "4b68ab3847feda7d6c62c1fbcbeebfa35eab7351ed5e78f4ddadea5df64b8015", false},
+		{"two bytes", []byte{88, 89}, "c07a3de039fbc0914689549f041eae295d621de7f7f647fd863f6d2f8db2080e", false},
+		{"three bytes", []byte{88, 89, 90}, "ade099751d2ea9f3393f0f32d20c6b980dd5d3b0989dea599b966ae0d3cd5a1e", false},
+		{"4k bytes", bytes4k, "ba182851504af83589df0acd6ba850754d02cf61bff1ecd97ad810c34cfcdf79", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotStr, err := BytesSHA256(tt.data)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("BytesSHA256() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotStr != tt.wantStr {
+				t.Errorf("BytesSHA256() gotStr = %v, want %v", gotStr, tt.wantStr)
+			}
+		})
+	}
+}
+
+func BenchmarkBytesSHA256(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		BytesSHA256(bytes4k)
+	}
+}
