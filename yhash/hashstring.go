@@ -21,26 +21,38 @@ func StringSHA1(content string) (str string, err error) {
 	return calculateStringHash(&hash, content)
 }
 
-// StringSHA224 returns SHA224 checksum of the given string.
+// StringSHA224 returns SHA-224 checksum of the given string.
 func StringSHA224(content string) (str string, err error) {
 	hash := sha256.New224()
 	return calculateStringHash(&hash, content)
 }
 
-// StringSHA256 returns SHA256 checksum of the given string.
+// StringSHA256 returns SHA-256 checksum of the given string.
 func StringSHA256(content string) (str string, err error) {
 	hash := sha256.New()
 	return calculateStringHash(&hash, content)
 }
 
-// StringSHA384 returns SHA384 checksum of the given string.
+// StringSHA384 returns SHA-384 checksum of the given string.
 func StringSHA384(content string) (str string, err error) {
 	hash := sha512.New384()
 	return calculateStringHash(&hash, content)
 }
 
-// StringSHA512 returns SHA512 checksum of the given string.
+// StringSHA512 returns SHA-512 checksum of the given string.
 func StringSHA512(content string) (str string, err error) {
 	hash := sha512.New()
+	return calculateStringHash(&hash, content)
+}
+
+// StringSHA512_224 returns SHA-512/224 checksum of the given string.
+func StringSHA512_224(content string) (str string, err error) {
+	hash := sha512.New512_224()
+	return calculateStringHash(&hash, content)
+}
+
+// StringSHA512_256 returns SHA-512/256 checksum of the given string.
+func StringSHA512_256(content string) (str string, err error) {
+	hash := sha512.New512_256()
 	return calculateStringHash(&hash, content)
 }

@@ -48,6 +48,18 @@ func BenchmarkBytesSHA512(b *testing.B) {
 	}
 }
 
+func BenchmarkBytesSHA512_224(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = BytesSHA512_224(bytes4k)
+	}
+}
+
+func BenchmarkBytesSHA512_256(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = BytesSHA512_256(bytes4k)
+	}
+}
+
 func TestStringBytes(t *testing.T) {
 	type hashTestCase struct {
 		name    string
@@ -136,6 +148,32 @@ func TestStringBytes(t *testing.T) {
 				{"two bytes", []byte{88, 89}, "be50868b08abc38408269a76330c39e12119dd7e1581ff0910addc8de4e8f7f47874b494e33b8972448bd6c2cd329278b5dc439c555b12d3fad29a1f2dc28571", false},
 				{"three bytes", []byte{88, 89, 90}, "5f6bb0f20b1d682c099d6b7a487c83b2b399fa8587d3ce801909f91539589683a447fb382be91691362c7625cd909a0e07bf0389e2081f2c3af56ecdf93ea987", false},
 				{"4k bytes", bytes4k, "846b1834529bb78aa3ec393c82d38e0bc4be39490f16a44f9d4a01a11e6bb064551dda5f1dc315af788e388bbf7da5d44ff675ec9049c069f6398dd20636ec69", false},
+			},
+		},
+		{
+			name:   "SHA512_224",
+			method: BytesSHA512_224,
+			cases: []hashTestCase{
+				{"nil", nil, "6ed0dd02806fa89e25de060c19d3ac86cabb87d6a0ddd05c333b84f4", false},
+				{"empty", []byte{}, "6ed0dd02806fa89e25de060c19d3ac86cabb87d6a0ddd05c333b84f4", false},
+				{"one zero", []byte{0}, "283bb59af7081ed08197227d8f65b9591ffe1155be43e9550e57f941", false},
+				{"one byte", []byte{88}, "01e78dd7ef0d96663d444aafb3006f32416302e180072414aebbaa96", false},
+				{"two bytes", []byte{88, 89}, "e8c867a198dc3a153686076889417120c00cfe9e9f7524d4edf2f18e", false},
+				{"three bytes", []byte{88, 89, 90}, "e4866f342fad8a8ef5e9fc394d278d0aa6bc6b168112a6a0b69109b2", false},
+				{"4k bytes", bytes4k, "05abf6cdef6a93e520be3572965db66c46c04cc3ce78288c39d5519c", false},
+			},
+		},
+		{
+			name:   "SHA512_256",
+			method: BytesSHA512_256,
+			cases: []hashTestCase{
+				{"nil", nil, "c672b8d1ef56ed28ab87c3622c5114069bdd3ad7b8f9737498d0c01ecef0967a", false},
+				{"empty", []byte{}, "c672b8d1ef56ed28ab87c3622c5114069bdd3ad7b8f9737498d0c01ecef0967a", false},
+				{"one zero", []byte{0}, "10baad1713566ac2333467bddb0597dec9066120dd72ac2dcb8394221dcbe43d", false},
+				{"one byte", []byte{88}, "c41bb2432aa6ae37767a03137a09c2e7fb51ae07b59ee0f48828031f32f20f77", false},
+				{"two bytes", []byte{88, 89}, "60650bbde4f5f291d9094e81dea0c6d0ce25d7d30609e7ce875a7161d92409da", false},
+				{"three bytes", []byte{88, 89, 90}, "314c27d6eb571b864f6a80800d004d0fd188e96153089ede4b0ebc27bf84be98", false},
+				{"4k bytes", bytes4k, "243e3628ee74ceac96b153fc9a768c3a6c6c94933c585f26b63fa7ef565568b8", false},
 			},
 		},
 	}
