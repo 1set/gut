@@ -81,3 +81,38 @@ func BenchmarkBytesSHA1(b *testing.B) {
 		BytesSHA1(bytes4k)
 	}
 }
+
+func TestBytesSHA224(t *testing.T) {
+	tests := []struct {
+		name    string
+		data    []byte
+		wantStr string
+		wantErr bool
+	}{
+		{"nil", nil, "d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f", false},
+		{"empty", []byte{}, "d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f", false},
+		{"one zero", []byte{0}, "fff9292b4201617bdc4d3053fce02734166a683d7d858a7f5f59b073", false},
+		{"one byte", []byte{88}, "f00bdeb2cd9da240a57c951fdf1bcba509fd0cd83c5e5ad9a669de12", false},
+		{"two bytes", []byte{88, 89}, "a3a149bd66cd66e971d8ca4c12394818f6c63bca01a0d8c6b730f0d7", false},
+		{"three bytes", []byte{88, 89, 90}, "cc8660476871488742e0cac93a996a1b4fab7d3b7e3df10412cc0059", false},
+		{"4k bytes", bytes4k, "082947382dc751e6f5bbc59224b2758b7ce99627210715ba0ab6bced", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotStr, err := BytesSHA224(tt.data)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("BytesSHA224() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotStr != tt.wantStr {
+				t.Errorf("BytesSHA224() gotStr = %v, want %v", gotStr, tt.wantStr)
+			}
+		})
+	}
+}
+
+func BenchmarkBytesSHA224(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		BytesSHA224(bytes4k)
+	}
+}
