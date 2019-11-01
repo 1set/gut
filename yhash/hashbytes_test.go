@@ -125,6 +125,19 @@ func TestStringBytes(t *testing.T) {
 				{"4k bytes", bytes4k, "4f0f52037db97d7c3cdc3f2c58d479ea212f2e2456a9a64335922e6942ad4237bb79c18d4a6fe212810ad3019c6ef9ec", false},
 			},
 		},
+		{
+			name:   "SHA512",
+			method: BytesSHA512,
+			cases: []hashTestCase{
+				{"nil", nil, "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e", false},
+				{"empty", []byte{}, "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e", false},
+				{"one zero", []byte{0}, "b8244d028981d693af7b456af8efa4cad63d282e19ff14942c246e50d9351d22704a802a71c3580b6370de4ceb293c324a8423342557d4e5c38438f0e36910ee", false},
+				{"one byte", []byte{88}, "3173f0564ab9462b0978a765c1283f96f05ac9e9f8361ee1006dc905c153d85bf0e4c45622e5e990abcf48fb5192ad34722e8d6a723278b39fef9e4f9fc62378", false},
+				{"two bytes", []byte{88, 89}, "be50868b08abc38408269a76330c39e12119dd7e1581ff0910addc8de4e8f7f47874b494e33b8972448bd6c2cd329278b5dc439c555b12d3fad29a1f2dc28571", false},
+				{"three bytes", []byte{88, 89, 90}, "5f6bb0f20b1d682c099d6b7a487c83b2b399fa8587d3ce801909f91539589683a447fb382be91691362c7625cd909a0e07bf0389e2081f2c3af56ecdf93ea987", false},
+				{"4k bytes", bytes4k, "846b1834529bb78aa3ec393c82d38e0bc4be39490f16a44f9d4a01a11e6bb064551dda5f1dc315af788e388bbf7da5d44ff675ec9049c069f6398dd20636ec69", false},
+			},
+		},
 	}
 	for _, ts := range tests {
 		for _, tt := range ts.cases {
