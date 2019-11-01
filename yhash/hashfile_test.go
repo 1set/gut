@@ -16,6 +16,7 @@ func TestMain(m *testing.M) {
 }
 
 var filePathMap = make(map[string]string)
+var benchmarkFilePath string
 
 func setup() {
 	tempFileContents := map[string]string{
@@ -45,6 +46,7 @@ func setup() {
 			_ = file.Close()
 		}
 	}
+	benchmarkFilePath = filePathMap["large text file"]
 }
 
 func teardown() {
@@ -54,74 +56,68 @@ func teardown() {
 }
 
 func BenchmarkFileMD5(b *testing.B) {
-	path, found := "", false
-	if path, found = filePathMap["large text file"]; !found {
+	if len(benchmarkFilePath) == 0 {
 		b.Errorf("FileMD5() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileMD5(path)
+		_, _ = FileMD5(benchmarkFilePath)
 	}
 }
 
 func BenchmarkFileSHA1(b *testing.B) {
-	path, found := "", false
-	if path, found = filePathMap["large text file"]; !found {
+	if len(benchmarkFilePath) == 0 {
 		b.Errorf("FileSHA1() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA1(path)
+		_, _ = FileSHA1(benchmarkFilePath)
 	}
 }
 
 func BenchmarkFileSHA224(b *testing.B) {
-	path, found := "", false
-	if path, found = filePathMap["large text file"]; !found {
+	if len(benchmarkFilePath) == 0 {
 		b.Errorf("FileSHA224() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA224(path)
+		_, _ = FileSHA224(benchmarkFilePath)
 	}
 }
 
 func BenchmarkFileSHA256(b *testing.B) {
-	path, found := "", false
-	if path, found = filePathMap["large text file"]; !found {
+	if len(benchmarkFilePath) == 0 {
 		b.Errorf("FileSHA256() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA256(path)
+		_, _ = FileSHA256(benchmarkFilePath)
 	}
 }
 
 func BenchmarkFileSHA384(b *testing.B) {
-	path, found := "", false
-	if path, found = filePathMap["large text file"]; !found {
+	if len(benchmarkFilePath) == 0 {
 		b.Errorf("FileSHA384() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA384(path)
+		_, _ = FileSHA384(benchmarkFilePath)
 	}
 }
 
 func BenchmarkFileSHA512(b *testing.B) {
-	path, found := "", false
-	if path, found = filePathMap["large text file"]; !found {
+	if len(benchmarkFilePath) == 0 {
 		b.Errorf("FileSHA512() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA512(path)
+		_, _ = FileSHA512(benchmarkFilePath)
 	}
 }
 

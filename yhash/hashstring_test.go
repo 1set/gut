@@ -5,51 +5,41 @@ import (
 	"testing"
 )
 
+var benchmarkContent = strings.Repeat("Angel", 1000)
+
 func BenchmarkStringMD5(b *testing.B) {
-	var content = strings.Repeat("Angel", 10)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = StringMD5(content)
+		_, _ = StringMD5(benchmarkContent)
 	}
 }
 
 func BenchmarkStringSHA1(b *testing.B) {
-	var content = strings.Repeat("Angel", 10)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = StringSHA1(content)
+		_, _ = StringSHA1(benchmarkContent)
 	}
 }
 
 func BenchmarkStringSHA224(b *testing.B) {
-	var content = strings.Repeat("Angel", 10)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = StringSHA224(content)
+		_, _ = StringSHA224(benchmarkContent)
 	}
 }
 
 func BenchmarkStringSHA256(b *testing.B) {
-	var content = strings.Repeat("Angel", 10)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = StringSHA256(content)
+		_, _ = StringSHA256(benchmarkContent)
 	}
 }
 
 func BenchmarkStringSHA384(b *testing.B) {
-	var content = strings.Repeat("Angel", 10)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = StringSHA384(content)
+		_, _ = StringSHA384(benchmarkContent)
 	}
 }
 
 func BenchmarkStringSHA512(b *testing.B) {
-	var content = strings.Repeat("Angel", 10)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = StringSHA512(content)
+		_, _ = StringSHA512(benchmarkContent)
 	}
 }
 
