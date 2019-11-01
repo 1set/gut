@@ -20,6 +20,12 @@ func FileSHA1(filePath string) (str string, err error) {
 	return calculateFileHash(&hash, filePath)
 }
 
+// FileSHA224 returns SHA224 checksum of the named file.
+func FileSHA224(filePath string) (str string, err error) {
+	hash := sha256.New224()
+	return calculateFileHash(&hash, filePath)
+}
+
 // FileSHA256 returns SHA256 checksum of the named file.
 func FileSHA256(filePath string) (str string, err error) {
 	hash := sha256.New()

@@ -20,6 +20,12 @@ func BytesSHA1(data []byte) (str string, err error) {
 	return calculateBytesHash(&hash, data)
 }
 
+// BytesSHA224 returns SHA224 checksum of the given bytes.
+func BytesSHA224(data []byte) (str string, err error) {
+	hash := sha256.New224()
+	return calculateBytesHash(&hash, data)
+}
+
 // BytesSHA256 returns SHA256 checksum of the given bytes.
 func BytesSHA256(data []byte) (str string, err error) {
 	hash := sha256.New()

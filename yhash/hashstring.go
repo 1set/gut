@@ -20,6 +20,12 @@ func StringSHA1(content string) (str string, err error) {
 	return calculateStringHash(&hash, content)
 }
 
+// StringSHA224 returns SHA224 checksum of the given string.
+func StringSHA224(content string) (str string, err error) {
+	hash := sha256.New224()
+	return calculateStringHash(&hash, content)
+}
+
 // StringSHA256 returns SHA256 checksum of the given string.
 func StringSHA256(content string) (str string, err error) {
 	hash := sha256.New()
