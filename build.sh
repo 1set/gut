@@ -1,13 +1,20 @@
 #!/bin/bash
 
 CHOICE="$1"
+TARGET="$2"
 
 set -eu
 
-printf "====== Begin at %s, Mode: %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$CHOICE"
+if [[ -z "$TARGET" ]]; then
+    TARGET="./y*"
+else
+    TARGET=("$TARGET")
+fi
+
+printf "====== Begin at %s, Mode: %s - %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$CHOICE" "$TARGET"
 
 COUNT=0
-for FOLDER in ./y*
+for FOLDER in $TARGET
 do
     PACKAGE="${FOLDER##*/}"
     if [[ ! -d "$PACKAGE" ]]; then
