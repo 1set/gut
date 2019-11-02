@@ -19,7 +19,7 @@ Code Quality:
 Test Coverage:
 [![Codecov](https://img.shields.io/codecov/c/gh/an63/gut)](https://codecov.io/gh/an63/gut)
 
-Misc:
+Miscellaneous:
 [![DeepSource](https://static.deepsource.io/deepsource-badge-light.svg)](https://deepsource.io/gh/an63/gut/?ref=repository-badge)
 
 Yet another collection of **G**o **u**tilities & **t**ools.
@@ -27,3 +27,4 @@ Yet another collection of **G**o **u**tilities & **t**ools.
 ## Packages
 
 -   [`yrand`](https://godoc.org/github.com/an63/gut/yrand): yet another wrapper of **crypto/rand** with func like **math/rand**
+-   [`yhash`](https://godoc.org/github.com/an63/gut/yhash): collection of helper methods to calculate checksum with algorithms like MD5, SHA-1, SHA-256 etc
