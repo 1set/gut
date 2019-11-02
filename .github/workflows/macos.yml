@@ -30,6 +30,15 @@ jobs:
       with:
         fetch-depth: 2
 
+    - name: Get dependencies
+      shell: bash
+      run: |
+        go get -v -t -d ./...
+        if [ -f Gopkg.toml ]; then
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+        fi
+
     - name: Build & Test
       shell: bash
       run: ./build.sh ci

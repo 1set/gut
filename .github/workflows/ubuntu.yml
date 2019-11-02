@@ -1,4 +1,4 @@
-name: ubuntu
+name: Ubuntu
 on:
   push:
     paths-ignore:
@@ -9,7 +9,7 @@ on:
 jobs:
 
   build:
-    name: Build on ubuntu
+    name: Build on Ubuntu
     runs-on: ${{ matrix.vm-os }}
     strategy:
       max-parallel: 10
@@ -29,6 +29,15 @@ jobs:
       uses: actions/checkout@v1
       with:
         fetch-depth: 2
+
+    - name: Get dependencies
+      shell: bash
+      run: |
+        go get -v -t -d ./...
+        if [ -f Gopkg.toml ]; then
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+        fi
 
     - name: Build & Test
       shell: bash
