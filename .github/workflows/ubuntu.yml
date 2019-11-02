@@ -1,4 +1,4 @@
-name: build
+name: Ubuntu
 on:
   push:
     paths-ignore:
@@ -9,13 +9,13 @@ on:
 jobs:
 
   build:
-    name: Build
+    name: Build on Ubuntu
     runs-on: ${{ matrix.vm-os }}
     strategy:
       max-parallel: 10
       fail-fast: false
       matrix:
-        vm-os: [ubuntu-latest, macOS-latest]
+        vm-os: [ubuntu-latest]
         go-version: [1.12.10, 1.13.3]
 
     steps:
@@ -48,7 +48,6 @@ jobs:
       with:
         token: ${{secrets.codecov_token}}
         file: ./coverage.txt
-      if: startsWith(matrix.vm-os, 'ubuntu')
 
     - name: Upload report to Codacy
       shell: bash
@@ -60,7 +59,6 @@ jobs:
         godacov -t $CODACY_PROJECT_TOKEN -r ./coverage.txt -c $GITHUB_SHA
       env:
         CODACY_PROJECT_TOKEN: ${{ secrets.codacy_token }}
-      if: startsWith(matrix.vm-os, 'ubuntu')
 
     - name: Upload report to Code Climate
       shell: bash
@@ -73,7 +71,6 @@ jobs:
         ./cc-test-reporter upload-coverage
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.cc_report_id }}
-      if: startsWith(matrix.vm-os, 'ubuntu')
 
     - name: Upload report to DeepSource
       shell: bash
@@ -82,4 +79,3 @@ jobs:
         ./bin/deepsource report --analyzer test-coverage --key go --value-file ./coverage.txt
       env:
         DEEPSOURCE_DSN: ${{ secrets.deepsource_dsn }}
-      if: startsWith(matrix.vm-os, 'ubuntu')

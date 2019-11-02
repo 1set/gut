@@ -10,3 +10,7 @@ enabled = true
 
   [analyzers.meta]
   import_path = "github.com/an63/gut"
+
+[[analyzers]]
+name = "test-coverage"
+enabled = true
