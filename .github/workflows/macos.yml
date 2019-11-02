@@ -1,0 +1,35 @@
+name: macOS
+on:
+  push:
+    paths-ignore:
+    - '**.md'
+  schedule:
+    - cron:  '0 21 * * *'
+
+jobs:
+
+  build:
+    name: Build on macOS
+    runs-on: ${{ matrix.vm-os }}
+    strategy:
+      max-parallel: 10
+      fail-fast: false
+      matrix:
+        vm-os: [macOS-latest]
+        go-version: [1.12.10, 1.13.3]
+
+    steps:
+    - name: Set up Go ${{ matrix.go-version }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go-version }}
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1
+      with:
+        fetch-depth: 2
+
+    - name: Build & Test
+      shell: bash
+      run: ./build.sh ci
