@@ -27,4 +27,4 @@ Yet another collection of **G**o **u**tilities & **t**ools.
 ## Packages
 
 -   [`yrand`](https://godoc.org/github.com/an63/gut/yrand): yet another wrapper of **crypto/rand** with func like **math/rand**
--   [`yhash`](https://godoc.org/github.com/an63/gut/yhash): collection of helper methods to calculate checksum with algorithms like MD5, SHA-1, SHA-256 etc
+-   [`yhash`](https://godoc.org/github.com/an63/gut/yhash): yet another collection of methods to calculate checksum of file/string/bytes
