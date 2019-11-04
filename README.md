@@ -1,6 +1,6 @@
 # gut℠
 
-Yet another collection of **G**o **u**tilities & **t**ools.
+Yet another collection of **G**o **u**tilities & **t**ools. A simple one. Just **go** with your **gut** feeling.
 
 <table>
     <tbody>
