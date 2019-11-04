@@ -1,6 +1,9 @@
 # gut℠
 
-Yet another collection of **G**o **u**tilities & **t**ools. A simple one. Just **go** with your **gut** feeling.
+Yet another collection of **G**o **u**tilities & **t**ools.    
+A simple one. Just **go** with your **gut** feeling.
+
+---
 
 <table>
     <tbody>
@@ -72,7 +75,7 @@ Yet another collection of **G**o **u**tilities & **t**ools. A simple one. Just *
     </tbody>
 </table>
 
-Miscellaneous:  
+Miscellaneous:    
 [![DeepSource](https://static.deepsource.io/deepsource-badge-light.svg)](https://deepsource.io/gh/an63/gut/?ref=repository-badge)
 
 ## Packages
