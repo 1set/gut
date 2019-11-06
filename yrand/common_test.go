@@ -53,7 +53,7 @@ func BenchmarkIsEqualFloat(b *testing.B) {
 }
 
 func TestIterateRandomNumbers(t *testing.T) {
-	numbers := make([]uint64, 0)
+	var numbers []uint64
 	recordNumbers := func(num uint64) error {
 		numbers = append(numbers, num)
 		return nil

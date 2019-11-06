@@ -14,10 +14,12 @@ var (
 	errChoiceEmpty     = errors.New("slice should not be empty")
 )
 
+// Check if two float numbers are equal within a given tolerance.
 func isEqualFloat(a, b, tolerance float64) bool {
 	return math.Abs(a-b) <= tolerance
 }
 
+// Iterate over an newly generated list of `count` random uint64 numbers in [0, `max`).
 func iterateRandomNumbers(count int, max uint64, callback func(uint64) error) (err error) {
 	if count <= 0 {
 		err = errIterateCount
@@ -50,6 +52,7 @@ func iterateRandomNumbers(count int, max uint64, callback func(uint64) error) (e
 	return
 }
 
+// Returns a random int number in [0, `max`) for index purpose.
 func randomIndex(max int) (idx int, err error) {
 	if max <= 0 {
 		err = errChoiceEmpty
