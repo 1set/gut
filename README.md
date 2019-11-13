@@ -1,9 +1,9 @@
 # gut℠
 
-Yet another collection of **G**o **u**tilities & **t**ools.    
+Yet another collection of **G**o **u**tilities & **t**ools.  
 A simple one. Just **go** with your **gut** feeling.
 
----
+* * *
 
 <table>
     <tbody>
@@ -61,7 +61,7 @@ A simple one. Just **go** with your **gut** feeling.
                         src="https://api.codacy.com/project/badge/Grade/f70fcc271c3e4785a3dfb87739a44cd0"
                         referrerpolicy="no-referrer" alt="Codacy Badge"></a>
                 <a href='https://codeclimate.com/github/1set/gut/maintainability'><img
-                        src="https://api.codeclimate.com/v1/badges/c92481b34278a763bb88/maintainability"
+                        src="https://api.codeclimate.com/v1/badges/6217d80425ed0b096664/maintainability"
                         referrerpolicy="no-referrer" alt="Code Climate Maintainability"></a>
             </td>
         </tr>
@@ -70,15 +70,12 @@ A simple one. Just **go** with your **gut** feeling.
                 Test Coverage
             </td>
             <td align="left" valign="middle">
-                <a href='https://codecov.io/gh/1set/gut'><img src="https://img.shields.io/codecov/c/gh/1set/gut"
+                <a href='https://codecov.io/gh/1set/gut'><img src="https://codecov.io/gh/1set/gut/branch/master/graph/badge.svg"
                         referrerpolicy="no-referrer" alt="Codecov"></a>
             </td>
         </tr>
     </tbody>
 </table>
-
-Miscellaneous:    
-[![DeepSource](https://static.deepsource.io/deepsource-badge-light.svg)](https://deepsource.io/gh/1set/gut/?ref=repository-badge)
 
 ## Packages
 
