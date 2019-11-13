@@ -3,7 +3,7 @@ package yrand_test
 import (
 	"fmt"
 
-	"github.com/an63/gut/yrand"
+	"github.com/1set/gut/yrand"
 )
 
 // This example generates a random 6-digit PIN.

@@ -3,7 +3,7 @@ package yhash_test
 import (
 	"fmt"
 
-	"github.com/an63/gut/yhash"
+	"github.com/1set/gut/yhash"
 )
 
 // This example calculates MD5 checksum of "doc.go" file in current folder.

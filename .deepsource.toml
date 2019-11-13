@@ -9,7 +9,7 @@ name = "go"
 enabled = true
 
   [analyzers.meta]
-  import_path = "github.com/an63/gut"
+  import_path = "github.com/1set/gut"
 
 [[analyzers]]
 name = "test-coverage"
