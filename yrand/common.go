@@ -21,11 +21,12 @@ func isEqualFloat(a, b, tolerance float64) bool {
 
 // Iterates over an newly generated list of `count` random uint64 numbers in [0, `max`).
 func iterateRandomNumbers(count int, max uint64, callback func(uint64) error) (err error) {
-	if count <= 0 {
+	switch {
+	case count <= 0:
 		err = errIterateCount
-	} else if max <= 1 {
+	case max <= 1:
 		err = errIterateMax
-	} else if callback == nil {
+	case callback == nil:
 		err = errIterateCallback
 	}
 	if err != nil {
@@ -34,7 +35,6 @@ func iterateRandomNumbers(count int, max uint64, callback func(uint64) error) (e
 
 	randBig := new(big.Int)
 	randBytes := make([]byte, 8)
-
 	for left := count; left > 0; {
 		if _, err = rand.Read(randBytes); err != nil {
 			return
