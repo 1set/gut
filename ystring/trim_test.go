@@ -6,8 +6,6 @@ import (
 
 var (
 	emptyString      = ""
-	oneCharString    = "A"
-	twoCharsString   = "KO"
 	threeCharsString = "Luv"
 )
 
