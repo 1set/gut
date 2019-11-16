@@ -5,6 +5,7 @@ import (
 )
 
 var (
+	emptyString      = ""
 	oneCharString    = "A"
 	twoCharsString   = "KO"
 	threeCharsString = "Luv"
@@ -37,7 +38,7 @@ func TestTrimAfterFirst(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := TrimAfterFirst(tt.args.s, tt.args.substr); got != tt.want {
-				t.Errorf("TrimAfterFirst() = %v, want %v", got, tt.want)
+				t.Errorf("TrimAfterFirst() = %q, want %q", got, tt.want)
 			}
 		})
 	}
