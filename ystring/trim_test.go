@@ -29,6 +29,8 @@ func TestTrimAfterFirst(t *testing.T) {
 		{"String starts with substring", args{"AppleComputer", "Apple"}, emptyString},
 		{"String ends with substring", args{"AppleComputer", "Computer"}, "Apple"},
 		{"String doesn't contain substring", args{"AppleComputer", "Banana"}, "AppleComputer"},
+		{"String contains single substring", args{"What a wonderful world!", "wonderful"}, "What a "},
+		{"String contains one-char substring", args{"abc.def.ghi.txt", "."}, "abc"},
 		{"String contains multiple substring", args{"Long, long ago, long ago, long ago, long ago.", "long ago"}, "Long, "},
 		{"String and substring contains non-ASCII", args{"我真的非常非常感谢你🤙", "非常"}, "我真的"},
 	}
