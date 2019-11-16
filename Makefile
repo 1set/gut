@@ -26,7 +26,7 @@ testdev:
 bench:
 	$(GOTEST) -parallel=4 -run="none" -benchtime="2s" -benchmem -bench=. ./$(PACKAGE)
 benchdev:
-	$(GOTEST) -parallel=8 -run="none" -benchtime="1s" -benchmem -bench=. ./$(PACKAGE)
+	$(GOTEST) -parallel=8 -run="none" -benchtime="3s" -benchmem -bench=. ./$(PACKAGE)
 cover:
 	$(GOTEST) -race -cover -covermode=atomic -coverprofile=coverage.out ./$(PACKAGE)
 	cat coverage.out >> coverage.txt
