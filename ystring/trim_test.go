@@ -32,6 +32,7 @@ func TestTrimAfterFirst(t *testing.T) {
 		{"String contains one-char substring", args{"abc.def.ghi.txt", "."}, "abc"},
 		{"String contains multiple substring", args{"Long, long ago, long ago, long ago, long ago.", "long ago"}, "Long, "},
 		{"String and substring contains non-ASCII", args{"我真的非常非常感谢你🤙", "非常"}, "我真的"},
+		{"String and substring are full of emojis", args{"💟🤙⏭️✔️🔠🏖️💢❎💎🕳▶️🔛️🈹🕞🇧🇪🆎🔉☑️🚫⏏️💠🍒", "💎"}, "💟🤙⏭️✔️🔠🏖️💢❎"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -71,6 +72,7 @@ func TestTrimAfterLast(t *testing.T) {
 		{"String contains one-char substring", args{"abc.def.ghi.txt", "."}, "abc.def.ghi"},
 		{"String contains multiple substring", args{"Long, long ago, long ago, long ago, long ago.", "long ago"}, "Long, long ago, long ago, long ago, "},
 		{"String and substring contains non-ASCII", args{"我真的非常非常感谢你🤙", "非常"}, "我真的非常"},
+		{"String and substring are full of emojis", args{"💟🤙⏭️✔️🔠🏖️💢❎💎🕳▶️🔛️🈹🕞🇧🇪🆎🔉☑️🚫⏏️💠🍒", "💎"}, "💟🤙⏭️✔️🔠🏖️💢❎"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -110,6 +112,7 @@ func TestTrimBeforeFirst(t *testing.T) {
 		{"String contains one-char substring", args{"abc.def.ghi.txt", "."}, "def.ghi.txt"},
 		{"String contains multiple substring", args{"Long, long ago, long ago, long ago, long ago.", "long ago"}, ", long ago, long ago, long ago."},
 		{"String and substring contains non-ASCII", args{"我真的非常非常感谢你🤙", "非常"}, "非常感谢你🤙"},
+		{"String and substring are full of emojis", args{"💟🤙⏭️✔️🔠🏖️💢❎💎🕳▶️🔛️🈹🕞🇧🇪🆎🔉☑️🚫⏏️💠🍒", "💎"}, "🕳▶️🔛️🈹🕞🇧🇪🆎🔉☑️🚫⏏️💠🍒"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -149,6 +152,7 @@ func TestTrimBeforeLast(t *testing.T) {
 		{"String contains one-char substring", args{"abc.def.ghi.txt", "."}, "txt"},
 		{"String contains multiple substring", args{"Long, long ago, long ago, long ago, long ago.", "long ago"}, "."},
 		{"String and substring contains non-ASCII", args{"我真的非常非常感谢你🤙", "非常"}, "感谢你🤙"},
+		{"String and substring are full of emojis", args{"💟🤙⏭️✔️🔠🏖️💢❎💎🕳▶️🔛️🈹🕞🇧🇪🆎🔉☑️🚫⏏️💠🍒", "💎"}, "🕳▶️🔛️🈹🕞🇧🇪🆎🔉☑️🚫⏏️💠🍒"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
