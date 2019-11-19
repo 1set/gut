@@ -76,7 +76,9 @@ func TestShrink(t *testing.T) {
 		{"String contains letters with heading&trailing whitespaces", args{"   abcdef   ", "."}, "abcdef"},
 		{"String contains letters and whitespaces with heading&trailing whitespaces", args{" \t  a \t b \v c  \n ", "."}, "a.b.c"},
 		{"Separator string is empty", args{"   a  b  c   d   ", ""}, "abcd"},
-		{"Separator string contains two chars", args{"   a  b \t c   d \n\n  e  ", "=-"}, "a=-b=-c=-d=-e"},
+		{"Separator string contains two chars", args{"   a  \n\t b\tc   d \n\n  e  ", "=-"}, "a=-b=-c=-d=-e"},
+		{"String contains emoji chars", args{" \t\n🏖️💢\t❎\t💎🕳▶️🔛\t️🈹🕞 \t \f \n\v ", ""}, "🏖️💢❎💎🕳▶️🔛️🈹🕞"},
+		{"String and substring contains emoji chars", args{" \t\f 🏖️\v\t\n🕞 \t \f \n🥰\v ", "💌"}, "🏖️💌🕞💌🥰"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -89,6 +91,6 @@ func TestShrink(t *testing.T) {
 
 func BenchmarkShrink(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Shrink("  lone   ly devel  oper   ", ".")
+		_ = Shrink("\t    lone  \n ly devel\t\t  \n oper \v  \f ", "~~~")
 	}
 }

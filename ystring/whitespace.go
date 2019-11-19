@@ -2,6 +2,7 @@ package ystring
 
 import (
 	"strings"
+	"unicode"
 )
 
 // IsEmpty checks if the string is empty.
@@ -16,5 +17,20 @@ func IsBlank(s string) bool {
 
 // Shrink returns a string that replaces consecutive whitespace characters in s with the sep string.
 func Shrink(s, sep string) string {
-	return strings.Join(strings.Fields(s), sep)
+	sb := strings.Builder{}
+	sb.Grow(len(s))
+
+	wFlag := false
+	for _, c := range strings.TrimSpace(s) {
+		if unicode.IsSpace(c) {
+			wFlag = true
+		} else {
+			if wFlag {
+				sb.WriteString(sep)
+				wFlag = false
+			}
+			sb.WriteRune(c)
+		}
+	}
+	return sb.String()
 }
