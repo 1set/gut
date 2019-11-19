@@ -38,8 +38,8 @@ func TestIsBlank(t *testing.T) {
 		want bool
 	}{
 		{"Empty string", "", true},
-		{"String contains one whitespace", " ", true},
 		{"String contains one tab", "\t", true},
+		{"String contains one whitespace", " ", true},
 		{"String contains whitespaces", " \t\n \t \f \n\v ", true},
 		{"String contains letters", "hello", false},
 	}
@@ -69,8 +69,8 @@ func TestShrink(t *testing.T) {
 		want string
 	}{
 		{"Empty string", args{"", "."}, ""},
-		{"String contains one whitespace", args{" ", "."}, ""},
 		{"String contains one tab", args{"\t", "."}, ""},
+		{"String contains one whitespace", args{" ", "."}, ""},
 		{"String contains only whitespaces", args{" \t\n \t \f \n\v ", "."}, ""},
 		{"String contains letters and whitespaces", args{"a   b   c", "."}, "a.b.c"},
 		{"String contains letters with heading&trailing whitespaces", args{"   abcdef   ", "."}, "abcdef"},
@@ -92,5 +92,32 @@ func TestShrink(t *testing.T) {
 func BenchmarkShrink(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = Shrink("\t    lone  \n ly devel\t\t  \n oper \v  \f ", "~~~")
+	}
+}
+
+func TestLength(t *testing.T) {
+	tests := []struct {
+		name string
+		s    string
+		want int
+	}{
+		{"Empty string", "", 0},
+		{"String contains one tab", "\t", 1},
+		{"String contains three whitespaces", "\t \n", 3},
+		{"String contains four emojis", "👍😍🌍🔥", 4},
+		{"String contains five combined emojis", "😍✍🏻🗣️🕳️🤏", 8},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Length(tt.s); got != tt.want {
+				t.Errorf("Length() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func BenchmarkLength(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = Length("\t  🏖️💢\t❎lone  \n ly devel\t🌍\t  💎🕳▶️🔛\t️🈹🕞  \n oper \v  \f  ~~~")
 	}
 }

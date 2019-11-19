@@ -3,6 +3,7 @@ package ystring
 import (
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 // IsEmpty checks if the string is empty.
@@ -33,4 +34,9 @@ func Shrink(s, sep string) string {
 		}
 	}
 	return sb.String()
+}
+
+// Length returns the number of runes in a given string.
+func Length(s string) int {
+	return utf8.RuneCountInString(s)
 }
