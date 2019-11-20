@@ -25,7 +25,7 @@ func Truncate(s string, n int) string {
 		if n <= cnt {
 			return s[0:idx]
 		}
-		cnt += 1
+		cnt++
 	}
 	return s
 }
