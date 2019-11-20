@@ -19,7 +19,7 @@ func TestIsEmpty(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := IsEmpty(tt.s); got != tt.want {
-				t.Errorf("IsEmpty() = %v, want %v", got, tt.want)
+				t.Errorf("IsEmpty() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -46,7 +46,7 @@ func TestIsBlank(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := IsBlank(tt.s); got != tt.want {
-				t.Errorf("IsBlank() = %v, want %v", got, tt.want)
+				t.Errorf("IsBlank() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -88,7 +88,7 @@ func TestShrink(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Shrink(tt.args.s, tt.args.sep); got != tt.want {
-				t.Errorf("Shrink() = %v, want %v", got, tt.want)
+				t.Errorf("Shrink() got = %q, want %q", got, tt.want)
 			}
 		})
 	}
@@ -116,7 +116,7 @@ func TestLength(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Length(tt.s); got != tt.want {
-				t.Errorf("Length() = %v, want %v", got, tt.want)
+				t.Errorf("Length() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -141,6 +141,17 @@ func TestTruncate(t *testing.T) {
 	}{
 		{"Negative n", args{"abc", -2}, emptyString, true},
 		{"Zero n", args{"abc", 0}, emptyString, false},
+		{"One-char string with n=1", args{"A", 1}, "A", false},
+		{"One-char string with n=2", args{"A", 2}, "A", false},
+		{"One-char hanji string with n=1", args{"倉", 1}, "倉", false},
+		{"One-char hanji string with n=2", args{"倉", 2}, "倉", false},
+		{"String contains only ASCII", args{"BenchmarkTruncate-16", 9}, "Benchmark", false},
+		{"String contains only non-ASCII n=0", args{"すきやばし次郎―生涯一鮨職人🍣🍱", 0}, emptyString, false},
+		{"String contains only non-ASCII n=1", args{"すきやばし次郎―生涯一鮨職人🍣🍱", 1}, "す", false},
+		{"String contains only non-ASCII n=7", args{"すきやばし次郎―生涯一鮨職人🍣🍱", 7}, "すきやばし次郎", false},
+		{"String contains only non-ASCII n=15 (less than actual)", args{"すきやばし次郎―生涯一鮨職人🍣", 15}, "すきやばし次郎―生涯一鮨職人🍣", false},
+		{"String contains only non-ASCII n=16 (equal to actual)", args{"すきやばし次郎―生涯一鮨職人🍣🍱", 16}, "すきやばし次郎―生涯一鮨職人🍣🍱", false},
+		{"String contains only non-ASCII n=100 (more than actual)", args{"すきやばし次郎―生涯一鮨職人🍣🍱", 100}, "すきやばし次郎―生涯一鮨職人🍣🍱", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -151,7 +162,7 @@ func TestTruncate(t *testing.T) {
 			}()
 
 			if got := Truncate(tt.args.s, tt.args.n); got != tt.want {
-				t.Errorf("Truncate() = %v, want %v", got, tt.want)
+				t.Errorf("Truncate() got = %q, want %q", got, tt.want)
 			}
 		})
 	}

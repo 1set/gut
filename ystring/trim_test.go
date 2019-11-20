@@ -32,7 +32,7 @@ func TestTrimAfterFirst(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := TrimAfterFirst(tt.args.s, tt.args.substr); got != tt.want {
-				t.Errorf("TrimAfterFirst() = %q, want %q", got, tt.want)
+				t.Errorf("TrimAfterFirst() got = %q, want %q", got, tt.want)
 			}
 		})
 	}
@@ -72,7 +72,7 @@ func TestTrimAfterLast(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := TrimAfterLast(tt.args.s, tt.args.substr); got != tt.want {
-				t.Errorf("TrimAfterFirst() = %q, want %q", got, tt.want)
+				t.Errorf("TrimAfterFirst() got = %q, want %q", got, tt.want)
 			}
 		})
 	}
@@ -112,7 +112,7 @@ func TestTrimBeforeFirst(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := TrimBeforeFirst(tt.args.s, tt.args.substr); got != tt.want {
-				t.Errorf("TrimBeforeFirst() = %q, want %q", got, tt.want)
+				t.Errorf("TrimBeforeFirst() got = %q, want %q", got, tt.want)
 			}
 		})
 	}
@@ -152,7 +152,7 @@ func TestTrimBeforeLast(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := TrimBeforeLast(tt.args.s, tt.args.substr); got != tt.want {
-				t.Errorf("TrimBeforeLast() = %q, want %q", got, tt.want)
+				t.Errorf("TrimBeforeLast() got = %q, want %q", got, tt.want)
 			}
 		})
 	}
