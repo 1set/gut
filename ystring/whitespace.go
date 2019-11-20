@@ -43,10 +43,13 @@ func Length(s string) int {
 
 // Truncate returns first n runes of s.
 func Truncate(s string, n int) string {
-	if n < 0 {
+	switch {
+	case n < 0:
 		panic("ystring: negative Truncate length n")
-	} else if n == 0 {
+	case n == 0:
 		return s[0:0]
+	case n >= len(s):
+		return s
 	}
 
 	cnt := 0
