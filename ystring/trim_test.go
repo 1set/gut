@@ -4,11 +4,6 @@ import (
 	"testing"
 )
 
-var (
-	emptyString      = ""
-	threeCharsString = "Luv"
-)
-
 func TestTrimAfterFirst(t *testing.T) {
 	type args struct {
 		s      string

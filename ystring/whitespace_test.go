@@ -10,8 +10,8 @@ func TestIsEmpty(t *testing.T) {
 		s    string
 		want bool
 	}{
-		{"Empty string", "", true},
-		{"String contains one whitespace", " ", false},
+		{"Empty string", emptyString, true},
+		{"String contains one whitespace", oneWhitespaceString, false},
 		{"String contains one tab", "\t", false},
 		{"String contains whitespaces", " \t\n \t   ", false},
 		{"String contains letters", "hello", false},
@@ -37,9 +37,9 @@ func TestIsBlank(t *testing.T) {
 		s    string
 		want bool
 	}{
-		{"Empty string", "", true},
+		{"Empty string", emptyString, true},
 		{"String contains one tab", "\t", true},
-		{"String contains one whitespace", " ", true},
+		{"String contains one whitespace", oneWhitespaceString, true},
 		{"String contains whitespaces", " \t\n \t \f \n\v ", true},
 		{"String contains letters", "hello", false},
 	}
@@ -68,10 +68,11 @@ func TestShrink(t *testing.T) {
 		args args
 		want string
 	}{
-		{"Empty string", args{"", "."}, ""},
-		{"String contains one tab", args{"\t", "."}, ""},
-		{"String contains one whitespace", args{" ", "."}, ""},
-		{"String contains only whitespaces", args{" \t\n \t \f \n\v ", "."}, ""},
+		{"Empty string", args{emptyString, "."}, emptyString},
+		{"Empty substring", args{"a b c", emptyString}, "abc"},
+		{"String contains one tab", args{"\t", "."}, emptyString},
+		{"String contains one whitespace", args{oneWhitespaceString, "."}, emptyString},
+		{"String contains only whitespaces", args{" \t\n \t \f \n\v ", "."}, emptyString},
 		{"String contains whitespaces with only one char", args{" \t\n \t S\f \n\v ", "."}, "S"},
 		{"String contains whitespaces with two chars", args{" \t\n O\f\t\t \nK\v ", "."}, "O.K"},
 		{"String contains letters and whitespaces", args{"a   b   c", "."}, "a.b.c"},
@@ -79,9 +80,9 @@ func TestShrink(t *testing.T) {
 		{"String contains letters and whitespaces with heading&trailing whitespaces", args{" \t  a \t b \v c  \n ", "."}, "a.b.c"},
 		{"String contains substring", args{"1234567", "345"}, "1234567"},
 		{"String and substring are the same", args{"12345678", "12345678"}, "12345678"},
-		{"Separator string is empty", args{"   a  b  c   d   ", ""}, "abcd"},
+		{"Separator string is empty", args{"   a  b  c   d   ", emptyString}, "abcd"},
 		{"Separator string contains two chars", args{"   a  \n\t b\tc   d \n\n  e  ", "=-"}, "a=-b=-c=-d=-e"},
-		{"String contains emoji chars", args{" \t\n🏖️💢\t❎\t💎🕳▶️🔛\t️🈹🕞 \t \f \n\v ", ""}, "🏖️💢❎💎🕳▶️🔛️🈹🕞"},
+		{"String contains emoji chars", args{" \t\n🏖️💢\t❎\t💎🕳▶️🔛\t️🈹🕞 \t \f \n\v ", emptyString}, "🏖️💢❎💎🕳▶️🔛️🈹🕞"},
 		{"String and substring contains emoji chars", args{" \t\f 🏖️\v\t\n🕞 \t \f \n🥰\v ", "💌"}, "🏖️💌🕞💌🥰"},
 	}
 	for _, tt := range tests {
@@ -105,7 +106,7 @@ func TestLength(t *testing.T) {
 		s    string
 		want int
 	}{
-		{"Empty string", "", 0},
+		{"Empty string", emptyString, 0},
 		{"String contains one tab", "\t", 1},
 		{"String contains two hanjis", "沢愛", 2},
 		{"String contains three whitespaces", "\t \n", 3},
@@ -124,5 +125,40 @@ func TestLength(t *testing.T) {
 func BenchmarkLength(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = Length("\t  🏖️💢\t❎lone  \n ly devel\t🌍\t  💎🕳▶️🔛\t️🈹🕞  \n oper \v  \f  ~~~")
+	}
+}
+
+func TestTruncate(t *testing.T) {
+	type args struct {
+		s string
+		n int
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{"Negative n", args{"abc", -2}, emptyString, true},
+		{"Zero n", args{"abc", 0}, emptyString, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); (r != nil) != tt.wantErr {
+					t.Errorf("Truncate() panic = %v, wantErr %v", r, tt.wantErr)
+				}
+			}()
+
+			if got := Truncate(tt.args.s, tt.args.n); got != tt.want {
+				t.Errorf("Truncate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func BenchmarkTruncate(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = Truncate("\t  🏖️💢\t❎lone  \n ly devel\t🌍\t  💎🕳▶️🔛\t️🈹🕞  \n oper \v  \f  ~~~", 10)
 	}
 }
