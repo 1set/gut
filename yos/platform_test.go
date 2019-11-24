@@ -3,6 +3,7 @@ package yos
 import (
 	"github.com/1set/gut/ystring"
 	"os"
+	"strconv"
 	"testing"
 )
 
@@ -61,5 +62,50 @@ func BenchmarkIsOnWindows(b *testing.B) {
 func BenchmarkIsOnLinux(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = IsOnLinux()
+	}
+}
+
+func TestIsOnBitsOfArch(t *testing.T) {
+	type testCaseDef struct {
+		name    string
+		intSize int
+		is32b   bool
+		is64b   bool
+	}
+	tests := []testCaseDef{
+		{"32-bit", 32, true, false},
+		{"64-bit", 64, false, true},
+	}
+
+	currIntSize := strconv.IntSize
+	var testCase *testCaseDef
+	for _, tt := range tests {
+		if tt.intSize == currIntSize {
+			testCase = &tt
+			break
+		}
+	}
+	if testCase == nil {
+		t.Skipf("skipping since the %d-bit architecture is not supported", currIntSize)
+	}
+
+	if ok := IsOn32bitArch(); testCase.is32b != ok {
+		t.Errorf("IsOn32bitArch() for case %q got = %v, want = %v", testCase.name, ok, testCase.is32b)
+	}
+
+	if ok := IsOn64bitArch(); testCase.is64b != ok {
+		t.Errorf("IsOn64bitArch() for case %q got = %v, want = %v", testCase.name, ok, testCase.is64b)
+	}
+}
+
+func BenchmarkIsOn32bitArch(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = IsOn32bitArch()
+	}
+}
+
+func BenchmarkIsOn64bitArch(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = IsOn64bitArch()
 	}
 }
