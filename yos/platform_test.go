@@ -1,10 +1,11 @@
 package yos
 
 import (
-	"github.com/1set/gut/ystring"
 	"os"
 	"strconv"
 	"testing"
+
+	"github.com/1set/gut/ystring"
 )
 
 func TestIsOnPlatform(t *testing.T) {
