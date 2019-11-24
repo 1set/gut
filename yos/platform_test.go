@@ -16,7 +16,7 @@ func TestIsOnPlatform(t *testing.T) {
 	tests := []testCaseDef{
 		{"MACOS", true, false, false},
 		{"WINDOWS", false, true, false},
-		{"LINUX", true, false, true},
+		{"LINUX", false, false, true},
 	}
 
 	currentOsName := os.Getenv("OS_NAME")
