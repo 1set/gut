@@ -11,7 +11,19 @@ else
     TARGET=("$TARGET")
 fi
 
-printf "====== Begin at %s, Mode: %s - %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$CHOICE" "$TARGET"
+system_name=$(uname -s)
+if [[ $system_name == MINGW64_NT* ]] ; then
+    platform_name="WINDOWS"
+elif [[ $system_name == Linux* ]] ; then
+    platform_name="LINUX"
+elif [[ $system_name == Darwin* ]] ; then
+    platform_name="MACOS"
+else
+    platform_name="UNKNOWN"
+fi
+export OS_NAME="$platform_name"
+
+printf "====== Begin at %s, OS: %s, Mode: %s - %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$OS_NAME" "$CHOICE" "$TARGET"
 
 COUNT=0
 for FOLDER in $TARGET
