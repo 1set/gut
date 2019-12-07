@@ -19,3 +19,7 @@ func IsDirExist(path string) (exist bool, err error) {
 func IsSymlinkExist(path string) (exist bool, err error) {
 	panic("Todo if symblink is not handled well by IsFileExist / IsDirExist")
 }
+
+func JoinPath(elem ...string) string {
+	panic("Todo")
+}
