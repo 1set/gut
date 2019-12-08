@@ -62,7 +62,7 @@ func IsSymlinkExist(path string) (exist bool, err error) {
 	exist, err = false, nil
 	var info os.FileInfo
 	if info, err = os.Lstat(path); err == nil {
-		if (info.Mode() & os.ModeSymlink) > 0 {
+		if (info.Mode() & os.ModeSymlink) != 0 {
 			exist = true
 		} else {
 			err = ErrIsNotSymlink
