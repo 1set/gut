@@ -10,8 +10,9 @@ func IsEmpty(s string) bool {
 	return len(s) == 0
 }
 
+// IsNotEmpty checks if the string is not empty.
 func IsNotEmpty(s string) bool {
-	panic("Todo")
+	return len(s) > 0
 }
 
 // IsBlank checks if the string contains only whitespaces.
@@ -19,8 +20,9 @@ func IsBlank(s string) bool {
 	return len(strings.TrimSpace(s)) == 0
 }
 
+// IsNotBlank checks if the string contains characters apart from whitespaces.
 func IsNotBlank(s string) bool {
-	panic("Todo")
+	return len(strings.TrimSpace(s)) > 0
 }
 
 // Shrink returns a string that replaces consecutive whitespace characters in s with the sep string.

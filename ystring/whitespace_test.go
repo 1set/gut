@@ -6,9 +6,9 @@ import (
 
 func TestIsEmpty(t *testing.T) {
 	tests := []struct {
-		name string
-		s    string
-		want bool
+		name  string
+		s     string
+		empty bool
 	}{
 		{"Empty string", emptyString, true},
 		{"String contains one whitespace", oneWhitespaceString, false},
@@ -18,8 +18,11 @@ func TestIsEmpty(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsEmpty(tt.s); got != tt.want {
-				t.Errorf("IsEmpty() got = %v, want %v", got, tt.want)
+			if got := IsEmpty(tt.s); got != tt.empty {
+				t.Errorf("IsEmpty() got = %v, want %v", got, tt.empty)
+			}
+			if got := IsNotEmpty(tt.s); got != !tt.empty {
+				t.Errorf("IsNotEmpty() got = %v, want %v", got, !tt.empty)
 			}
 		})
 	}
@@ -33,9 +36,9 @@ func BenchmarkIsEmpty(b *testing.B) {
 
 func TestIsBlank(t *testing.T) {
 	tests := []struct {
-		name string
-		s    string
-		want bool
+		name  string
+		s     string
+		blank bool
 	}{
 		{"Empty string", emptyString, true},
 		{"String contains one tab", "\t", true},
@@ -45,8 +48,11 @@ func TestIsBlank(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsBlank(tt.s); got != tt.want {
-				t.Errorf("IsBlank() got = %v, want %v", got, tt.want)
+			if got := IsBlank(tt.s); got != tt.blank {
+				t.Errorf("IsBlank() got = %v, want %v", got, tt.blank)
+			}
+			if got := IsNotBlank(tt.s); got != !tt.blank {
+				t.Errorf("IsNotBlank() got = %v, want %v", got, !tt.blank)
 			}
 		})
 	}
