@@ -20,7 +20,7 @@ func IsBlank(s string) bool {
 	return len(strings.TrimSpace(s)) == 0
 }
 
-// IsNotBlank checks if the string contains characters apart from whitespaces.
+// IsNotBlank checks if the string contains any non-whitespace characters.
 func IsNotBlank(s string) bool {
 	return len(strings.TrimSpace(s)) > 0
 }

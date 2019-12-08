@@ -1,11 +1,20 @@
 package yos
 
+import (
+	"os"
+	"path/filepath"
+)
+
+// IsExist checks if the file, directory or symbolic link exists.
 func IsExist(path string) bool {
-	panic("Todo")
+	_, err := os.Stat(path)
+	return err == nil
 }
 
+// IsExist checks if the file, directory or symbolic link doesn't exist.
 func IsNotExist(path string) bool {
-	panic("Todo")
+	_, err := os.Stat(path)
+	return os.IsNotExist(err)
 }
 
 func IsFileExist(path string) (exist bool, err error) {
@@ -21,5 +30,5 @@ func IsSymlinkExist(path string) (exist bool, err error) {
 }
 
 func JoinPath(elem ...string) string {
-	panic("Todo")
+	return filepath.Join(elem...)
 }

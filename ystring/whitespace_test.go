@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestIsEmpty(t *testing.T) {
+func TestIsEmptyOrNot(t *testing.T) {
 	tests := []struct {
 		name  string
 		s     string
@@ -34,7 +34,7 @@ func BenchmarkIsEmpty(b *testing.B) {
 	}
 }
 
-func TestIsBlank(t *testing.T) {
+func TestIsBlankOrNot(t *testing.T) {
 	tests := []struct {
 		name  string
 		s     string
