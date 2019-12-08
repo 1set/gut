@@ -30,7 +30,13 @@ func TestIsEmptyOrNot(t *testing.T) {
 
 func BenchmarkIsEmpty(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = IsEmpty("lonely developer")
+		_ = IsEmpty("lovely developer")
+	}
+}
+
+func BenchmarkIsNotEmpty(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = IsNotEmpty("lovely developer")
 	}
 }
 
@@ -60,7 +66,13 @@ func TestIsBlankOrNot(t *testing.T) {
 
 func BenchmarkIsBlank(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = IsBlank("lonely developer")
+		_ = IsBlank("lovely developer")
+	}
+}
+
+func BenchmarkIsNotBlank(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = IsNotBlank("lovely developer")
 	}
 }
 
@@ -102,6 +114,6 @@ func TestShrink(t *testing.T) {
 
 func BenchmarkShrink(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Shrink("\t    lone  \n ly devel\t\t  \n oper \v  \f ", "~~~")
+		_ = Shrink("\t    love  \n ly devel\t\t  \n oper \v  \f ", "~~~")
 	}
 }
