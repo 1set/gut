@@ -6,15 +6,26 @@ import (
 	"testing"
 )
 
+var TestCaseRootSymlink string
+
+func init() {
+	TestCaseRootSymlink = "/Users/vej/Desktop/temp-test-symlink"
+}
+
 func TestIsExistOrNot(t *testing.T) {
 	tests := []struct {
-		name string
-		path string
+		name  string
+		path  string
 		exist bool
 	}{
 		{"check missing", "__do_not_exist__", false},
 		{"check doc file", "doc.go", true},
 		{"check current dir", ".", true},
+		{"check symlink origin", JoinPath(TestCaseRootSymlink, "origin_file.txt"), true},
+		{"check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), true},
+		{"check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), true},
+		{"check symlink of symlink", JoinPath(TestCaseRootSymlink, "2symlink.txt"), true},
+		{"check broken symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -29,20 +40,27 @@ func TestIsExistOrNot(t *testing.T) {
 }
 
 func TestIsFileExist(t *testing.T) {
-	type args struct {
-		path string
-	}
 	tests := []struct {
 		name      string
-		args      args
+		path      string
 		wantExist bool
 		wantErr   bool
 	}{
-		// TODO: Add test cases.
+		{"check missing", "__do_not_exist__", false, true},
+		{"check doc file", "doc.go", true, false},
+		{"check current dir", ".", false, true},
+		{"check symlink origin file", JoinPath(TestCaseRootSymlink, "origin_file.txt"), true, false},
+		{"check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), true, false},
+		{"check symlink of symlink of file", JoinPath(TestCaseRootSymlink, "2symlink.txt"), true, false},
+		{"check symlink origin dir", JoinPath(TestCaseRootSymlink, "target_dir"), false, true},
+		{"check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), false, true},
+		{"check symlink of symlink of dir", JoinPath(TestCaseRootSymlink, "2dir_link"), false, true},
+		{"check broken file symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), false, true},
+		{"check broken dir symlink", JoinPath(TestCaseRootSymlink, "broken2.txt"), false, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotExist, err := IsFileExist(tt.args.path)
+			gotExist, err := IsFileExist(tt.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsFileExist() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -55,20 +73,27 @@ func TestIsFileExist(t *testing.T) {
 }
 
 func TestIsDirExist(t *testing.T) {
-	type args struct {
-		path string
-	}
 	tests := []struct {
 		name      string
-		args      args
+		path      string
 		wantExist bool
 		wantErr   bool
 	}{
-		// TODO: Add test cases.
+		{"check missing", "__do_not_exist__", false, true},
+		{"check doc file", "doc.go", false, true},
+		{"check current dir", ".", true, false},
+		{"check symlink origin file", JoinPath(TestCaseRootSymlink, "origin_file.txt"), false, true},
+		{"check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), false, true},
+		{"check symlink of symlink of file", JoinPath(TestCaseRootSymlink, "2symlink.txt"), false, true},
+		{"check symlink origin dir", JoinPath(TestCaseRootSymlink, "target_dir"), true, false},
+		{"check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), true, false},
+		{"check symlink of symlink of dir", JoinPath(TestCaseRootSymlink, "2dir_link"), true, false},
+		{"check broken file symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), false, true},
+		{"check broken dir symlink", JoinPath(TestCaseRootSymlink, "broken2.txt"), false, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotExist, err := IsDirExist(tt.args.path)
+			gotExist, err := IsDirExist(tt.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsDirExist() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -81,20 +106,27 @@ func TestIsDirExist(t *testing.T) {
 }
 
 func TestIsSymlinkExist(t *testing.T) {
-	type args struct {
-		path string
-	}
 	tests := []struct {
 		name      string
-		args      args
+		path      string
 		wantExist bool
 		wantErr   bool
 	}{
-		// TODO: Add test cases.
+		{"check missing", "__do_not_exist__", false, true},
+		{"check doc file", "doc.go", false, true},
+		{"check current dir", ".", false, true},
+		{"check symlink origin file", JoinPath(TestCaseRootSymlink, "origin_file.txt"), false, true},
+		{"check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), true, false},
+		{"check symlink of symlink of file", JoinPath(TestCaseRootSymlink, "2symlink.txt"), true, false},
+		{"check symlink origin dir", JoinPath(TestCaseRootSymlink, "target_dir"), false, true},
+		{"check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), true, false},
+		{"check symlink of symlink of dir", JoinPath(TestCaseRootSymlink, "2dir_link"), true, false},
+		{"check broken file symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), true, false},
+		{"check broken dir symlink", JoinPath(TestCaseRootSymlink, "broken2.txt"), true, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotExist, err := IsSymlinkExist(tt.args.path)
+			gotExist, err := IsSymlinkExist(tt.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsSymlinkExist() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -112,6 +144,8 @@ func TestJoinPath(t *testing.T) {
 		elem []string
 		want string
 	}{
+		{"nil", nil, ""},
+		{"empty", []string{}, ""},
 		{"single part", []string{"abc"}, "abc"},
 		{"two parts", []string{"ab", "cd"}, strings.Join([]string{"ab", "cd"}, string(os.PathSeparator))},
 		{"three parts", []string{"ab", "cd", "ef"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},

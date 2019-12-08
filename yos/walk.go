@@ -5,9 +5,9 @@ import (
 )
 
 type PathInfo struct {
-	Path string
+	Path     string
 	FullPath string
-	Info *os.FileInfo
+	Info     *os.FileInfo
 }
 
 func ListDir(root string) (items []*PathInfo, err error) {
