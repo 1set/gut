@@ -12,32 +12,8 @@ else
     TARGET=("$TARGET")
 fi
 
-# set platform name
-system_name=$(uname -s)
-if [[ $system_name == MINGW64_NT* ]] ; then
-    platform_name="WINDOWS"
-elif [[ $system_name == Linux* ]] ; then
-    platform_name="LINUX"
-elif [[ $system_name == Darwin* ]] ; then
-    platform_name="MACOS"
-else
-    platform_name="UNKNOWN"
-fi
-export OS_NAME="$platform_name"
-
-# get system temp dir
-for TMPDIR in "$TMPDIR" "$TMP" /var/tmp /tmp
-do
-    test -d "$TMPDIR" && break
-done
-
-# uncompress test resource to temp dir
-set -eu
-export MSYS=winsymlinks:native
-export TESTRSSDIR=${TMPDIR%/}/gut_test_resource
-rm -fr "$TESTRSSDIR"
-unzip -o test_resource.zip -d "$TESTRSSDIR"
-printf "Uncompress test resource: %s\n\n" "$TESTRSSDIR"
+# prepare environment
+source ./prepare.sh
 
 printf "====== Begin at %s, OS: %s, Mode: %s - %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$OS_NAME" "$CHOICE" "$TARGET"
 
