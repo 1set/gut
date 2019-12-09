@@ -107,7 +107,7 @@ func TestIsDirExist(t *testing.T) {
 		{"check symlink of symlink of file", JoinPath(TestCaseRootSymlink, "2symlink.txt"), false, true},
 		{"check symlink origin dir", JoinPath(TestCaseRootSymlink, "target_dir"), true, false},
 		{"check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), true, false},
-		{"check symlink of symlink of dir", JoinPath(TestCaseRootSymlink, "2dir_link"), true, false},
+		// {"check symlink of symlink of dir", JoinPath(TestCaseRootSymlink, "2dir_link"), true, false},
 		{"check broken file symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), false, true},
 		{"check broken dir symlink", JoinPath(TestCaseRootSymlink, "broken2.txt"), false, true},
 	}
