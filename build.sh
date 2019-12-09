@@ -1,16 +1,18 @@
 #!/bin/bash
 
+set -e
+
 CHOICE="$1"
 TARGET="$2"
 
-set -eu
-
+# define target
 if [[ -z "$TARGET" ]]; then
     TARGET="./y*"
 else
     TARGET=("$TARGET")
 fi
 
+# set platform name
 system_name=$(uname -s)
 if [[ $system_name == MINGW64_NT* ]] ; then
     platform_name="WINDOWS"
@@ -23,6 +25,17 @@ else
 fi
 export OS_NAME="$platform_name"
 
+# uncompress test resource to temp dir
+for TMPDIR in "$TMPDIR" "$TMP" /var/tmp /tmp
+do
+    test -d "$TMPDIR" && break
+done
+export TESTRSSDIR=${TMPDIR%/}/gut_test_resource
+rm -fr "$TESTRSSDIR"
+unzip -o test_resource.zip -d "$TESTRSSDIR"
+printf "Uncompress test resource: %s\n\n" "$TESTRSSDIR"
+
+set -eu
 printf "====== Begin at %s, OS: %s, Mode: %s - %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$OS_NAME" "$CHOICE" "$TARGET"
 
 COUNT=0
