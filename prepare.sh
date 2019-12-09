@@ -7,7 +7,6 @@ do
     test -d "$TMPDIR" && break
 done
 
-set -eu
 # set platform name
 system_name=$(uname -s)
 if [[ $system_name == MINGW64_NT* ]] ; then
@@ -22,7 +21,8 @@ fi
 export OS_NAME="$platform_name"
 
 # uncompress test resource to temp dir
-export MSYS=winsymlinks:native
+echo "$MSYS"
+export MSYS=winsymlinks:nativestrict
 export TESTRSSDIR=${TMPDIR%/}/gut_test_resource
 rm -fr "$TESTRSSDIR"
 unzip -o test_resource.zip -d "$TESTRSSDIR"

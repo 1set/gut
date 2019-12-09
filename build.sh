@@ -14,6 +14,7 @@ fi
 
 # prepare environment
 source ./prepare.sh
+set -eu
 
 printf "====== Begin at %s, OS: %s, Mode: %s - %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$OS_NAME" "$CHOICE" "$TARGET"
 
