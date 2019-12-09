@@ -6,11 +6,7 @@ import (
 	"testing"
 )
 
-var TestCaseRootSymlink string
-
-func init() {
-	TestCaseRootSymlink = "/Users/vej/Desktop/temp-test-symlink"
-}
+var TestCaseRootSymlink = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "symlink")
 
 func TestIsExistOrNot(t *testing.T) {
 	tests := []struct {
@@ -127,7 +123,7 @@ func TestIsDirExist(t *testing.T) {
 
 func BenchmarkIsDirExist(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = IsDirExist(".")
+		_, _ = IsDirExist(TestCaseRootSymlink)
 	}
 }
 
@@ -166,8 +162,10 @@ func TestIsSymlinkExist(t *testing.T) {
 }
 
 func BenchmarkIsSymlinkExist(b *testing.B) {
+	path := JoinPath(TestCaseRootSymlink, "symlink.txt")
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = IsSymlinkExist("doc.go")
+		_, _ = IsSymlinkExist(path)
 	}
 }
 
