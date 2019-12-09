@@ -25,17 +25,20 @@ else
 fi
 export OS_NAME="$platform_name"
 
-# uncompress test resource to temp dir
+# get system temp dir
 for TMPDIR in "$TMPDIR" "$TMP" /var/tmp /tmp
 do
     test -d "$TMPDIR" && break
 done
+
+# uncompress test resource to temp dir
+set -eu
+export MSYS=winsymlinks:native
 export TESTRSSDIR=${TMPDIR%/}/gut_test_resource
 rm -fr "$TESTRSSDIR"
 unzip -o test_resource.zip -d "$TESTRSSDIR"
 printf "Uncompress test resource: %s\n\n" "$TESTRSSDIR"
 
-set -eu
 printf "====== Begin at %s, OS: %s, Mode: %s - %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$OS_NAME" "$CHOICE" "$TARGET"
 
 COUNT=0
