@@ -6,7 +6,11 @@ import (
 	"testing"
 )
 
-var TestCaseRootSymlink = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "symlink")
+var TestCaseRootSymlink string
+
+func init() {
+	TestCaseRootSymlink = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "symlink")
+}
 
 func TestIsExistOrNot(t *testing.T) {
 	tests := []struct {
