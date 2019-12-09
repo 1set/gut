@@ -1,27 +1,20 @@
 #!/bin/bash
 
+set -e
+
 CHOICE="$1"
 TARGET="$2"
 
-set -eu
-
+# define target
 if [[ -z "$TARGET" ]]; then
     TARGET="./y*"
 else
     TARGET=("$TARGET")
 fi
 
-system_name=$(uname -s)
-if [[ $system_name == MINGW64_NT* ]] ; then
-    platform_name="WINDOWS"
-elif [[ $system_name == Linux* ]] ; then
-    platform_name="LINUX"
-elif [[ $system_name == Darwin* ]] ; then
-    platform_name="MACOS"
-else
-    platform_name="UNKNOWN"
-fi
-export OS_NAME="$platform_name"
+# prepare environment
+source ./prepare.sh
+set -eu
 
 printf "====== Begin at %s, OS: %s, Mode: %s - %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$OS_NAME" "$CHOICE" "$TARGET"
 

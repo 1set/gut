@@ -4,11 +4,11 @@ import (
 	"testing"
 )
 
-func TestIsEmpty(t *testing.T) {
+func TestIsEmptyOrNot(t *testing.T) {
 	tests := []struct {
-		name string
-		s    string
-		want bool
+		name  string
+		s     string
+		empty bool
 	}{
 		{"Empty string", emptyString, true},
 		{"String contains one whitespace", oneWhitespaceString, false},
@@ -18,8 +18,11 @@ func TestIsEmpty(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsEmpty(tt.s); got != tt.want {
-				t.Errorf("IsEmpty() got = %v, want %v", got, tt.want)
+			if got := IsEmpty(tt.s); got != tt.empty {
+				t.Errorf("IsEmpty() got = %v, want %v", got, tt.empty)
+			}
+			if got := IsNotEmpty(tt.s); got != !tt.empty {
+				t.Errorf("IsNotEmpty() got = %v, want %v", got, !tt.empty)
 			}
 		})
 	}
@@ -27,15 +30,21 @@ func TestIsEmpty(t *testing.T) {
 
 func BenchmarkIsEmpty(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = IsEmpty("lonely developer")
+		_ = IsEmpty("lovely developer")
 	}
 }
 
-func TestIsBlank(t *testing.T) {
+func BenchmarkIsNotEmpty(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = IsNotEmpty("lovely developer")
+	}
+}
+
+func TestIsBlankOrNot(t *testing.T) {
 	tests := []struct {
-		name string
-		s    string
-		want bool
+		name  string
+		s     string
+		blank bool
 	}{
 		{"Empty string", emptyString, true},
 		{"String contains one tab", "\t", true},
@@ -45,8 +54,11 @@ func TestIsBlank(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsBlank(tt.s); got != tt.want {
-				t.Errorf("IsBlank() got = %v, want %v", got, tt.want)
+			if got := IsBlank(tt.s); got != tt.blank {
+				t.Errorf("IsBlank() got = %v, want %v", got, tt.blank)
+			}
+			if got := IsNotBlank(tt.s); got != !tt.blank {
+				t.Errorf("IsNotBlank() got = %v, want %v", got, !tt.blank)
 			}
 		})
 	}
@@ -54,7 +66,13 @@ func TestIsBlank(t *testing.T) {
 
 func BenchmarkIsBlank(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = IsBlank("lonely developer")
+		_ = IsBlank("lovely developer")
+	}
+}
+
+func BenchmarkIsNotBlank(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = IsNotBlank("lovely developer")
 	}
 }
 
@@ -96,6 +114,6 @@ func TestShrink(t *testing.T) {
 
 func BenchmarkShrink(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Shrink("\t    lone  \n ly devel\t\t  \n oper \v  \f ", "~~~")
+		_ = Shrink("\t    love  \n ly devel\t\t  \n oper \v  \f ", "~~~")
 	}
 }
