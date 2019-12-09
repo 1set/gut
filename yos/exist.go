@@ -7,8 +7,11 @@ import (
 )
 
 var (
-	ErrIsDir        = errors.New("target is a directory")
-	ErrIsFile       = errors.New("target is a file")
+	// ErrIsDir indicates the given path is actually a directory
+	ErrIsDir = errors.New("target is a directory")
+	// ErrIsFile indicates the given path is actually a file
+	ErrIsFile = errors.New("target is a file")
+	// ErrIsNotSymlink indicates the given path is not a symbolic link
 	ErrIsNotSymlink = errors.New("target is not a symbolic link")
 )
 
@@ -19,7 +22,7 @@ func IsExist(path string) bool {
 	return err == nil
 }
 
-// IsExist checks if the file, directory doesn't exist.
+// IsNotExist checks if the file, directory doesn't exist.
 // If the file is a symbolic link, it will attempt to follow the link and check if the source file doesn't exist.
 func IsNotExist(path string) bool {
 	_, err := os.Stat(path)
