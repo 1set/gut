@@ -28,7 +28,7 @@ func verifyTestResult(t *testing.T, name string, expected []string, actual []*Fi
 			t.Errorf("%s() got #%d path = %q, want suffix = %q", name, idx, item.Path, suffix)
 			return
 		}
-		fileName := (*item.Info).Name()
+		fileName := item.Info.Name()
 		if !strings.HasSuffix(suffix, fileName) {
 			t.Errorf("%s() got #%d suffix = %q, want name = %q", name, idx, suffix, fileName)
 			return
