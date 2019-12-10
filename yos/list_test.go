@@ -76,6 +76,12 @@ func TestListAll(t *testing.T) {
 	verifyTestResult(t, "ListAll", content, items, err)
 }
 
+func BenchmarkListAll(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = ListAll(TestCaseRootList)
+	}
+}
+
 func TestListFile(t *testing.T) {
 	content := []string{
 		"yos/list/File0.txt",
@@ -101,6 +107,12 @@ func TestListFile(t *testing.T) {
 	verifyTestResult(t, "ListFile", content, items, err)
 }
 
+func BenchmarkListFile(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = ListFile(TestCaseRootList)
+	}
+}
+
 func TestListDir(t *testing.T) {
 	content := []string{
 		"yos/list",
@@ -122,4 +134,10 @@ func TestListDir(t *testing.T) {
 
 	items, err := ListDir(TestCaseRootList)
 	verifyTestResult(t, "ListDir", content, items, err)
+}
+
+func BenchmarkListDir(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = ListDir(TestCaseRootList)
+	}
 }
