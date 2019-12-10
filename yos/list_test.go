@@ -10,7 +10,6 @@ var TestCaseRootList string
 
 func init() {
 	TestCaseRootList = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "list")
-	//TestCaseRootList = "/Users/vej/go/src/github.com/1set/gut/local/test_resource/yos/list"
 }
 
 func verifyTestResult(t *testing.T, name string, expected []string, actual []*FilePathInfo, err error) {
