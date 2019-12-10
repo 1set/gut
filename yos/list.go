@@ -52,3 +52,37 @@ func ListMatchAll(root string, patterns ...string) (entries []*FilePathInfo, err
 		return
 	})
 }
+
+func ListMatchFile(root string, patterns ...string) (entries []*FilePathInfo, err error) {
+	return listCondEntries(root, func(info os.FileInfo) (ok bool, err error) {
+		if info.IsDir() {
+			// ignore directories
+			return
+		}
+		fileName := info.Name()
+		for _, pattern := range patterns {
+			ok, err = filepath.Match(pattern, fileName)
+			if ok || err != nil {
+				break
+			}
+		}
+		return
+	})
+}
+
+func ListMatchDir(root string, patterns ...string) (entries []*FilePathInfo, err error) {
+	return listCondEntries(root, func(info os.FileInfo) (ok bool, err error) {
+		if !info.IsDir() {
+			// ignore files
+			return
+		}
+		fileName := info.Name()
+		for _, pattern := range patterns {
+			ok, err = filepath.Match(pattern, fileName)
+			if ok || err != nil {
+				break
+			}
+		}
+		return
+	})
+}
