@@ -10,14 +10,14 @@ type FilePathInfo struct {
 	Info *os.FileInfo
 }
 
-// listCondItems returns a list of conditional directory entries.
-func listCondItems(root string, cond func(os.FileInfo) bool) (items []*FilePathInfo, err error) {
+// listCondEntries returns a list of conditional directory entries.
+func listCondEntries(root string, cond func(os.FileInfo) bool) (entries []*FilePathInfo, err error) {
 	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if cond(info) {
-			items = append(items, &FilePathInfo{
+			entries = append(entries, &FilePathInfo{
 				Path: path,
 				Info: &info,
 			})
@@ -27,14 +27,14 @@ func listCondItems(root string, cond func(os.FileInfo) bool) (items []*FilePathI
 	return
 }
 
-func ListAll(root string) (items []*FilePathInfo, err error) {
-	return listCondItems(root, func(info os.FileInfo) bool { return true })
+func ListAll(root string) (entries []*FilePathInfo, err error) {
+	return listCondEntries(root, func(info os.FileInfo) bool { return true })
 }
 
-func ListFile(root string) (items []*FilePathInfo, err error) {
-	return listCondItems(root, func(info os.FileInfo) bool { return !info.IsDir() })
+func ListFile(root string) (entries []*FilePathInfo, err error) {
+	return listCondEntries(root, func(info os.FileInfo) bool { return !info.IsDir() })
 }
 
-func ListDir(root string) (items []*FilePathInfo, err error) {
-	return listCondItems(root, func(info os.FileInfo) bool { return info.IsDir() })
+func ListDir(root string) (entries []*FilePathInfo, err error) {
+	return listCondEntries(root, func(info os.FileInfo) bool { return info.IsDir() })
 }

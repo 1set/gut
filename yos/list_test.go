@@ -12,18 +12,18 @@ func init() {
 	TestCaseRootList = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "list")
 }
 
-func verifyTestResult(t *testing.T, name string, content []string, items []*FilePathInfo, err error) {
+func verifyTestResult(t *testing.T, name string, expected []string, actual []*FilePathInfo, err error) {
 	if err != nil {
 		t.Errorf("%s() got error = %v, wantErr %v", name, err, false)
 		return
 	}
-	if len(items) != len(content) {
-		t.Errorf("%s() got length = %v, want = %v", name, len(items), len(content))
+	if len(actual) != len(expected) {
+		t.Errorf("%s() got length = %v, want = %v", name, len(actual), len(expected))
 		return
 	}
 
-	for idx, item := range items {
-		suffix := content[idx]
+	for idx, item := range actual {
+		suffix := expected[idx]
 		if !strings.HasSuffix(item.Path, suffix) {
 			t.Errorf("%s() got #%d path = %q, want suffix = %q", name, idx, item.Path, suffix)
 			return
@@ -37,7 +37,7 @@ func verifyTestResult(t *testing.T, name string, content []string, items []*File
 }
 
 func TestListAll(t *testing.T) {
-	content := []string{
+	expected := []string{
 		"yos/list",
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
@@ -72,8 +72,8 @@ func TestListAll(t *testing.T) {
 		"yos/list/🤙🏝️.md",
 	}
 
-	items, err := ListAll(TestCaseRootList)
-	verifyTestResult(t, "ListAll", content, items, err)
+	actual, err := ListAll(TestCaseRootList)
+	verifyTestResult(t, "ListAll", expected, actual, err)
 }
 
 func BenchmarkListAll(b *testing.B) {
@@ -83,7 +83,7 @@ func BenchmarkListAll(b *testing.B) {
 }
 
 func TestListFile(t *testing.T) {
-	content := []string{
+	expected := []string{
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
 		"yos/list/broken_symlink.wtf",
@@ -103,8 +103,8 @@ func TestListFile(t *testing.T) {
 		"yos/list/🤙🏝️.md",
 	}
 
-	items, err := ListFile(TestCaseRootList)
-	verifyTestResult(t, "ListFile", content, items, err)
+	actual, err := ListFile(TestCaseRootList)
+	verifyTestResult(t, "ListFile", expected, actual, err)
 }
 
 func BenchmarkListFile(b *testing.B) {
@@ -114,7 +114,7 @@ func BenchmarkListFile(b *testing.B) {
 }
 
 func TestListDir(t *testing.T) {
-	content := []string{
+	expected := []string{
 		"yos/list",
 		"yos/list/deep_folder",
 		"yos/list/deep_folder/deep",
@@ -132,8 +132,8 @@ func TestListDir(t *testing.T) {
 		"yos/list/white space",
 	}
 
-	items, err := ListDir(TestCaseRootList)
-	verifyTestResult(t, "ListDir", content, items, err)
+	actual, err := ListDir(TestCaseRootList)
+	verifyTestResult(t, "ListDir", expected, actual, err)
 }
 
 func BenchmarkListDir(b *testing.B) {
