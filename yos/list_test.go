@@ -235,6 +235,12 @@ func TestListMatchAll(t *testing.T) {
 	}
 }
 
+func BenchmarkListMatchAll(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = ListMatchAll(TestCaseRootList, "*.md", "*.txt")
+	}
+}
+
 func TestListMatchFile(t *testing.T) {
 	expectedAll := []string{
 		"yos/list/File0.txt",
@@ -311,6 +317,12 @@ func TestListMatchFile(t *testing.T) {
 	}
 }
 
+func BenchmarkListMatchFile(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = ListMatchFile(TestCaseRootList, "*.md", "*.txt")
+	}
+}
+
 func TestListMatchDir(t *testing.T) {
 	expectedAll := []string{
 		"yos/list",
@@ -374,5 +386,11 @@ func TestListMatchDir(t *testing.T) {
 				verifyTestResult(t, "ListMatchDir", tt.wantSuffix, actual, err)
 			}
 		})
+	}
+}
+
+func BenchmarkListMatchDir(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = ListMatchDir(TestCaseRootList, "*.txt", "deep*")
 	}
 }
