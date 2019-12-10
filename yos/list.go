@@ -40,8 +40,15 @@ func ListDir(root string) (entries []*FilePathInfo, err error) {
 	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return info.IsDir(), nil })
 }
 
-//func ListMatchAll(root string, patterns ...string) (entries []*FilePathInfo, err error) {
-//	return listCondEntries(root, func(info os.FileInfo) bool {
-//		return true
-//	})
-//}
+func ListMatchAll(root string, patterns ...string) (entries []*FilePathInfo, err error) {
+	return listCondEntries(root, func(info os.FileInfo) (ok bool, err error) {
+		fileName := info.Name()
+		for _, pattern := range patterns {
+			ok, err = filepath.Match(pattern, fileName)
+			if ok || err != nil {
+				break
+			}
+		}
+		return
+	})
+}
