@@ -23,7 +23,7 @@ func verifyTestResult(t *testing.T, name string, expected []string, actual []*Fi
 	}
 
 	for idx, item := range actual {
-		suffix := expected[idx]
+		suffix := strings.Replace(expected[idx], `/`, string(os.PathSeparator), -1)
 		if !strings.HasSuffix(item.Path, suffix) {
 			t.Errorf("%s() got #%d path = %q, want suffix = %q", name, idx, item.Path, suffix)
 			return
