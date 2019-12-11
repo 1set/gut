@@ -73,6 +73,12 @@ func TestListAll(t *testing.T) {
 		"yos/list/🤙🏝️.md",
 	}
 
+	for _, path := range []string{"", "  ", "__not_found_folder__"} {
+		if _, err := ListAll(path); err == nil {
+			t.Errorf("ListAll(%q) got no error, diff from expected", path)
+			return
+		}
+	}
 	actual, err := ListAll(TestCaseRootList)
 	verifyTestResult(t, "ListAll", expected, actual, err)
 }
@@ -104,6 +110,12 @@ func TestListFile(t *testing.T) {
 		"yos/list/🤙🏝️.md",
 	}
 
+	for _, path := range []string{"", "  ", "__not_found_folder__"} {
+		if _, err := ListFile(path); err == nil {
+			t.Errorf("ListFile(%q) got no error, diff from expected", path)
+			return
+		}
+	}
 	actual, err := ListFile(TestCaseRootList)
 	verifyTestResult(t, "ListFile", expected, actual, err)
 }
@@ -133,6 +145,12 @@ func TestListDir(t *testing.T) {
 		"yos/list/white space",
 	}
 
+	for _, path := range []string{"", "  ", "__not_found_folder__"} {
+		if _, err := ListFile(path); err == nil {
+			t.Errorf("ListFile(%q) got no error, diff from expected", path)
+			return
+		}
+	}
 	actual, err := ListDir(TestCaseRootList)
 	verifyTestResult(t, "ListDir", expected, actual, err)
 }
