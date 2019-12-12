@@ -10,7 +10,7 @@ var TestCaseRootList string
 
 func init() {
 	TestCaseRootList = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "list")
-	//TestCaseRootList = `/Users/vej/go/src/github.com/1set/gut/local/test_resource/yos/list`
+	// TestCaseRootList = `/Users/vej/go/src/github.com/1set/gut/local/test_resource/yos/list`
 }
 
 func verifyTestResult(t *testing.T, name string, expected []string, actual []*FilePathInfo, err error) {
@@ -89,6 +89,7 @@ func BenchmarkListDir(b *testing.B) {
 }
 
 func TestListMatch(t *testing.T) {
+	allEntriesPattern := []string{"*"}
 	type args struct {
 		root     string
 		flag     int
@@ -101,26 +102,27 @@ func TestListMatch(t *testing.T) {
 		wantErr    bool
 	}{
 		// TODO: fill these tests
-		{"Empty root", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Root not exist", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"No Flag", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Flag for file", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Flag for dir", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Flag for file & dir", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Flag for no recursive", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Flag for recursive", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Flag for ToLower", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Flag for no ToLower", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"No pattern", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Broken pattern", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"No pattern", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Empty pattern", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Pattern for *", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Pattern for exact match", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Pattern match none", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Pattern with slash", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Pattern with case-sensitive match", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
-		{"Pattern with case-insensitive match", args{TestCaseRootList, 0, []string{}}, expectedResultMap["Empty"], false},
+		{"Empty root path", args{"", ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], true},
+		{"Root not exist", args{"__not_found_folder__", ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], true},
+		{"No Flag", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
+		{"Flag for file", args{TestCaseRootList, ListIncludeFile, allEntriesPattern}, expectedResultMap["RootFiles"], false},
+		{"Flag for dir", args{TestCaseRootList, ListIncludeDir, allEntriesPattern}, expectedResultMap["RootDirs"], false},
+		{"Flag for file & dir", args{TestCaseRootList, ListIncludeFile | ListIncludeDir, allEntriesPattern}, expectedResultMap["RootAll"], false},
+		{"Flag for recursive & file", args{TestCaseRootList, ListRecursive | ListIncludeFile, allEntriesPattern}, expectedResultMap["AllFiles"], false},
+		{"Flag for recursive & dir", args{TestCaseRootList, ListRecursive | ListIncludeDir, allEntriesPattern}, expectedResultMap["AllDirs"], false},
+
+		// {"Flag for ToLower", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
+		// {"Flag for no ToLower", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
+		// {"No pattern", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
+		// {"Broken pattern", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
+		// {"No pattern", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
+		// {"Empty pattern", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
+		// {"Pattern for *", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
+		// {"Pattern for exact match", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
+		// {"Pattern match none", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
+		// {"Pattern with slash", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
+		// {"Pattern with case-sensitive match", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
+		// {"Pattern with case-insensitive match", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
 	}
 
 	for _, tt := range tests {
@@ -146,7 +148,6 @@ func BenchmarkListMatch(b *testing.B) {
 var expectedResultMap = map[string][]string{
 	"Empty": []string{},
 	"All": []string{
-		"yos/list",
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
 		"yos/list/broken_symlink.wtf",
@@ -199,7 +200,6 @@ var expectedResultMap = map[string][]string{
 		"yos/list/🤙🏝️.md",
 	},
 	"AllDirs": []string{
-		"yos/list",
 		"yos/list/deep_folder",
 		"yos/list/deep_folder/deep",
 		"yos/list/deep_folder/deep/deeper",
@@ -214,5 +214,47 @@ var expectedResultMap = map[string][]string{
 		"yos/list/nested_empty/empty1/empty2/empty3/empty4/empty5",
 		"yos/list/simple_folder",
 		"yos/list/white space",
+	},
+	"RootFiles": []string{
+		"yos/list/File0.txt",
+		"yos/list/File4.txt",
+		"yos/list/broken_symlink.wtf",
+		"yos/list/file1.txt",
+		"yos/list/file2.txt",
+		"yos/list/file3.txt",
+		"yos/list/no_ext_name_file",
+		"yos/list/symlink_to_dir",
+		"yos/list/symlink_to_file.txt",
+		"yos/list/white space.txt",
+		"yos/list/测试文件.md",
+		"yos/list/🤙🏝️.md",
+	},
+	"RootDirs": []string{
+		"yos/list/deep_folder",
+		"yos/list/empty_folder",
+		"yos/list/folder_like_file.txt",
+		"yos/list/nested_empty",
+		"yos/list/simple_folder",
+		"yos/list/white space",
+	},
+	"RootAll": []string{
+		"yos/list/File0.txt",
+		"yos/list/File4.txt",
+		"yos/list/broken_symlink.wtf",
+		"yos/list/deep_folder",
+		"yos/list/empty_folder",
+		"yos/list/file1.txt",
+		"yos/list/file2.txt",
+		"yos/list/file3.txt",
+		"yos/list/folder_like_file.txt",
+		"yos/list/nested_empty",
+		"yos/list/no_ext_name_file",
+		"yos/list/simple_folder",
+		"yos/list/symlink_to_dir",
+		"yos/list/symlink_to_file.txt",
+		"yos/list/white space",
+		"yos/list/white space.txt",
+		"yos/list/测试文件.md",
+		"yos/list/🤙🏝️.md",
 	},
 }

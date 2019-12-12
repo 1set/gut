@@ -17,6 +17,9 @@ func listCondEntries(root string, cond func(os.FileInfo) (bool, error)) (entries
 		if err != nil {
 			return err
 		}
+		if root == path {
+			return nil
+		}
 		var ok bool
 		if ok, err = cond(info); ok {
 			entries = append(entries, &FilePathInfo{
@@ -29,7 +32,7 @@ func listCondEntries(root string, cond func(os.FileInfo) (bool, error)) (entries
 	return
 }
 
-// ListAll returns a list of all directory entries in the given directory in lexical order, including root.
+// ListAll returns a list of all directory entries in the given directory in lexical order.
 // It searches recursively, but symbolic links will be not be followed.
 func ListAll(root string) (entries []*FilePathInfo, err error) {
 	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return true, nil })
@@ -41,7 +44,7 @@ func ListFile(root string) (entries []*FilePathInfo, err error) {
 	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return !info.IsDir(), nil })
 }
 
-// ListDir returns a list of nested directory entries in the given directory in lexical order, including root.
+// ListDir returns a list of nested directory entries in the given directory in lexical order.
 // It searches recursively, but symbolic links will be not be followed.
 func ListDir(root string) (entries []*FilePathInfo, err error) {
 	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return info.IsDir(), nil })
