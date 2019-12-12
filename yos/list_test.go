@@ -10,7 +10,6 @@ var TestCaseRootList string
 
 func init() {
 	TestCaseRootList = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "list")
-	// TestCaseRootList = `/Users/vej/go/src/github.com/1set/gut/local/test_resource/yos/list`
 }
 
 func verifyTestResult(t *testing.T, name string, expected []string, actual []*FilePathInfo, err error) {
@@ -110,19 +109,20 @@ func TestListMatch(t *testing.T) {
 		{"Flag for file & dir", args{TestCaseRootList, ListIncludeFile | ListIncludeDir, allEntriesPattern}, expectedResultMap["RootAll"], false},
 		{"Flag for recursive & file", args{TestCaseRootList, ListRecursive | ListIncludeFile, allEntriesPattern}, expectedResultMap["AllFiles"], false},
 		{"Flag for recursive & dir", args{TestCaseRootList, ListRecursive | ListIncludeDir, allEntriesPattern}, expectedResultMap["AllDirs"], false},
-
-		// {"Flag for ToLower", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
-		// {"Flag for no ToLower", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
-		// {"No pattern", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
-		// {"Broken pattern", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
-		// {"No pattern", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
-		// {"Empty pattern", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
-		// {"Pattern for *", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
-		// {"Pattern for exact match", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
-		// {"Pattern match none", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
-		// {"Pattern with slash", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
-		// {"Pattern with case-sensitive match", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
-		// {"Pattern with case-insensitive match", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
+		{"Flag with ToLower", args{TestCaseRootList, ListIncludeFile | ListToLower, []string{"file*"}}, expectedResultMap["AllFile*Insensitive"], false},
+		{"Flag without ToLower", args{TestCaseRootList, ListIncludeFile, []string{"file*"}}, expectedResultMap["AllFile*Sensitive"], false},
+		{"No pattern", args{TestCaseRootList, ListIncludeFile, expectedResultMap["Empty"]}, expectedResultMap["Empty"], false},
+		{"Broken pattern", args{TestCaseRootList, ListIncludeFile, []string{"*[1-"}}, expectedResultMap["Empty"], true},
+		{"Empty pattern", args{TestCaseRootList, ListIncludeFile, []string{""}}, expectedResultMap["Empty"], false},
+		{"Pattern for exact match", args{TestCaseRootList, ListRecursive | ListIncludeFile, []string{"file1.txt"}}, expectedResultMap["All file1.txt"], false},
+		{"Pattern match none", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.pdf"}}, expectedResultMap["Empty"], false},
+		{"Pattern match txt", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt"}}, expectedResultMap["All *.txt"], false},
+		{"Pattern with slash", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"/*.txt"}}, expectedResultMap["Empty"], false},
+		{"Pattern with case-sensitive match", args{TestCaseRootList, ListIncludeFile, []string{"File*"}}, expectedResultMap["OnlyFile*"], false},
+		{"Pattern with case-insensitive non-match", args{TestCaseRootList, ListIncludeFile | ListToLower, []string{"File*"}}, expectedResultMap["Empty"], false},
+		{"Duplicate patterns", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt", "*.txt", "*.txt"}}, expectedResultMap["All *.txt"], false},
+		{"Multiple matched patterns", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt", "*.md"}}, expectedResultMap["All *.txt *.md"], false},
+		{"Combine of match and non-match patterns", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt", "*.pdf", "*.jpg"}}, expectedResultMap["All *.txt"], false},
 	}
 
 	for _, tt := range tests {
@@ -256,5 +256,55 @@ var expectedResultMap = map[string][]string{
 		"yos/list/white space.txt",
 		"yos/list/测试文件.md",
 		"yos/list/🤙🏝️.md",
+	},
+	"AllFile*Insensitive": []string{
+		"yos/list/File0.txt",
+		"yos/list/File4.txt",
+		"yos/list/file1.txt",
+		"yos/list/file2.txt",
+		"yos/list/file3.txt",
+	},
+	"AllFile*Sensitive": []string{
+		"yos/list/file1.txt",
+		"yos/list/file2.txt",
+		"yos/list/file3.txt",
+	},
+	"All file1.txt": []string{
+		"yos/list/file1.txt",
+		"yos/list/simple_folder/file1.txt",
+	},
+	"All *.txt": []string{
+		"yos/list/File0.txt",
+		"yos/list/File4.txt",
+		"yos/list/deep_folder/deep/deeper/deepest/text_file.txt",
+		"yos/list/file1.txt",
+		"yos/list/file2.txt",
+		"yos/list/file3.txt",
+		"yos/list/folder_like_file.txt",
+		"yos/list/simple_folder/file1.txt",
+		"yos/list/simple_folder/file2.txt",
+		"yos/list/simple_folder/file3.txt",
+		"yos/list/symlink_to_file.txt",
+		"yos/list/white space.txt",
+	},
+	"All *.txt *.md": []string{
+		"yos/list/File0.txt",
+		"yos/list/File4.txt",
+		"yos/list/deep_folder/deep/deeper/deepest/text_file.txt",
+		"yos/list/file1.txt",
+		"yos/list/file2.txt",
+		"yos/list/file3.txt",
+		"yos/list/folder_like_file.txt",
+		"yos/list/simple_folder/file1.txt",
+		"yos/list/simple_folder/file2.txt",
+		"yos/list/simple_folder/file3.txt",
+		"yos/list/symlink_to_file.txt",
+		"yos/list/white space.txt",
+		"yos/list/测试文件.md",
+		"yos/list/🤙🏝️.md",
+	},
+	"OnlyFile*": []string{
+		"yos/list/File0.txt",
+		"yos/list/File4.txt",
 	},
 }
