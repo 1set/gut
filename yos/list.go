@@ -51,12 +51,19 @@ func ListDir(root string) (entries []*FilePathInfo, err error) {
 }
 
 const (
+	// Recursively list directory entries encountered.
 	ListRecursive int = 1 << iota
+	// Convert file name to lower case before the pattern matching.
 	ListToLower
+	// Include matched files in the returned list.
 	ListIncludeFile
+	// Include matched directories in the returned list.
 	ListIncludeDir
 )
 
+// ListMatch returns a list of directory entries that matches any given pattern in the directory in lexical order.
+// ListMatch requires the pattern to match all of the filename, not just a substring.
+// Symbolic links will be not be followed. ErrBadPattern is returned if any pattern is malformed.
 func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathInfo, err error) {
 	return listCondEntries(root, func(info os.FileInfo) (ok bool, err error) {
 		fileName := info.Name()
