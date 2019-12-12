@@ -38,41 +38,6 @@ func verifyTestResult(t *testing.T, name string, expected []string, actual []*Fi
 }
 
 func TestListAll(t *testing.T) {
-	expected := []string{
-		"yos/list",
-		"yos/list/File0.txt",
-		"yos/list/File4.txt",
-		"yos/list/broken_symlink.wtf",
-		"yos/list/deep_folder",
-		"yos/list/deep_folder/deep",
-		"yos/list/deep_folder/deep/deeper",
-		"yos/list/deep_folder/deep/deeper/deepest",
-		"yos/list/deep_folder/deep/deeper/deepest/text_file.txt",
-		"yos/list/empty_folder",
-		"yos/list/file1.txt",
-		"yos/list/file2.txt",
-		"yos/list/file3.txt",
-		"yos/list/folder_like_file.txt",
-		"yos/list/nested_empty",
-		"yos/list/nested_empty/empty1",
-		"yos/list/nested_empty/empty1/empty2",
-		"yos/list/nested_empty/empty1/empty2/empty3",
-		"yos/list/nested_empty/empty1/empty2/empty3/empty4",
-		"yos/list/nested_empty/empty1/empty2/empty3/empty4/empty5",
-		"yos/list/no_ext_name_file",
-		"yos/list/simple_folder",
-		"yos/list/simple_folder/file1.txt",
-		"yos/list/simple_folder/file2.txt",
-		"yos/list/simple_folder/file3.txt",
-		"yos/list/symlink_to_dir",
-		"yos/list/symlink_to_file.txt",
-		"yos/list/white space",
-		"yos/list/white space/only one file",
-		"yos/list/white space.txt",
-		"yos/list/测试文件.md",
-		"yos/list/🤙🏝️.md",
-	}
-
 	for _, path := range []string{"", "  ", "__not_found_folder__"} {
 		if _, err := ListAll(path); err == nil {
 			t.Errorf("ListAll(%q) got no error, diff from expected", path)
@@ -80,7 +45,7 @@ func TestListAll(t *testing.T) {
 		}
 	}
 	actual, err := ListAll(TestCaseRootList)
-	verifyTestResult(t, "ListAll", expected, actual, err)
+	verifyTestResult(t, "ListAll", expectedResultMap["All"], actual, err)
 }
 
 func BenchmarkListAll(b *testing.B) {
@@ -90,26 +55,6 @@ func BenchmarkListAll(b *testing.B) {
 }
 
 func TestListFile(t *testing.T) {
-	expected := []string{
-		"yos/list/File0.txt",
-		"yos/list/File4.txt",
-		"yos/list/broken_symlink.wtf",
-		"yos/list/deep_folder/deep/deeper/deepest/text_file.txt",
-		"yos/list/file1.txt",
-		"yos/list/file2.txt",
-		"yos/list/file3.txt",
-		"yos/list/no_ext_name_file",
-		"yos/list/simple_folder/file1.txt",
-		"yos/list/simple_folder/file2.txt",
-		"yos/list/simple_folder/file3.txt",
-		"yos/list/symlink_to_dir",
-		"yos/list/symlink_to_file.txt",
-		"yos/list/white space/only one file",
-		"yos/list/white space.txt",
-		"yos/list/测试文件.md",
-		"yos/list/🤙🏝️.md",
-	}
-
 	for _, path := range []string{"", "  ", "__not_found_folder__"} {
 		if _, err := ListFile(path); err == nil {
 			t.Errorf("ListFile(%q) got no error, diff from expected", path)
@@ -117,7 +62,7 @@ func TestListFile(t *testing.T) {
 		}
 	}
 	actual, err := ListFile(TestCaseRootList)
-	verifyTestResult(t, "ListFile", expected, actual, err)
+	verifyTestResult(t, "ListFile", expectedResultMap["AllFiles"], actual, err)
 }
 
 func BenchmarkListFile(b *testing.B) {
@@ -127,24 +72,6 @@ func BenchmarkListFile(b *testing.B) {
 }
 
 func TestListDir(t *testing.T) {
-	expected := []string{
-		"yos/list",
-		"yos/list/deep_folder",
-		"yos/list/deep_folder/deep",
-		"yos/list/deep_folder/deep/deeper",
-		"yos/list/deep_folder/deep/deeper/deepest",
-		"yos/list/empty_folder",
-		"yos/list/folder_like_file.txt",
-		"yos/list/nested_empty",
-		"yos/list/nested_empty/empty1",
-		"yos/list/nested_empty/empty1/empty2",
-		"yos/list/nested_empty/empty1/empty2/empty3",
-		"yos/list/nested_empty/empty1/empty2/empty3/empty4",
-		"yos/list/nested_empty/empty1/empty2/empty3/empty4/empty5",
-		"yos/list/simple_folder",
-		"yos/list/white space",
-	}
-
 	for _, path := range []string{"", "  ", "__not_found_folder__"} {
 		if _, err := ListFile(path); err == nil {
 			t.Errorf("ListFile(%q) got no error, diff from expected", path)
@@ -152,7 +79,7 @@ func TestListDir(t *testing.T) {
 		}
 	}
 	actual, err := ListDir(TestCaseRootList)
-	verifyTestResult(t, "ListDir", expected, actual, err)
+	verifyTestResult(t, "ListDir", expectedResultMap["AllDirs"], actual, err)
 }
 
 func BenchmarkListDir(b *testing.B) {
@@ -277,4 +204,77 @@ func BenchmarkListMatch(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, _ = ListMatch(TestCaseRootList, ListRecursive|ListIncludeFile|ListIncludeDir, "*.txt", "deep*")
 	}
+}
+
+var expectedResultMap = map[string][]string{
+	"All": []string{
+		"yos/list",
+		"yos/list/File0.txt",
+		"yos/list/File4.txt",
+		"yos/list/broken_symlink.wtf",
+		"yos/list/deep_folder",
+		"yos/list/deep_folder/deep",
+		"yos/list/deep_folder/deep/deeper",
+		"yos/list/deep_folder/deep/deeper/deepest",
+		"yos/list/deep_folder/deep/deeper/deepest/text_file.txt",
+		"yos/list/empty_folder",
+		"yos/list/file1.txt",
+		"yos/list/file2.txt",
+		"yos/list/file3.txt",
+		"yos/list/folder_like_file.txt",
+		"yos/list/nested_empty",
+		"yos/list/nested_empty/empty1",
+		"yos/list/nested_empty/empty1/empty2",
+		"yos/list/nested_empty/empty1/empty2/empty3",
+		"yos/list/nested_empty/empty1/empty2/empty3/empty4",
+		"yos/list/nested_empty/empty1/empty2/empty3/empty4/empty5",
+		"yos/list/no_ext_name_file",
+		"yos/list/simple_folder",
+		"yos/list/simple_folder/file1.txt",
+		"yos/list/simple_folder/file2.txt",
+		"yos/list/simple_folder/file3.txt",
+		"yos/list/symlink_to_dir",
+		"yos/list/symlink_to_file.txt",
+		"yos/list/white space",
+		"yos/list/white space/only one file",
+		"yos/list/white space.txt",
+		"yos/list/测试文件.md",
+		"yos/list/🤙🏝️.md",
+	},
+	"AllFiles": []string{
+		"yos/list/File0.txt",
+		"yos/list/File4.txt",
+		"yos/list/broken_symlink.wtf",
+		"yos/list/deep_folder/deep/deeper/deepest/text_file.txt",
+		"yos/list/file1.txt",
+		"yos/list/file2.txt",
+		"yos/list/file3.txt",
+		"yos/list/no_ext_name_file",
+		"yos/list/simple_folder/file1.txt",
+		"yos/list/simple_folder/file2.txt",
+		"yos/list/simple_folder/file3.txt",
+		"yos/list/symlink_to_dir",
+		"yos/list/symlink_to_file.txt",
+		"yos/list/white space/only one file",
+		"yos/list/white space.txt",
+		"yos/list/测试文件.md",
+		"yos/list/🤙🏝️.md",
+	},
+	"AllDirs": []string{
+		"yos/list",
+		"yos/list/deep_folder",
+		"yos/list/deep_folder/deep",
+		"yos/list/deep_folder/deep/deeper",
+		"yos/list/deep_folder/deep/deeper/deepest",
+		"yos/list/empty_folder",
+		"yos/list/folder_like_file.txt",
+		"yos/list/nested_empty",
+		"yos/list/nested_empty/empty1",
+		"yos/list/nested_empty/empty1/empty2",
+		"yos/list/nested_empty/empty1/empty2/empty3",
+		"yos/list/nested_empty/empty1/empty2/empty3/empty4",
+		"yos/list/nested_empty/empty1/empty2/empty3/empty4/empty5",
+		"yos/list/simple_folder",
+		"yos/list/white space",
+	},
 }
