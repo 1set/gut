@@ -52,6 +52,7 @@ func ListDir(root string) (entries []*FilePathInfo, err error) {
 }
 
 const (
+	// The flags are used by the ListMatch methods.
 	ListRecursive   int = 1 << iota // Recursively list directory entries encountered.
 	ListToLower                     // Convert file name to lower case before the pattern matching.
 	ListIncludeFile                 // Include matched files in the returned list.
