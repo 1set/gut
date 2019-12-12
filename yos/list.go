@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// A FilePathInfo describes a file's path and stat.
 type FilePathInfo struct {
 	Path string
 	Info os.FileInfo
@@ -51,14 +52,10 @@ func ListDir(root string) (entries []*FilePathInfo, err error) {
 }
 
 const (
-	// Recursively list directory entries encountered.
-	ListRecursive int = 1 << iota
-	// Convert file name to lower case before the pattern matching.
-	ListToLower
-	// Include matched files in the returned list.
-	ListIncludeFile
-	// Include matched directories in the returned list.
-	ListIncludeDir
+	ListRecursive   int = 1 << iota // Recursively list directory entries encountered.
+	ListToLower                     // Convert file name to lower case before the pattern matching.
+	ListIncludeFile                 // Include matched files in the returned list.
+	ListIncludeDir                  // Include matched directories in the returned list.
 )
 
 // ListMatch returns a list of directory entries that matches any given pattern in the directory in lexical order.

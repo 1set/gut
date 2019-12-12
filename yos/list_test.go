@@ -100,7 +100,6 @@ func TestListMatch(t *testing.T) {
 		wantSuffix []string
 		wantErr    bool
 	}{
-		// TODO: fill these tests
 		{"Empty root path", args{"", ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], true},
 		{"Root not exist", args{"__not_found_folder__", ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], true},
 		{"No Flag", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
