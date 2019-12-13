@@ -128,6 +128,7 @@ func TestListMatch(t *testing.T) {
 		{"Broken pattern", args{TestCaseRootList, ListIncludeFile, []string{"*[1-"}}, expectedResultMap["Empty"], true},
 		{"Empty pattern", args{TestCaseRootList, ListIncludeFile, []string{""}}, expectedResultMap["Empty"], false},
 		{"Pattern for exact match", args{TestCaseRootList, ListRecursive | ListIncludeFile, []string{"file1.txt"}}, expectedResultMap["All file1.txt"], false},
+		{"Pattern for exclude", args{TestCaseRootList, ListRecursive | ListIncludeFile, []string{"[^.]*"}}, expectedResultMap["AllFiles"], false},
 		{"Pattern match none", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.pdf"}}, expectedResultMap["Empty"], false},
 		{"Pattern match txt", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt"}}, expectedResultMap["All *.txt"], false},
 		{"Pattern with slash", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"/*.txt"}}, expectedResultMap["Empty"], false},
