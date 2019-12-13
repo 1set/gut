@@ -18,14 +18,14 @@ func TestIsExistOrNot(t *testing.T) {
 		path  string
 		exist bool
 	}{
-		{"check missing", "__do_not_exist__", false},
-		{"check doc file", "doc.go", true},
-		{"check current dir", ".", true},
-		{"check symlink origin", JoinPath(TestCaseRootSymlink, "origin_file.txt"), true},
-		{"check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), true},
-		{"check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), true},
-		{"check symlink of symlink", JoinPath(TestCaseRootSymlink, "2symlink.txt"), true},
-		{"check broken symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), false},
+		{"Check missing", "__do_not_exist__", false},
+		{"Check doc file", "doc.go", true},
+		{"Check current dir", ".", true},
+		{"Check symlink origin", JoinPath(TestCaseRootSymlink, "origin_file.txt"), true},
+		{"Check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), true},
+		{"Check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), true},
+		{"Check symlink of symlink", JoinPath(TestCaseRootSymlink, "2symlink.txt"), true},
+		{"Check broken symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -58,18 +58,18 @@ func TestIsFileExist(t *testing.T) {
 		wantExist bool
 		wantErr   bool
 	}{
-		{"check missing", "__do_not_exist__", false, true},
-		{"check doc file", "doc.go", true, false},
-		{"check current dir", ".", false, true},
-		{"check symlink dir", JoinPath(TestCaseRootSymlink), false, true},
-		{"check symlink origin file", JoinPath(TestCaseRootSymlink, "origin_file.txt"), true, false},
-		{"check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), true, false},
-		{"check symlink of symlink of file", JoinPath(TestCaseRootSymlink, "2symlink.txt"), true, false},
-		{"check symlink origin dir", JoinPath(TestCaseRootSymlink, "target_dir"), false, true},
-		{"check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), false, true},
-		{"check symlink of symlink of dir", JoinPath(TestCaseRootSymlink, "2dir_link"), false, true},
-		{"check broken file symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), false, true},
-		{"check broken dir symlink", JoinPath(TestCaseRootSymlink, "broken2.txt"), false, true},
+		{"Check missing", "__do_not_exist__", false, true},
+		{"Check doc file", "doc.go", true, false},
+		{"Check current dir", ".", false, true},
+		{"Check symlink dir", JoinPath(TestCaseRootSymlink), false, true},
+		{"Check symlink origin file", JoinPath(TestCaseRootSymlink, "origin_file.txt"), true, false},
+		{"Check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), true, false},
+		{"Check symlink of symlink of file", JoinPath(TestCaseRootSymlink, "2symlink.txt"), true, false},
+		{"Check symlink origin dir", JoinPath(TestCaseRootSymlink, "target_dir"), false, true},
+		{"Check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), false, true},
+		{"Check symlink of symlink of dir", JoinPath(TestCaseRootSymlink, "2dir_link"), false, true},
+		{"Check broken file symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), false, true},
+		{"Check broken dir symlink", JoinPath(TestCaseRootSymlink, "broken2.txt"), false, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -98,18 +98,18 @@ func TestIsDirExist(t *testing.T) {
 		wantExist bool
 		wantErr   bool
 	}{
-		{"check missing", "__do_not_exist__", false, true},
-		{"check doc file", "doc.go", false, true},
-		{"check current dir", ".", true, false},
-		{"check symlink dir", JoinPath(TestCaseRootSymlink), true, false},
-		{"check symlink origin file", JoinPath(TestCaseRootSymlink, "origin_file.txt"), false, true},
-		{"check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), false, true},
-		{"check symlink of symlink of file", JoinPath(TestCaseRootSymlink, "2symlink.txt"), false, true},
-		{"check symlink origin dir", JoinPath(TestCaseRootSymlink, "target_dir"), true, false},
-		{"check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), true, false},
-		// {"check symlink of symlink of dir", JoinPath(TestCaseRootSymlink, "2dir_link"), true, false},
-		{"check broken file symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), false, true},
-		{"check broken dir symlink", JoinPath(TestCaseRootSymlink, "broken2.txt"), false, true},
+		{"Check missing", "__do_not_exist__", false, true},
+		{"Check doc file", "doc.go", false, true},
+		{"Check current dir", ".", true, false},
+		{"Check symlink dir", JoinPath(TestCaseRootSymlink), true, false},
+		{"Check symlink origin file", JoinPath(TestCaseRootSymlink, "origin_file.txt"), false, true},
+		{"Check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), false, true},
+		{"Check symlink of symlink of file", JoinPath(TestCaseRootSymlink, "2symlink.txt"), false, true},
+		{"Check symlink origin dir", JoinPath(TestCaseRootSymlink, "target_dir"), true, false},
+		{"Check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), true, false},
+		// {"Check symlink of symlink of dir", JoinPath(TestCaseRootSymlink, "2dir_link"), true, false},
+		{"Check broken file symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), false, true},
+		{"Check broken dir symlink", JoinPath(TestCaseRootSymlink, "broken2.txt"), false, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -138,18 +138,18 @@ func TestIsSymlinkExist(t *testing.T) {
 		wantExist bool
 		wantErr   bool
 	}{
-		{"check missing", "__do_not_exist__", false, true},
-		{"check doc file", "doc.go", false, true},
-		{"check current dir", ".", false, true},
-		{"check symlink dir", JoinPath(TestCaseRootSymlink), false, true},
-		{"check symlink origin file", JoinPath(TestCaseRootSymlink, "origin_file.txt"), false, true},
-		{"check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), true, false},
-		{"check symlink of symlink of file", JoinPath(TestCaseRootSymlink, "2symlink.txt"), true, false},
-		{"check symlink origin dir", JoinPath(TestCaseRootSymlink, "target_dir"), false, true},
-		{"check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), true, false},
-		{"check symlink of symlink of dir", JoinPath(TestCaseRootSymlink, "2dir_link"), true, false},
-		{"check broken file symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), true, false},
-		{"check broken dir symlink", JoinPath(TestCaseRootSymlink, "broken2.txt"), true, false},
+		{"Check missing", "__do_not_exist__", false, true},
+		{"Check doc file", "doc.go", false, true},
+		{"Check current dir", ".", false, true},
+		{"Check symlink dir", JoinPath(TestCaseRootSymlink), false, true},
+		{"Check symlink origin file", JoinPath(TestCaseRootSymlink, "origin_file.txt"), false, true},
+		{"Check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), true, false},
+		{"Check symlink of symlink of file", JoinPath(TestCaseRootSymlink, "2symlink.txt"), true, false},
+		{"Check symlink origin dir", JoinPath(TestCaseRootSymlink, "target_dir"), false, true},
+		{"Check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), true, false},
+		{"Check symlink of symlink of dir", JoinPath(TestCaseRootSymlink, "2dir_link"), true, false},
+		{"Check broken file symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), true, false},
+		{"Check broken dir symlink", JoinPath(TestCaseRootSymlink, "broken2.txt"), true, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -179,15 +179,15 @@ func TestJoinPath(t *testing.T) {
 		elem []string
 		want string
 	}{
-		{"nil", nil, ""},
-		{"empty", []string{}, ""},
-		{"single part", []string{"abc"}, "abc"},
-		{"two parts", []string{"ab", "cd"}, strings.Join([]string{"ab", "cd"}, string(os.PathSeparator))},
-		{"three parts", []string{"ab", "cd", "ef"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
-		{"contains trailing slash", []string{"ab/", "cd/", "ef/"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
-		{"contains heading slash", []string{"ab", "/cd", "/ef"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
-		{"contains heading & trailing slash", []string{"ab/", "/cd/", "/ef/"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
-		{"contains extra slash", []string{"ab//", "//cd//", "//ef/"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
+		{"Nil", nil, ""},
+		{"Empty", []string{}, ""},
+		{"Single part", []string{"abc"}, "abc"},
+		{"Two parts", []string{"ab", "cd"}, strings.Join([]string{"ab", "cd"}, string(os.PathSeparator))},
+		{"Three parts", []string{"ab", "cd", "ef"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
+		{"Contains trailing slash", []string{"ab/", "cd/", "ef/"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
+		{"Contains heading slash", []string{"ab", "/cd", "/ef"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
+		{"Contains heading & trailing slash", []string{"ab/", "/cd/", "/ef/"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
+		{"Contains extra slash", []string{"ab//", "//cd//", "//ef/"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
