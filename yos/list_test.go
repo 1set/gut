@@ -6,10 +6,11 @@ import (
 	"testing"
 )
 
-var TestCaseRootList string
+var TestCaseRootList, FileInTestCaseRootList string
 
 func init() {
 	TestCaseRootList = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "list")
+	FileInTestCaseRootList = JoinPath(TestCaseRootList, "no_ext_name_file")
 }
 
 func verifyTestResult(t *testing.T, name string, expected []string, actual []*FilePathInfo, err error) {
@@ -43,7 +44,11 @@ func TestListAll(t *testing.T) {
 			return
 		}
 	}
-	actual, err := ListAll(TestCaseRootList)
+
+	actual, err := ListAll(FileInTestCaseRootList)
+	verifyTestResult(t, "ListAll", expectedResultMap["Empty"], actual, err)
+
+	actual, err = ListAll(TestCaseRootList)
 	verifyTestResult(t, "ListAll", expectedResultMap["All"], actual, err)
 }
 
@@ -60,7 +65,11 @@ func TestListFile(t *testing.T) {
 			return
 		}
 	}
-	actual, err := ListFile(TestCaseRootList)
+
+	actual, err := ListFile(FileInTestCaseRootList)
+	verifyTestResult(t, "ListFile", expectedResultMap["Empty"], actual, err)
+
+	actual, err = ListFile(TestCaseRootList)
 	verifyTestResult(t, "ListFile", expectedResultMap["AllFiles"], actual, err)
 }
 
@@ -77,7 +86,11 @@ func TestListDir(t *testing.T) {
 			return
 		}
 	}
-	actual, err := ListDir(TestCaseRootList)
+
+	actual, err := ListDir(FileInTestCaseRootList)
+	verifyTestResult(t, "ListDir", expectedResultMap["Empty"], actual, err)
+
+	actual, err = ListDir(TestCaseRootList)
 	verifyTestResult(t, "ListDir", expectedResultMap["AllDirs"], actual, err)
 }
 
@@ -102,6 +115,7 @@ func TestListMatch(t *testing.T) {
 	}{
 		{"Empty root path", args{"", ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], true},
 		{"Root not exist", args{"__not_found_folder__", ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], true},
+		{"Root is a file", args{FileInTestCaseRootList, ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], false},
 		{"No Flag", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
 		{"Flag for file", args{TestCaseRootList, ListIncludeFile, allEntriesPattern}, expectedResultMap["RootFiles"], false},
 		{"Flag for dir", args{TestCaseRootList, ListIncludeDir, allEntriesPattern}, expectedResultMap["RootDirs"], false},
