@@ -51,12 +51,16 @@ func ListDir(root string) (entries []*FilePathInfo, err error) {
 	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return info.IsDir(), nil })
 }
 
+// The flags are used by the ListMatch methods.
 const (
-	// The flags are used by the ListMatch methods.
-	ListRecursive   int = 1 << iota // Recursively list directory entries encountered.
-	ListToLower                     // Convert file name to lower case before the pattern matching.
-	ListIncludeFile                 // Include matched files in the returned list.
-	ListIncludeDir                  // Include matched directories in the returned list.
+	// ListRecursive indicates ListMatch to recursively list directory entries encountered.
+	ListRecursive int = 1 << iota
+	// ListRecursive indicates ListMatch to convert file name to lower case before the pattern matching.
+	ListToLower
+	// ListRecursive indicates ListMatch to include matched files in the returned list.
+	ListIncludeFile
+	// ListRecursive indicates ListMatch to include matched directories in the returned list.
+	ListIncludeDir
 )
 
 // ListMatch returns a list of directory entries that matches any given pattern in the directory in lexical order.
