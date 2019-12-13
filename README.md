@@ -70,7 +70,7 @@ A simple one. Just **go** with your **gut** feeling.
                 Test Coverage
             </td>
             <td align="left" valign="middle">
-                <a href='https://codecov.io/gh/1set/gut'><img src="https://codecov.io/gh/1set/gut/branch/master/graph/badge.svg"
+                <a href='https://codecov.io/gh/1set/gut/branch/master'><img src="https://codecov.io/gh/1set/gut/branch/master/graph/badge.svg"
                         referrerpolicy="no-referrer" alt="Codecov"></a>
             </td>
         </tr>
@@ -82,3 +82,4 @@ A simple one. Just **go** with your **gut** feeling.
 -   [`yrand`](https://godoc.org/github.com/1set/gut/yrand): yet another wrapper of **crypto/rand** with func like **math/rand**
 -   [`yhash`](https://godoc.org/github.com/1set/gut/yhash): yet another collection of methods to calculate checksum of file/string/bytes
 -   [`ystring`](https://godoc.org/github.com/1set/gut/ystring): yet another collection of methods to manipulate UTF-8 encoded strings
+-   [`yos`](https://godoc.org/github.com/1set/gut/yos): yet another wrapper of platform-independent interface to operating system functionality
