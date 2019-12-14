@@ -17,11 +17,13 @@ func init() {
 	TestCaseRootList = yos.JoinPath(os.Getenv("TESTRSSDIR"), "yhash")
 	FilePathMap = map[string]string{
 		"empty file":           yos.JoinPath(TestCaseRootList, "empty_file"),
-		"one-line text file":   yos.JoinPath(TestCaseRootList, "one-line_text_file"),
-		"large text file":      yos.JoinPath(TestCaseRootList, "large_text_file"),
-		"xlarge text file":     yos.JoinPath(TestCaseRootList, "xlarge_text_file"),
-		"small binary file":    yos.JoinPath(TestCaseRootList, "small_binary_file"),
-		"another small binary": yos.JoinPath(TestCaseRootList, "another_small_binary"),
+		"one-line text file":   yos.JoinPath(TestCaseRootList, "one-line_text.txt"),
+		"large text file":      yos.JoinPath(TestCaseRootList, "large_text.txt"),
+		"xlarge text file":     yos.JoinPath(TestCaseRootList, "xlarge_text.txt"),
+		"small binary file":    yos.JoinPath(TestCaseRootList, "small_file.bin"),
+		"another small binary": yos.JoinPath(TestCaseRootList, "another_small.bin"),
+		"png image":            yos.JoinPath(TestCaseRootList, "image.png"),
+		"jpg image":            yos.JoinPath(TestCaseRootList, "image.jpg"),
 	}
 }
 
@@ -144,6 +146,8 @@ func TestFileHash(t *testing.T) {
 				{"xlarge text file", "", "0d9d7d9349c970fbf71b46698c5d1165", false},
 				{"small binary file", "", "f837aa60b6fe83458f790db60d529fc9", false},
 				{"another small binary", "", "89e19cf9c9680994d75adfac30887b31", false},
+				{"png image", "", "ee42b0615d9d8219eb152f32297ecf20", false},
+				{"jpg image", "", "ad352cef1774d58c7198a275c401b6c9", false},
 			},
 		},
 		{
@@ -157,6 +161,8 @@ func TestFileHash(t *testing.T) {
 				{"xlarge text file", "", "3912642ec8f1430ae3f1f870d2279a26a0a02297", false},
 				{"small binary file", "", "14af87ccec7f81bb28d53c84da2fd5a9d5925cda", false},
 				{"another small binary", "", "cd2ad24ee27178115ff6440bb3f996a142888838", false},
+				{"png image", "", "eebf5f2c4f6e4081c41899f959de2fd2711df9c1", false},
+				{"jpg image", "", "c576e9fd3617e4c5992c5fcc147ca7ad2b719ef1", false},
 			},
 		},
 		{
@@ -170,6 +176,8 @@ func TestFileHash(t *testing.T) {
 				{"xlarge text file", "", "45f94373b06ec25a35bb3d09f92648fd6a459adc727c1c4144a45b67", false},
 				{"small binary file", "", "f8bd06da0e66c71e85ffc6ca6a6ebffbf6eaf5bf97e1054148dde87c", false},
 				{"another small binary", "", "f6099a9ecf7273b5d0c8ce376da0306d9ad77b8e8c958676c6df1a8a", false},
+				{"png image", "", "26c35aa68c695cf4a7086740f5f05303202531885e332b2c80d29185", false},
+				{"jpg image", "", "09768296afddab047c9b0183e74cfc0dfd128e835f4e2616cc12c911", false},
 			},
 		},
 		{
@@ -183,6 +191,8 @@ func TestFileHash(t *testing.T) {
 				{"xlarge text file", "", "79ba34c7b43e2b6e4262ad966e2ba599ff53d553bd10fd73bbce096fd3ffa28f", false},
 				{"small binary file", "", "dcecab1355b5c2b9ecef281322bf265ac5840b4688748586e9632b473a5fe56b", false},
 				{"another small binary", "", "4d16089410a483860214a39730859e6b5a8a8b8e970911c79dd44ff331edde40", false},
+				{"png image", "", "dfeab6a38cd16c70b1ac79201f5d1ff7fbb59f40351daae990c27f0a5ba16c22", false},
+				{"jpg image", "", "05875dcc88abb73037cae1e090ca01dbfb272983f0c9055392c2f9e2e2451c39", false},
 			},
 		},
 		{
@@ -196,6 +206,8 @@ func TestFileHash(t *testing.T) {
 				{"xlarge text file", "", "929e8e1eff9b533ac203dc042a40cb54a63eda04e2b6430903daee5d1bab4206b520b0a57c31303955d98cb36e7906d1", false},
 				{"small binary file", "", "2e76b983134df83f43fbacb576992f07f87d8cd0620892ba19f8dde2a94ed904abda6d1fac5c5c7dda32dd99c387eb39", false},
 				{"another small binary", "", "1e0b8234559cbc8658851b6414810ee3a0b84222e3d49675a89eca50534419dccd3703410dedf13a6a0d9fde91451ed4", false},
+				{"png image", "", "f8f090850bea75f43206978c2da711754d43209be2b3267254e38fc4ce93e48d01610d5e68c42d37bef9b03f814ec184", false},
+				{"jpg image", "", "b6d6647539c9e23de6d2ebe0c7bf0ccf76949919168286308e734e55af4185d31bf07fe86652502188a8f4b3a98a22dd", false},
 			},
 		},
 		{
@@ -209,6 +221,8 @@ func TestFileHash(t *testing.T) {
 				{"xlarge text file", "", "3aa8d4b6bcaeb74f4d0d7bdc0fe227865efac852a2b8edcb629230c9a8bb01eefc35de318a0d9d09f0a4bb1f8718e2fcaa511ec44e02d4f8d2354dc3edf045e0", false},
 				{"small binary file", "", "a85e09c3b5dbb560f4e03ba880047dbc8b4999a64c1f54fbfbca17ee0bcbed3bc6708d699190b56668e464a59358d6b534c3963a1329ba01db21075ef5bedace", false},
 				{"another small binary", "", "025eee01d2ab71d80d20c9aa461f83f6413cd9bf20d9ce9ff201d025b43f7df10609ef8d207fa31c8aa708653650bd80a3af5830f495f114e1d5d3cd909bb4d7", false},
+				{"png image", "", "f96c0db10b08874254fbfa73d6576ecb41e20a95b1c287692da48adea10ac3feee6eb910bbcc293207ce777f861c1acc55b0b79fafe05bc8b4951a70cbbbb89c", false},
+				{"jpg image", "", "3a3add8d5f8b4e71d712e37ce5f15e2b2ff5d44b760e5c4f7f8754077c36185a1e54984712adee26afc28b27f8a633898c87f20e7a27b583305a4b78be8c88dc", false},
 			},
 		},
 		{
@@ -222,6 +236,8 @@ func TestFileHash(t *testing.T) {
 				{"xlarge text file", "", "08374eff5a420bc96e7dc3fd596c601cae8ccbec1b380e094a392574", false},
 				{"small binary file", "", "3ccd36a41c16eb62949ee655b6b02109e2ae3d6e5dbe8508f10d5a13", false},
 				{"another small binary", "", "5a31ba516b588cbdb6d76ff1c760b3a11691049ef6c36d071ba9b8e5", false},
+				{"png image", "", "774f87d77bac2d3461fdb5e498cf9d5930027c66e8407bb76d885638", false},
+				{"jpg image", "", "a6e8c0a166ad7d9303dc1862209931cd9b71d192ec9b3e971737252b", false},
 			},
 		},
 		{
@@ -235,6 +251,8 @@ func TestFileHash(t *testing.T) {
 				{"xlarge text file", "", "912567be7c2b0b9dfdc71cd086672689a67bb53ee0c7c32b4b45a331f01ba195", false},
 				{"small binary file", "", "36dd5d7e2ec22d11864bcf18e27f3f2ee26ae027e123f4eed0280c8e30bd6694", false},
 				{"another small binary", "", "6b47bf188df953bed6353a90872b3fae8451d96843a0879706df58598779b124", false},
+				{"png image", "", "1da258ed4c48b6f853e5534f3053271c9a53bf23d6bfca02c814b3ddd763afae", false},
+				{"jpg image", "", "04248ed1401a94c25ab372fce592d7c6c92c54c8b55dbd2d878ed4fae9088405", false},
 			},
 		},
 	}
