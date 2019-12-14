@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	TestCaseRootList string
-	FilePathMap      map[string]string
+	TestCaseRootList  string
+	TestFileBenchmark string
+	FilePathMap       map[string]string
 )
 
 func init() {
@@ -25,101 +26,94 @@ func init() {
 		"png image":            yos.JoinPath(TestCaseRootList, "image.png"),
 		"jpg image":            yos.JoinPath(TestCaseRootList, "image.jpg"),
 	}
+	TestFileBenchmark = FilePathMap["png image"]
 }
 
 func BenchmarkFileMD5(b *testing.B) {
-	testFile := FilePathMap["large text file"]
-	if ystring.IsBlank(testFile) {
+	if ystring.IsBlank(TestFileBenchmark) {
 		b.Errorf("FileMD5() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileMD5(testFile)
+		_, _ = FileMD5(TestFileBenchmark)
 	}
 }
 
 func BenchmarkFileSHA1(b *testing.B) {
-	testFile := FilePathMap["large text file"]
-	if ystring.IsBlank(testFile) {
+	if ystring.IsBlank(TestFileBenchmark) {
 		b.Errorf("FileSHA1() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA1(testFile)
+		_, _ = FileSHA1(TestFileBenchmark)
 	}
 }
 
 func BenchmarkFileSHA224(b *testing.B) {
-	testFile := FilePathMap["large text file"]
-	if ystring.IsBlank(testFile) {
+	if ystring.IsBlank(TestFileBenchmark) {
 		b.Errorf("FileSHA224() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA224(testFile)
+		_, _ = FileSHA224(TestFileBenchmark)
 	}
 }
 
 func BenchmarkFileSHA256(b *testing.B) {
-	testFile := FilePathMap["large text file"]
-	if ystring.IsBlank(testFile) {
+	if ystring.IsBlank(TestFileBenchmark) {
 		b.Errorf("FileSHA256() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA256(testFile)
+		_, _ = FileSHA256(TestFileBenchmark)
 	}
 }
 
 func BenchmarkFileSHA384(b *testing.B) {
-	testFile := FilePathMap["large text file"]
-	if ystring.IsBlank(testFile) {
+	if ystring.IsBlank(TestFileBenchmark) {
 		b.Errorf("FileSHA384() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA384(testFile)
+		_, _ = FileSHA384(TestFileBenchmark)
 	}
 }
 
 func BenchmarkFileSHA512(b *testing.B) {
-	testFile := FilePathMap["large text file"]
-	if ystring.IsBlank(testFile) {
+	if ystring.IsBlank(TestFileBenchmark) {
 		b.Errorf("FileSHA512() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA512(testFile)
+		_, _ = FileSHA512(TestFileBenchmark)
 	}
 }
 
 func BenchmarkFileSHA512_224(b *testing.B) {
-	testFile := FilePathMap["large text file"]
-	if ystring.IsBlank(testFile) {
+	if ystring.IsBlank(TestFileBenchmark) {
 		b.Errorf("FileSHA512_224() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA512_224(testFile)
+		_, _ = FileSHA512_224(TestFileBenchmark)
 	}
 }
 
 func BenchmarkFileSHA512_256(b *testing.B) {
-	testFile := FilePathMap["large text file"]
-	if ystring.IsBlank(testFile) {
+	if ystring.IsBlank(TestFileBenchmark) {
 		b.Errorf("FileSHA512_256() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA512_256(testFile)
+		_, _ = FileSHA512_256(TestFileBenchmark)
 	}
 }
 
