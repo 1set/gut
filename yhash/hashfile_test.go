@@ -1,145 +1,123 @@
 package yhash
 
 import (
-	"encoding/base64"
-	"io/ioutil"
 	"os"
-	"strings"
 	"testing"
+
+	"github.com/1set/gut/yos"
+	"github.com/1set/gut/ystring"
 )
 
-func TestMain(m *testing.M) {
-	setup()
-	code := m.Run()
-	teardown()
-	os.Exit(code)
-}
+var (
+	TestCaseRootList string
+	FilePathMap      map[string]string
+)
 
-var filePathMap = make(map[string]string)
-var benchmarkFilePath string
-
-func setup() {
-	tempFileContents := map[string]string{
-		"empty file":           "",
-		"one-line text file":   "Hello World",
-		"large text file":      strings.Repeat("Stop managing your time. Start managing your focus. ", 10000),
-		"xlarge text file":     strings.Repeat("Do or do not, there is no try. ", 1000000),
-		"small binary file":    "R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
-		"another small binary": "VGhlIHF1aWNrIGJyb3duIPCfpooganVtcHMgb3ZlciAxMyBsYXp5IPCfkLYuIOKAnFRoZXJlIHdhcyBhIHNtYWxsIG51bWJlciBvZiByZWFsbHkgc21hcnQsIHJlYWxseSB5b3VuZyBjb2RlcnMgd2hvIHByb2R1Y2VkIGEgbG90IG9mIHZlcnkgY2xldmVyIGNvZGUgdGhhdCBvbmx5IHRoZXkgY291bGQgdW5kZXJzdGFuZCzigJ0gc2FpZCB2YW4gUm9zc3VtLiDigJxUaGF0IGlzIHByb2JhYmx5IHRoZSByaWdodCBhdHRpdHVkZSB0byBoYXZlIHdoZW4geW91J3JlIGEgcmVhbGx5IHNtYWxsIHN0YXJ0dXAu4oCd",
-	}
-	for title, content := range tempFileContents {
-		name := strings.Replace(title, " ", "_", -1)
-		if file, err := ioutil.TempFile("", name); err == nil {
-			if strings.Contains(title, "binary") {
-				data, err := base64.StdEncoding.DecodeString(content)
-				if err != nil {
-					continue
-				}
-				if _, err = file.Write(data); err != nil {
-					continue
-				}
-			} else if _, err = file.WriteString(content); err != nil {
-				continue
-			}
-
-			filePathMap[title] = file.Name()
-			_ = file.Close()
-		}
-	}
-	benchmarkFilePath = filePathMap["large text file"]
-}
-
-func teardown() {
-	for _, path := range filePathMap {
-		os.Remove(path)
+func init() {
+	TestCaseRootList = yos.JoinPath(os.Getenv("TESTRSSDIR"), "yhash")
+	FilePathMap = map[string]string{
+		"empty file":           yos.JoinPath(TestCaseRootList, "empty_file"),
+		"one-line text file":   yos.JoinPath(TestCaseRootList, "one-line_text_file"),
+		"large text file":      yos.JoinPath(TestCaseRootList, "large_text_file"),
+		"xlarge text file":     yos.JoinPath(TestCaseRootList, "xlarge_text_file"),
+		"small binary file":    yos.JoinPath(TestCaseRootList, "small_binary_file"),
+		"another small binary": yos.JoinPath(TestCaseRootList, "another_small_binary"),
 	}
 }
 
 func BenchmarkFileMD5(b *testing.B) {
-	if len(benchmarkFilePath) == 0 {
+	testFile := FilePathMap["large text file"]
+	if ystring.IsBlank(testFile) {
 		b.Errorf("FileMD5() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileMD5(benchmarkFilePath)
+		_, _ = FileMD5(testFile)
 	}
 }
 
 func BenchmarkFileSHA1(b *testing.B) {
-	if len(benchmarkFilePath) == 0 {
+	testFile := FilePathMap["large text file"]
+	if ystring.IsBlank(testFile) {
 		b.Errorf("FileSHA1() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA1(benchmarkFilePath)
+		_, _ = FileSHA1(testFile)
 	}
 }
 
 func BenchmarkFileSHA224(b *testing.B) {
-	if len(benchmarkFilePath) == 0 {
+	testFile := FilePathMap["large text file"]
+	if ystring.IsBlank(testFile) {
 		b.Errorf("FileSHA224() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA224(benchmarkFilePath)
+		_, _ = FileSHA224(testFile)
 	}
 }
 
 func BenchmarkFileSHA256(b *testing.B) {
-	if len(benchmarkFilePath) == 0 {
+	testFile := FilePathMap["large text file"]
+	if ystring.IsBlank(testFile) {
 		b.Errorf("FileSHA256() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA256(benchmarkFilePath)
+		_, _ = FileSHA256(testFile)
 	}
 }
 
 func BenchmarkFileSHA384(b *testing.B) {
-	if len(benchmarkFilePath) == 0 {
+	testFile := FilePathMap["large text file"]
+	if ystring.IsBlank(testFile) {
 		b.Errorf("FileSHA384() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA384(benchmarkFilePath)
+		_, _ = FileSHA384(testFile)
 	}
 }
 
 func BenchmarkFileSHA512(b *testing.B) {
-	if len(benchmarkFilePath) == 0 {
+	testFile := FilePathMap["large text file"]
+	if ystring.IsBlank(testFile) {
 		b.Errorf("FileSHA512() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA512(benchmarkFilePath)
+		_, _ = FileSHA512(testFile)
 	}
 }
 
 func BenchmarkFileSHA512_224(b *testing.B) {
-	if len(benchmarkFilePath) == 0 {
+	testFile := FilePathMap["large text file"]
+	if ystring.IsBlank(testFile) {
 		b.Errorf("FileSHA512_224() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA512_224(benchmarkFilePath)
+		_, _ = FileSHA512_224(testFile)
 	}
 }
 
 func BenchmarkFileSHA512_256(b *testing.B) {
-	if len(benchmarkFilePath) == 0 {
+	testFile := FilePathMap["large text file"]
+	if ystring.IsBlank(testFile) {
 		b.Errorf("FileSHA512_256() got no file for benchmark")
 		return
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = FileSHA512_256(benchmarkFilePath)
+		_, _ = FileSHA512_256(testFile)
 	}
 }
 
@@ -264,10 +242,10 @@ func TestFileHash(t *testing.T) {
 		for _, tt := range ts.cases {
 			t.Run(ts.name+" "+tt.name, func(t *testing.T) {
 				filePath := tt.filePath
-				if len(tt.filePath) == 0 {
+				if ystring.IsBlank(tt.filePath) {
 					var found bool
-					if filePath, found = filePathMap[tt.name]; !found {
-						t.Errorf("FileMD5() got no file for case '%v'", tt.name)
+					if filePath, found = FilePathMap[tt.name]; !found {
+						t.Errorf("File%s() got no file for case '%v'", ts.name, tt.name)
 						return
 					}
 				}
