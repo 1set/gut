@@ -8,6 +8,7 @@ import (
 )
 
 func TestShuffle(t *testing.T) {
+	t.Parallel()
 	num, _ := rangeInt(0)
 	swapFunc := func(i, j int) {
 		num[i], num[j] = num[j], num[i]
@@ -77,6 +78,7 @@ func BenchmarkShuffleWithSlice(b *testing.B) {
 }
 
 func TestChoiceInt(t *testing.T) {
+	t.Parallel()
 	int100, _ := rangeInt(100)
 	int500000, _ := rangeInt(500000)
 	tests := []struct {
@@ -130,6 +132,7 @@ func BenchmarkChoiceInt(b *testing.B) {
 }
 
 func TestChoiceString(t *testing.T) {
+	t.Parallel()
 	str100, _ := rangeString(100)
 	str500000, _ := rangeString(500000)
 	tests := []struct {

@@ -118,6 +118,7 @@ func BenchmarkFileSHA512_256(b *testing.B) {
 }
 
 func TestFileHash(t *testing.T) {
+	t.Parallel()
 	type hashTestCase struct {
 		name     string
 		filePath string

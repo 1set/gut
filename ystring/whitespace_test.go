@@ -5,6 +5,7 @@ import (
 )
 
 func TestIsEmptyOrNot(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name  string
 		s     string
@@ -41,6 +42,7 @@ func BenchmarkIsNotEmpty(b *testing.B) {
 }
 
 func TestIsBlankOrNot(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name  string
 		s     string
@@ -77,6 +79,7 @@ func BenchmarkIsNotBlank(b *testing.B) {
 }
 
 func TestShrink(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		s   string
 		sep string
