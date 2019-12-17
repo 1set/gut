@@ -5,6 +5,7 @@ import (
 )
 
 func TestLength(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name string
 		s    string
@@ -33,6 +34,7 @@ func BenchmarkLength(b *testing.B) {
 }
 
 func TestTruncate(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		s string
 		n int

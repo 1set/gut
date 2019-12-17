@@ -61,6 +61,7 @@ func BenchmarkBytesSHA512_256(b *testing.B) {
 }
 
 func TestStringBytes(t *testing.T) {
+	t.Parallel()
 	type hashTestCase struct {
 		name    string
 		data    []byte

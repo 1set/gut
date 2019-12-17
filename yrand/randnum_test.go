@@ -5,6 +5,7 @@ import (
 )
 
 func TestInt64Range(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		min int64
 		max int64
@@ -55,11 +56,11 @@ func BenchmarkInt64Range(b *testing.B) {
 }
 
 func TestInt32Range(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		min int32
 		max int32
 	}
-
 	tests := []struct {
 		name       string
 		args       args
@@ -101,11 +102,11 @@ func BenchmarkInt32Range(b *testing.B) {
 }
 
 func TestIntRange(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		min int
 		max int
 	}
-
 	tests := []struct {
 		name       string
 		args       args
@@ -151,11 +152,11 @@ func BenchmarkIntRange(b *testing.B) {
 }
 
 func TestUint64Range(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		min uint64
 		max uint64
 	}
-
 	tests := []struct {
 		name       string
 		args       args
@@ -197,11 +198,11 @@ func BenchmarkUint64Range(b *testing.B) {
 }
 
 func TestUint32Range(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		min uint32
 		max uint32
 	}
-
 	tests := []struct {
 		name       string
 		args       args
@@ -242,11 +243,11 @@ func BenchmarkUint32Range(b *testing.B) {
 }
 
 func TestUintRange(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		min uint
 		max uint
 	}
-
 	tests := []struct {
 		name       string
 		args       args
@@ -288,6 +289,7 @@ func BenchmarkUintRange(b *testing.B) {
 }
 
 func TestFloat64(t *testing.T) {
+	t.Parallel()
 	count := 100000
 	total := 0.0
 	for i := 0; i < count; i++ {
@@ -316,6 +318,7 @@ func BenchmarkFloat64(b *testing.B) {
 }
 
 func TestFloat32(t *testing.T) {
+	t.Parallel()
 	count := 100000
 	total := float32(0.0)
 	for i := 0; i < count; i++ {

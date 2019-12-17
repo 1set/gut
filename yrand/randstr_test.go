@@ -6,6 +6,7 @@ import (
 )
 
 func TestString(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		alphabet string
 		length   int
@@ -48,6 +49,7 @@ func BenchmarkString(b *testing.B) {
 }
 
 func TestRunes(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		alphabet string
 		length   int
@@ -90,6 +92,7 @@ func BenchmarkRunes(b *testing.B) {
 }
 
 func TestStringLetters(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		length     int
@@ -129,6 +132,7 @@ func BenchmarkStringLetters(b *testing.B) {
 }
 
 func TestStringBase36(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		length     int
@@ -168,6 +172,7 @@ func BenchmarkStringBase36(b *testing.B) {
 }
 
 func TestStringBase62(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		length     int

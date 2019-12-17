@@ -5,6 +5,7 @@ import (
 )
 
 func TestTrimAfterFirst(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		s      string
 		substr string
@@ -45,6 +46,7 @@ func BenchmarkTrimAfterFirst(b *testing.B) {
 }
 
 func TestTrimAfterLast(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		s      string
 		substr string
@@ -85,6 +87,7 @@ func BenchmarkTrimAfterLast(b *testing.B) {
 }
 
 func TestTrimBeforeFirst(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		s      string
 		substr string
@@ -125,6 +128,7 @@ func BenchmarkTrimBeforeFirst(b *testing.B) {
 }
 
 func TestTrimBeforeLast(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		s      string
 		substr string
