@@ -1,13 +1,29 @@
 package yos
 
 import (
+	"errors"
 	"io"
 	"math/bits"
 	"os"
 	"path/filepath"
+
+	"github.com/1set/gut/ystring"
+)
+
+var (
+	ErrEmptyPath = errors.New("path is empty")
 )
 
 func CopyFile(src, dest string) (err error) {
+	if ystring.IsBlank(src) || ystring.IsBlank(dest) {
+		err = ErrEmptyPath
+		return
+	}
+
+	// clean up paths
+	src, dest = filepath.Clean(src), filepath.Clean(dest)
+
+	// check if source exists
 	var srcInfo, destInfo os.FileInfo
 	if srcInfo, err = os.Stat(src); err != nil {
 		return
