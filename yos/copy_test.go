@@ -5,26 +5,35 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 	"testing"
 )
 
 var (
-	TestCaseRootCopy   string
-	TestCaseOutputCopy string
-	TestFileMapCopy    map[string]string
+	TestCaseRootCopy      string
+	TestCaseOutputCopy    string
+	TestCaseBenchmarkCopy string
+	TestFileMapCopy       map[string]string
+	TestDirMapCopy        map[string]string
 )
 
 func init() {
 	TestCaseRootCopy = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "copy")
 	TestCaseOutputCopy = JoinPath(TestCaseRootCopy, "output")
+	TestCaseBenchmarkCopy = JoinPath(TestCaseOutputCopy, "benchmark")
 	TestFileMapCopy = map[string]string{
-		"EmptyDir":   JoinPath(TestCaseRootCopy, "empty-folder"),
-		"ContentDir": JoinPath(TestCaseRootCopy, "content-folder"),
-		"EmptyFile":  JoinPath(TestCaseRootCopy, "empty-file.txt"),
-		"SmallText":  JoinPath(TestCaseRootCopy, "small-text.txt"),
-		"LargeText":  JoinPath(TestCaseRootCopy, "large-text.txt"),
-		"PngImage":   JoinPath(TestCaseRootCopy, "image.png"),
-		"SvgImage":   JoinPath(TestCaseRootCopy, "image.svg"),
+		"Symlink":          JoinPath(TestCaseRootCopy, "soft-link.txt"),
+		"EmptyFile":        JoinPath(TestCaseRootCopy, "empty-file.txt"),
+		"SmallText":        JoinPath(TestCaseRootCopy, "small-text.txt"),
+		"LargeText":        JoinPath(TestCaseRootCopy, "large-text.txt"),
+		"PngImage":         JoinPath(TestCaseRootCopy, "image.png"),
+		"SvgImage":         JoinPath(TestCaseRootCopy, "image.svg"),
+		"Out_ExistingFile": JoinPath(TestCaseOutputCopy, "existing-file.txt"),
+	}
+	TestDirMapCopy = map[string]string{
+		"EmptyDir":        JoinPath(TestCaseRootCopy, "empty-folder"),
+		"ContentDir":      JoinPath(TestCaseRootCopy, "content-folder"),
+		"Out_ExistingDir": JoinPath(TestCaseOutputCopy, "existing-dir"),
 	}
 }
 
@@ -76,15 +85,27 @@ func compareFile(file1, file2 string) (bool, error) {
 	}
 }
 
-func TestCopyFileV4(t *testing.T) {
-
-	var tests = []struct {
+func TestCopyFile(t *testing.T) {
+	tests := []struct {
 		name     string
 		srcPath  string
 		destPath string
 		tarPath  string
 		wantErr  bool
-	}{}
+	}{
+		{"Source file not exist", JoinPath(TestCaseRootCopy, "__not_exist__"), TestCaseOutputCopy, TestCaseOutputCopy, true},
+		{"Source is a dir", TestDirMapCopy["ContentDir"], TestCaseOutputCopy, TestCaseOutputCopy, true},
+		{"Source is a symlink", TestFileMapCopy["Symlink"], TestCaseOutputCopy, TestCaseOutputCopy, false},
+		{"Destination is a dir", TestFileMapCopy["SmallText"], TestDirMapCopy["Out_ExistingDir"], JoinPath(TestDirMapCopy["Out_ExistingDir"], "small-text.txt"), false},
+		{"Destination is a file", TestFileMapCopy["SmallText"], TestFileMapCopy["Out_ExistingFile"], TestFileMapCopy["Out_ExistingFile"], false},
+		{"Destination file not exist", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "not-exist-file.txt"), JoinPath(TestCaseOutputCopy, "not-exist-file.txt"), false},
+		{"Destination dir not exist", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "not-exist-dir", "not-exist-file.txt"), TestCaseOutputCopy, true},
+		{"Copy empty file", TestFileMapCopy["EmptyFile"], JoinPath(TestCaseOutputCopy, "empty-file.txt"), JoinPath(TestCaseOutputCopy, "empty-file.txt"), false},
+		{"Copy small text file", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "small-text.txt"), JoinPath(TestCaseOutputCopy, "small-text.txt"), false},
+		{"Copy large text file", TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "large-text.txt"), JoinPath(TestCaseOutputCopy, "large-text.txt"), false},
+		{"Copy png image file", TestFileMapCopy["PngImage"], JoinPath(TestCaseOutputCopy, "image.png"), JoinPath(TestCaseOutputCopy, "image.png"), false},
+		{"Copy svg image file", TestFileMapCopy["SvgImage"], JoinPath(TestCaseOutputCopy, "image.svg"), JoinPath(TestCaseOutputCopy, "image.svg"), false},
+	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -101,6 +122,20 @@ func TestCopyFileV4(t *testing.T) {
 					t.Errorf("CopyFile() the files are not the same: %v, %v", tt.srcPath, tt.tarPath)
 					return
 				}
+			}
+		})
+	}
+}
+
+func BenchmarkCopyFile(b *testing.B) {
+	for name, path := range TestFileMapCopy {
+		if strings.HasPrefix(name, "Out_") {
+			continue
+		}
+		b.Run(name, func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				_ = CopyFile(path, TestCaseBenchmarkCopy)
 			}
 		})
 	}
