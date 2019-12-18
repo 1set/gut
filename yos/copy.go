@@ -4,9 +4,31 @@ import (
 	"io"
 	"math/bits"
 	"os"
+	"path/filepath"
 )
 
 func CopyFile(src, dest string) (err error) {
+	var srcInfo, destInfo os.FileInfo
+	if srcInfo, err = os.Stat(src); err != nil {
+		return
+	}
+
+	// check if destination exists
+	if destInfo, err = os.Stat(dest); err != nil {
+		// check existence of parent of the missing destination
+		if os.IsNotExist(err) {
+			_, err = os.Stat(filepath.Dir(dest))
+		}
+	} else {
+		// append filename of source to path of the existing destination
+		if destInfo.IsDir() {
+			dest = JoinPath(dest, srcInfo.Name())
+		}
+	}
+
+	if err != nil {
+		return
+	}
 	return bufferCopyFile(src, dest, 256*1024)
 }
 

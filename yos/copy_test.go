@@ -10,6 +10,7 @@ import (
 )
 
 var (
+	EmptyString           string
 	TestCaseRootCopy      string
 	TestCaseOutputCopy    string
 	TestCaseBenchmarkCopy string
@@ -93,13 +94,15 @@ func TestCopyFile(t *testing.T) {
 		tarPath  string
 		wantErr  bool
 	}{
-		{"Source file not exist", JoinPath(TestCaseRootCopy, "__not_exist__"), TestCaseOutputCopy, TestCaseOutputCopy, true},
-		{"Source is a dir", TestDirMapCopy["ContentDir"], TestCaseOutputCopy, TestCaseOutputCopy, true},
-		{"Source is a symlink", TestFileMapCopy["Symlink"], TestCaseOutputCopy, TestCaseOutputCopy, false},
+		{"Source is empty", EmptyString, TestCaseOutputCopy, EmptyString, true},
+		{"Source file not exist", JoinPath(TestCaseRootCopy, "__not_exist__"), TestCaseOutputCopy, EmptyString, true},
+		{"Source is a dir", TestDirMapCopy["ContentDir"], TestCaseOutputCopy, EmptyString, true},
+		// {"Source is a symlink", TestFileMapCopy["Symlink"], TestCaseOutputCopy, TestCaseOutputCopy, false},
+		{"Destination is empty", TestFileMapCopy["SmallText"], EmptyString, EmptyString, true},
 		{"Destination is a dir", TestFileMapCopy["SmallText"], TestDirMapCopy["Out_ExistingDir"], JoinPath(TestDirMapCopy["Out_ExistingDir"], "small-text.txt"), false},
 		{"Destination is a file", TestFileMapCopy["SmallText"], TestFileMapCopy["Out_ExistingFile"], TestFileMapCopy["Out_ExistingFile"], false},
 		{"Destination file not exist", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "not-exist-file.txt"), JoinPath(TestCaseOutputCopy, "not-exist-file.txt"), false},
-		{"Destination dir not exist", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "not-exist-dir", "not-exist-file.txt"), TestCaseOutputCopy, true},
+		{"Destination dir not exist", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "not-exist-dir", "not-exist-file.txt"), EmptyString, true},
 		{"Copy empty file", TestFileMapCopy["EmptyFile"], JoinPath(TestCaseOutputCopy, "empty-file.txt"), JoinPath(TestCaseOutputCopy, "empty-file.txt"), false},
 		{"Copy small text file", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "small-text.txt"), JoinPath(TestCaseOutputCopy, "small-text.txt"), false},
 		{"Copy large text file", TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "large-text.txt"), JoinPath(TestCaseOutputCopy, "large-text.txt"), false},
