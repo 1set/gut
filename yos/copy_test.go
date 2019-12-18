@@ -108,6 +108,8 @@ func TestCopyFile(t *testing.T) {
 		{"Copy large text file", TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "large-text.txt"), JoinPath(TestCaseOutputCopy, "large-text.txt"), false},
 		{"Copy png image file", TestFileMapCopy["PngImage"], JoinPath(TestCaseOutputCopy, "image.png"), JoinPath(TestCaseOutputCopy, "image.png"), false},
 		{"Copy svg image file", TestFileMapCopy["SvgImage"], JoinPath(TestCaseOutputCopy, "image.svg"), JoinPath(TestCaseOutputCopy, "image.svg"), false},
+		{"Source and destination are same", TestFileMapCopy["SmallText"], TestFileMapCopy["SmallText"], EmptyString, true},
+		{"Source and destination root are same", TestFileMapCopy["SmallText"], TestCaseRootCopy, EmptyString, true},
 	}
 
 	for _, tt := range tests {

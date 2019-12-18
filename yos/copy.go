@@ -12,6 +12,7 @@ import (
 
 var (
 	ErrEmptyPath = errors.New("path is empty")
+	ErrSameFile  = errors.New("files are identical")
 )
 
 func CopyFile(src, dest string) (err error) {
@@ -45,6 +46,7 @@ func CopyFile(src, dest string) (err error) {
 	if err != nil {
 		return
 	}
+
 	return bufferCopyFile(src, dest, 256*1024)
 }
 
@@ -55,11 +57,26 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	}
 	defer srcFile.Close()
 
-	var srcInfo os.FileInfo
+	var srcInfo, destInfo os.FileInfo
 	if srcInfo, err = os.Stat(src); err != nil {
 		return
 	}
 
+	// check if source and destination files are identical
+	if destInfo, err = os.Stat(dest); err == nil {
+		if os.SameFile(srcInfo, destInfo) {
+			err = ErrSameFile
+		}
+	} else if os.IsNotExist(err) {
+		// it's okay if destination file doesn't exist
+		err = nil
+	}
+
+	if err != nil {
+		return
+	}
+
+	// use smaller buffer if source file is not big enough
 	fileSize := srcInfo.Size()
 	if bufferSize > fileSize {
 		bufferSize = 1 << bits.Len64(uint64(fileSize))
