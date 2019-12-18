@@ -22,6 +22,7 @@ func init() {
 	TestCaseRootCopy = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "copy")
 	TestCaseOutputCopy = JoinPath(TestCaseRootCopy, "output")
 	TestCaseBenchmarkCopy = JoinPath(TestCaseOutputCopy, "benchmark")
+
 	TestFileMapCopy = map[string]string{
 		"Symlink":          JoinPath(TestCaseRootCopy, "soft-link.txt"),
 		"EmptyFile":        JoinPath(TestCaseRootCopy, "empty-file.txt"),
@@ -62,12 +63,12 @@ func compareFile(file1, file2 string) (bool, error) {
 		return false, err
 	}
 
-	const chunckSize = 64 * 1024
+	const chunkSize = 64 * 1024
 	for {
-		b1 := make([]byte, chunckSize)
+		b1 := make([]byte, chunkSize)
 		_, err1 := f1.Read(b1)
 
-		b2 := make([]byte, chunckSize)
+		b2 := make([]byte, chunkSize)
 		_, err2 := f2.Read(b2)
 
 		if err1 != nil || err2 != nil {
@@ -88,28 +89,29 @@ func compareFile(file1, file2 string) (bool, error) {
 
 func TestCopyFile(t *testing.T) {
 	tests := []struct {
-		name     string
-		srcPath  string
-		destPath string
-		tarPath  string
-		wantErr  bool
+		name       string
+		srcPath    string
+		destPath   string
+		inputPath  string
+		outputPath string
+		wantErr    bool
 	}{
-		{"Source is empty", EmptyString, TestCaseOutputCopy, EmptyString, true},
-		{"Source file not exist", JoinPath(TestCaseRootCopy, "__not_exist__"), TestCaseOutputCopy, EmptyString, true},
-		{"Source is a dir", TestDirMapCopy["ContentDir"], TestCaseOutputCopy, EmptyString, true},
-		// {"Source is a symlink", TestFileMapCopy["Symlink"], TestCaseOutputCopy, TestCaseOutputCopy, false},
-		{"Destination is empty", TestFileMapCopy["SmallText"], EmptyString, EmptyString, true},
-		{"Destination is a dir", TestFileMapCopy["SmallText"], TestDirMapCopy["Out_ExistingDir"], JoinPath(TestDirMapCopy["Out_ExistingDir"], "small-text.txt"), false},
-		{"Destination is a file", TestFileMapCopy["SmallText"], TestFileMapCopy["Out_ExistingFile"], TestFileMapCopy["Out_ExistingFile"], false},
-		{"Destination file not exist", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "not-exist-file.txt"), JoinPath(TestCaseOutputCopy, "not-exist-file.txt"), false},
-		{"Destination dir not exist", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "not-exist-dir", "not-exist-file.txt"), EmptyString, true},
-		{"Copy empty file", TestFileMapCopy["EmptyFile"], JoinPath(TestCaseOutputCopy, "empty-file.txt"), JoinPath(TestCaseOutputCopy, "empty-file.txt"), false},
-		{"Copy small text file", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "small-text.txt"), JoinPath(TestCaseOutputCopy, "small-text.txt"), false},
-		{"Copy large text file", TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "large-text.txt"), JoinPath(TestCaseOutputCopy, "large-text.txt"), false},
-		{"Copy png image file", TestFileMapCopy["PngImage"], JoinPath(TestCaseOutputCopy, "image.png"), JoinPath(TestCaseOutputCopy, "image.png"), false},
-		{"Copy svg image file", TestFileMapCopy["SvgImage"], JoinPath(TestCaseOutputCopy, "image.svg"), JoinPath(TestCaseOutputCopy, "image.svg"), false},
-		{"Source and destination are same", TestFileMapCopy["SmallText"], TestFileMapCopy["SmallText"], EmptyString, true},
-		{"Source and destination root are same", TestFileMapCopy["SmallText"], TestCaseRootCopy, EmptyString, true},
+		{"Source is empty", EmptyString, TestCaseOutputCopy, EmptyString, EmptyString, true},
+		{"Source file not exist", JoinPath(TestCaseRootCopy, "__not_exist__"), TestCaseOutputCopy, EmptyString, EmptyString, true},
+		{"Source is a dir", TestDirMapCopy["ContentDir"], TestCaseOutputCopy, EmptyString, EmptyString, true},
+		{"Source is a symlink", TestFileMapCopy["Symlink"], TestCaseOutputCopy, TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "soft-link.txt"), false},
+		{"Destination is empty", TestFileMapCopy["SmallText"], EmptyString, EmptyString, EmptyString, true},
+		{"Destination is a dir", TestFileMapCopy["SmallText"], TestDirMapCopy["Out_ExistingDir"], TestFileMapCopy["SmallText"], JoinPath(TestDirMapCopy["Out_ExistingDir"], "small-text.txt"), false},
+		{"Destination is a file", TestFileMapCopy["SmallText"], TestFileMapCopy["Out_ExistingFile"], TestFileMapCopy["SmallText"], TestFileMapCopy["Out_ExistingFile"], false},
+		{"Destination file not exist", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "not-exist-file.txt"), TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "not-exist-file.txt"), false},
+		{"Destination dir not exist", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "not-exist-dir", "not-exist-file.txt"), EmptyString, EmptyString, true},
+		{"Copy empty file", TestFileMapCopy["EmptyFile"], JoinPath(TestCaseOutputCopy, "empty-file.txt"), TestFileMapCopy["EmptyFile"], JoinPath(TestCaseOutputCopy, "empty-file.txt"), false},
+		{"Copy small text file", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "small-text.txt"), TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "small-text.txt"), false},
+		{"Copy large text file", TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "large-text.txt"), TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "large-text.txt"), false},
+		{"Copy png image file", TestFileMapCopy["PngImage"], JoinPath(TestCaseOutputCopy, "image.png"), TestFileMapCopy["PngImage"], JoinPath(TestCaseOutputCopy, "image.png"), false},
+		{"Copy svg image file", TestFileMapCopy["SvgImage"], JoinPath(TestCaseOutputCopy, "image.svg"), TestFileMapCopy["SvgImage"], JoinPath(TestCaseOutputCopy, "image.svg"), false},
+		{"Source and destination are same", TestFileMapCopy["SmallText"], TestFileMapCopy["SmallText"], EmptyString, EmptyString, true},
+		{"Source and destination root are same", TestFileMapCopy["SmallText"], TestCaseRootCopy, EmptyString, EmptyString, true},
 	}
 
 	for _, tt := range tests {
@@ -120,11 +122,11 @@ func TestCopyFile(t *testing.T) {
 			}
 
 			if !tt.wantErr {
-				same, err := compareFile(tt.srcPath, tt.tarPath)
+				same, err := compareFile(tt.inputPath, tt.outputPath)
 				if err != nil {
-					t.Errorf("CopyFile() got error while comparing the files: %v, %v, error: %v", tt.srcPath, tt.tarPath, err)
+					t.Errorf("CopyFile() got error while comparing the files: %v, %v, error: %v", tt.inputPath, tt.outputPath, err)
 				} else if !same {
-					t.Errorf("CopyFile() the files are not the same: %v, %v", tt.srcPath, tt.tarPath)
+					t.Errorf("CopyFile() the files are not the same: %v, %v", tt.inputPath, tt.outputPath)
 					return
 				}
 			}
