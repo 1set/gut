@@ -61,4 +61,10 @@ do
     COUNT=$((COUNT+1))
 done
 
+printf "\n###### Clean Up ######\n"
+
+if [[ ! -z "$TESTRSSDIR" ]] ; then
+    rm -fr "$TESTRSSDIR"
+fi
+
 printf "\n====== End at %s, Packages: %d ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$COUNT"
