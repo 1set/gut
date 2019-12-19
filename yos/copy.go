@@ -37,7 +37,7 @@ func CopyFile(src, dest string) (err error) {
 			_, err = os.Stat(filepath.Dir(dest))
 		}
 	} else {
-		// append filename of source to path of the existing destination
+		// append file name of source to path of the existing destination
 		if destInfo.IsDir() {
 			dest = JoinPath(dest, srcInfo.Name())
 		}
@@ -79,7 +79,7 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	// use smaller buffer if source file is not big enough
 	fileSize := srcInfo.Size()
 	if bufferSize > fileSize {
-		bufferSize = 1 << bits.Len64(uint64(fileSize))
+		bufferSize = 1 << uint(bits.Len64(uint64(fileSize)))
 	}
 
 	if destFile, err = os.OpenFile(dest, os.O_RDWR|os.O_CREATE|os.O_TRUNC, srcInfo.Mode()); err != nil {

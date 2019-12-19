@@ -38,6 +38,8 @@ func verifyTestResult(t *testing.T, name string, expected []string, actual []*Fi
 }
 
 func TestListAll(t *testing.T) {
+	t.Parallel()
+
 	for _, path := range []string{"", "  ", "__not_found_folder__"} {
 		if _, err := ListAll(path); err == nil {
 			t.Errorf("ListAll(%q) got no error, diff from expected", path)
@@ -59,6 +61,8 @@ func BenchmarkListAll(b *testing.B) {
 }
 
 func TestListFile(t *testing.T) {
+	t.Parallel()
+
 	for _, path := range []string{"", "  ", "__not_found_folder__"} {
 		if _, err := ListFile(path); err == nil {
 			t.Errorf("ListFile(%q) got no error, diff from expected", path)
@@ -80,6 +84,8 @@ func BenchmarkListFile(b *testing.B) {
 }
 
 func TestListDir(t *testing.T) {
+	t.Parallel()
+
 	for _, path := range []string{"", "  ", "__not_found_folder__"} {
 		if _, err := ListFile(path); err == nil {
 			t.Errorf("ListFile(%q) got no error, diff from expected", path)
@@ -101,6 +107,8 @@ func BenchmarkListDir(b *testing.B) {
 }
 
 func TestListMatch(t *testing.T) {
+	t.Parallel()
+
 	allEntriesPattern := []string{"*"}
 	type args struct {
 		root     string

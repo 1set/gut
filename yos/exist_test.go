@@ -13,6 +13,8 @@ func init() {
 }
 
 func TestIsExistOrNot(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name  string
 		path  string
@@ -52,6 +54,8 @@ func BenchmarkIsNotExist(b *testing.B) {
 }
 
 func TestIsFileExist(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name      string
 		path      string
@@ -92,6 +96,8 @@ func BenchmarkIsFileExist(b *testing.B) {
 }
 
 func TestIsDirExist(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name      string
 		path      string
@@ -132,6 +138,8 @@ func BenchmarkIsDirExist(b *testing.B) {
 }
 
 func TestIsSymlinkExist(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name      string
 		path      string
@@ -174,6 +182,8 @@ func BenchmarkIsSymlinkExist(b *testing.B) {
 }
 
 func TestJoinPath(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name string
 		elem []string

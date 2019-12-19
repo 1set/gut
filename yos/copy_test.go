@@ -88,6 +88,8 @@ func compareFile(file1, file2 string) (bool, error) {
 }
 
 func TestCopyFile(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		srcPath    string
