@@ -24,7 +24,9 @@ func init() {
 	TestCaseBenchmarkCopy = JoinPath(TestCaseOutputCopy, "benchmark")
 
 	TestFileMapCopy = map[string]string{
-		"Symlink":          JoinPath(TestCaseRootCopy, "soft-link.txt"),
+		"SymlinkFile":      JoinPath(TestCaseRootCopy, "soft-link.txt"),
+		"SymlinkLink":      JoinPath(TestCaseRootCopy, "soft-link2.txt"),
+		"SymlinkDir":       JoinPath(TestCaseRootCopy, "soft-link-dir"),
 		"EmptyFile":        JoinPath(TestCaseRootCopy, "empty-file.txt"),
 		"SmallText":        JoinPath(TestCaseRootCopy, "small-text.txt"),
 		"LargeText":        JoinPath(TestCaseRootCopy, "large-text.txt"),
@@ -101,7 +103,9 @@ func TestCopyFile(t *testing.T) {
 		{"Source is empty", EmptyString, TestCaseOutputCopy, EmptyString, EmptyString, true},
 		{"Source file not exist", JoinPath(TestCaseRootCopy, "__not_exist__"), TestCaseOutputCopy, EmptyString, EmptyString, true},
 		{"Source is a dir", TestDirMapCopy["ContentDir"], TestCaseOutputCopy, EmptyString, EmptyString, true},
-		{"Source is a symlink", TestFileMapCopy["Symlink"], TestCaseOutputCopy, TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "soft-link.txt"), false},
+		{"Source is a symlink to file", TestFileMapCopy["SymlinkFile"], TestCaseOutputCopy, TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "soft-link.txt"), false},
+		{"Source is a symlink to symlink", TestFileMapCopy["SymlinkLink"], TestCaseOutputCopy, TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "soft-link.txt"), false},
+		{"Source is a symlink to dir", TestFileMapCopy["SymlinkDir"], TestCaseOutputCopy, EmptyString, EmptyString, true},
 		{"Destination is empty", TestFileMapCopy["SmallText"], EmptyString, EmptyString, EmptyString, true},
 		{"Destination is a dir", TestFileMapCopy["SmallText"], TestDirMapCopy["Out_ExistingDir"], TestFileMapCopy["SmallText"], JoinPath(TestDirMapCopy["Out_ExistingDir"], "small-text.txt"), false},
 		{"Destination is a file", TestFileMapCopy["SmallText"], TestFileMapCopy["Out_ExistingFile"], TestFileMapCopy["SmallText"], TestFileMapCopy["Out_ExistingFile"], false},
