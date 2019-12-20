@@ -2,6 +2,7 @@ package yos
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -37,6 +38,10 @@ func init() {
 	}
 }
 
+func joinPathNoClean(elem ...string) string {
+	return strings.Join(elem, string(os.PathSeparator))
+}
+
 func TestSameContent(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -54,7 +59,7 @@ func TestSameContent(t *testing.T) {
 		{"Path1 is a broken symlink", TestFileMapSet1["BrokenSymlink"], TestFileMapSet2["SmallText"], false, true},
 		{"Path2 is a broken symlink", TestFileMapSet1["SmallText"], TestFileMapSet2["BrokenSymlink"], false, true},
 		{"Path1 and path2 are exactly the same file", TestFileMapSet1["SmallText"], TestFileMapSet1["SmallText"], true, false},
-		{"Path1 and path2 are actually the same file", TestFileMapSet1["SmallText"], JoinPath(TestCaseRootSame, "set1", "..", "set1", "small-text.txt"), true, false},
+		{"Path1 and path2 are actually the same file", TestFileMapSet1["SmallText"], joinPathNoClean(TestCaseRootSame, "set1", "..", "set1", "small-text.txt"), true, false},
 		{"Path1 and path2 are files with same content", TestFileMapSet1["SmallText"], TestFileMapSet2["SmallText"], true, false},
 		{"Path1 and path2 are files with same content and different permissions", TestFileMapSet1["SmallText"], TestFileMapSet2["SmallTextExe"], true, false},
 		{"Path1 and path2 are empty files", TestFileMapSet1["EmptyFile"], TestFileMapSet2["EmptyFile"], true, false},
