@@ -1,9 +1,6 @@
 package yos
 
 import (
-	"bytes"
-	"io"
-	"log"
 	"os"
 	"strings"
 	"testing"
@@ -38,54 +35,6 @@ func init() {
 		"EmptyDir":        JoinPath(TestCaseRootCopy, "empty-folder"),
 		"ContentDir":      JoinPath(TestCaseRootCopy, "content-folder"),
 		"Out_ExistingDir": JoinPath(TestCaseOutputCopy, "existing-dir"),
-	}
-}
-
-func compareFile(file1, file2 string) (bool, error) {
-	f1s, err := os.Stat(file1)
-	if err != nil {
-		return false, err
-	}
-	f2s, err := os.Stat(file2)
-	if err != nil {
-		return false, err
-	}
-
-	if f1s.Size() != f2s.Size() {
-		return false, nil
-	}
-
-	f1, err := os.Open(file1)
-	if err != nil {
-		return false, err
-	}
-
-	f2, err := os.Open(file2)
-	if err != nil {
-		return false, err
-	}
-
-	const chunkSize = 64 * 1024
-	for {
-		b1 := make([]byte, chunkSize)
-		_, err1 := f1.Read(b1)
-
-		b2 := make([]byte, chunkSize)
-		_, err2 := f2.Read(b2)
-
-		if err1 != nil || err2 != nil {
-			if err1 == io.EOF && err2 == io.EOF {
-				return true, nil
-			} else if err1 == io.EOF || err2 == io.EOF {
-				return false, err1
-			} else {
-				log.Fatal(err1, err2)
-			}
-		}
-
-		if !bytes.Equal(b1, b2) {
-			return false, nil
-		}
 	}
 }
 
@@ -128,7 +77,7 @@ func TestCopyFile(t *testing.T) {
 			}
 
 			if !tt.wantErr {
-				same, err := compareFile(tt.inputPath, tt.outputPath)
+				same, err := SameContent(tt.inputPath, tt.outputPath)
 				if err != nil {
 					t.Errorf("CopyFile() got error while comparing the files: %v, %v, error: %v", tt.inputPath, tt.outputPath, err)
 				} else if !same {
