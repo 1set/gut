@@ -101,6 +101,14 @@ func TestSameContent(t *testing.T) {
 }
 
 func BenchmarkSameContent(b *testing.B) {
+	b.Run("SameFile", func(b *testing.B) {
+		path := TestFileMapSet1["LargeText"]
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_, _ = SameContent(path, path)
+		}
+	})
+
 	for name, path1 := range TestFileMapSet1 {
 		path2 := TestFileMapSet2[name]
 		b.Run(name, func(b *testing.B) {
