@@ -45,6 +45,8 @@ func joinPathNoClean(elem ...string) string {
 }
 
 func TestSameContent(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name     string
 		path1    string
@@ -93,6 +95,18 @@ func TestSameContent(t *testing.T) {
 			}
 			if gotSame != tt.wantSame {
 				t.Errorf("SameContent() gotSame = %v, want %v", gotSame, tt.wantSame)
+			}
+		})
+	}
+}
+
+func BenchmarkSameContent(b *testing.B) {
+	for name, path1 := range TestFileMapSet1 {
+		path2 := TestFileMapSet2[name]
+		b.Run(name, func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				_, _ = SameContent(path1, path2)
 			}
 		})
 	}
