@@ -68,7 +68,6 @@ func TestSameContent(t *testing.T) {
 		{"Path1 and path2 are different files (whitespace)", TestFileMapSet1["SmallText"], TestFileMapSet2["SmallTextV2"], false, false},
 		{"Path1 and path2 are different files (newline)", TestFileMapSet1["SmallText"], TestFileMapSet2["SmallTextV3"], false, false},
 		{"Path1 and path2 are different files with same size", TestFileMapSet1["LargeText"], TestFileMapSet2["LargeTextV2"], false, false},
-
 		{"Path1 and path2 are symlinks to the same file", JoinPath(TestCaseRootSameLink, "link_content1.txt"), JoinPath(TestCaseRootSameLink, "link2_content1.txt"), true, false},
 		{"Path1 and path2 are symlinks to files with same content", JoinPath(TestCaseRootSameLink, "link_content1.txt"), JoinPath(TestCaseRootSameLink, "link_content2.txt"), true, false},
 		{"Path1 is a symlink to a directory", JoinPath(TestCaseRootSameLink, "link_folder"), TestFileMapSet2["SmallText"], false, true},
@@ -76,13 +75,13 @@ func TestSameContent(t *testing.T) {
 		{"Path1 is a symlink to a file and path2 is a file with same content", JoinPath(TestCaseRootSameLink, "link_content1.txt"), JoinPath(TestCaseRootSameLink, "content2.txt"), true, false},
 		{"Path1 is a symlink to a symlink and path2 is the symlink to a file", JoinPath(TestCaseRootSameLink, "link_link_content1.txt"), JoinPath(TestCaseRootSameLink, "link_content1.txt"), true, false},
 		{"Path1 is a symlink to a symlink and path2 is the symlink to a directory", JoinPath(TestCaseRootSameLink, "link_link_folder"), JoinPath(TestCaseRootSameLink, "link_folder"), false, true},
-		{"Path1 is a symlink to a symlink and path2 is the symlink to path1", "", "", false, true},
-		{"Path1 is a symlink to a symlink and path2 is the symlink to itself", "", "", false, true},
-		{"Path1 is a symlink to a symlink and path2 is the symlink which is broken", "", "", false, true},
-		{"Path1 is a symlink to a symlink and path2 is the symlink to another symlink which is broken", "", "", false, true},
-		{"Path1 is a symlink to a symlink and path2 is the symlink to another symlink to a file", "", "", false, true},
-		{"Path1 is a symlink to a symlink and path2 is the symlink to another symlink to a directory", "", "", false, true},
-		{"Path1 is a symlink to a symlink and path2 is the symlink to another symlink to path1", "", "", false, true},
+		{"Path1 is a symlink to a symlink and path2 is the symlink to path1", JoinPath(TestCaseRootSameLink, "circle_link1"), JoinPath(TestCaseRootSameLink, "circle_link2"), false, true},
+		{"Path1 is a symlink to a symlink and path2 is the symlink to itself", JoinPath(TestCaseRootSameLink, "link_self_link"), JoinPath(TestCaseRootSameLink, "self_link"), false, true},
+		{"Path1 is a symlink to a symlink and path2 is the symlink which is broken", JoinPath(TestCaseRootSameLink, "link_broken_link"), JoinPath(TestCaseRootSameLink, "broken_link"), false, true},
+		{"Path1 is a symlink to a symlink and path2 is the symlink to another symlink which is broken", JoinPath(TestCaseRootSameLink, "link_link_broken_link"), JoinPath(TestCaseRootSameLink, "link_broken_link"), false, true},
+		{"Path1 is a symlink to a symlink and path2 is the symlink to another symlink to a file", JoinPath(TestCaseRootSameLink, "link_link_link_content1.txt"), JoinPath(TestCaseRootSameLink, "link_link_content1.txt"), true, false},
+		{"Path1 is a symlink to a symlink and path2 is the symlink to another symlink to a directory", JoinPath(TestCaseRootSameLink, "link_link_link_folder"), JoinPath(TestCaseRootSameLink, "link_link_folder"), false, true},
+		{"Path1 is a symlink to a symlink and path2 is the symlink to another symlink to path1", JoinPath(TestCaseRootSameLink, "triple_link1"), JoinPath(TestCaseRootSameLink, "triple_link2"), false, true},
 	}
 
 	for _, tt := range tests {
