@@ -83,21 +83,3 @@ func SameContent(path1, path2 string) (same bool, err error) {
 
 	return
 }
-
-/*
-
-Path1 is a symlink to a directory
-Path1 is a symlink to a file and path2 is the file
-Path1 is a symlink to a file and path2 is a file with same content
-Path1 is a symlink to a symlink and path2 is the symlink to a file
-Path1 is a symlink to a symlink and path2 is the symlink to a directory
-Path1 is a symlink to a symlink and path2 is the symlink to path1
-Path1 is a symlink to a symlink and path2 is the symlink to itself
-Path1 is a symlink to a symlink and path2 is the symlink which is broken
-Path1 is a symlink to a symlink and path2 is the symlink to another symlink which is broken
-Path1 is a symlink to a symlink and path2 is the symlink to another symlink to a file
-Path1 is a symlink to a symlink and path2 is the symlink to another symlink to a directory
-Path1 is a symlink to a symlink and path2 is the symlink to another symlink to path1
-Path1 and path2 are symlinks to the same file
-Path1 and path2 are symlinks to files with same content
-*/
