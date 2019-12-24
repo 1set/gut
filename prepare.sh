@@ -27,3 +27,8 @@ export TESTRSSDIR=${TMPDIR%/}/gut_test_resource
 rm -fr "$TESTRSSDIR"
 unzip -o test_resource.zip -d "$TESTRSSDIR"
 printf "Uncompress test resource: %s\n\n" "$TESTRSSDIR"
+
+chmod 000 "$TESTRSSDIR"/yos/copy/none_perm.txt
+chmod 000 "$TESTRSSDIR"/yos/copy/output/none_perm.txt
+chmod 000 "$TESTRSSDIR"/yos/same/set1/none_perm.txt
+chmod 000 "$TESTRSSDIR"/yos/same/set2/none_perm.txt
