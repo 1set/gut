@@ -49,26 +49,21 @@ func SameContent(path1, path2 string) (same bool, err error) {
 		nr2, err2 := file2.Read(buf2)
 
 		if err1 == io.EOF && err2 == io.EOF {
-			if nr1 > 0 || nr2 > 0 {
-				err = io.ErrUnexpectedEOF
-			} else {
+			if nr1 == 0 && nr2 == 0 {
 				same = true
+				break
+			} else {
+				err = io.ErrUnexpectedEOF
 			}
-			break
-		}
-
-		if err1 != nil {
+		} else if err1 != nil {
 			err = err1
-			break
-		}
-
-		if err2 != nil {
+		} else if err2 != nil {
 			err = err2
-			break
+		} else if nr1 != nr2 {
+			err = ErrShortRead
 		}
 
-		if nr1 != nr2 {
-			err = ErrShortRead
+		if err != nil {
 			break
 		}
 
