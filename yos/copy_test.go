@@ -29,7 +29,10 @@ func init() {
 		"LargeText":        JoinPath(TestCaseRootCopy, "large-text.txt"),
 		"PngImage":         JoinPath(TestCaseRootCopy, "image.png"),
 		"SvgImage":         JoinPath(TestCaseRootCopy, "image.svg"),
+		"SameName":         JoinPath(TestCaseRootCopy, "same-name"),
+		"SameName2":        JoinPath(TestCaseRootCopy, "same-name2"),
 		"Out_ExistingFile": JoinPath(TestCaseOutputCopy, "existing-file.txt"),
+		"Out_SameName2":    JoinPath(TestCaseOutputCopy, "same-name2"),
 	}
 	TestDirMapCopy = map[string]string{
 		"EmptyDir":        JoinPath(TestCaseRootCopy, "empty-folder"),
@@ -67,6 +70,8 @@ func TestCopyFile(t *testing.T) {
 		{"Copy svg image file", TestFileMapCopy["SvgImage"], JoinPath(TestCaseOutputCopy, "image.svg"), TestFileMapCopy["SvgImage"], JoinPath(TestCaseOutputCopy, "image.svg"), false},
 		{"Source and destination are same", TestFileMapCopy["SmallText"], TestFileMapCopy["SmallText"], EmptyString, EmptyString, true},
 		{"Source and destination root are same", TestFileMapCopy["SmallText"], TestCaseRootCopy, EmptyString, EmptyString, true},
+		{"Source(file) and inferred destination(dir) use the same name", TestFileMapCopy["SameName"], TestCaseOutputCopy, EmptyString, EmptyString, true},
+		{"Source(file) and inferred destination(file) use the same name", TestFileMapCopy["SameName2"], TestCaseOutputCopy, TestFileMapCopy["SameName2"], TestFileMapCopy["Out_SameName2"], false},
 	}
 
 	for _, tt := range tests {
