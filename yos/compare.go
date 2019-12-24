@@ -52,9 +52,8 @@ func SameContent(path1, path2 string) (same bool, err error) {
 			if nr1 == 0 && nr2 == 0 {
 				same = true
 				break
-			} else {
-				err = io.ErrUnexpectedEOF
 			}
+			err = io.ErrUnexpectedEOF
 		} else if err1 != nil {
 			err = err1
 		} else if err2 != nil {

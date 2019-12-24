@@ -115,8 +115,7 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 				err = io.ErrUnexpectedEOF
 			}
 			break
-		}
-		if nr == 0 {
+		} else if nr == 0 {
 			break
 		}
 
