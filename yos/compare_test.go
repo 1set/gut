@@ -92,6 +92,10 @@ func TestSameContent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if strings.Contains(tt.name, "permission") && IsOnWindows() {
+				t.Skipf("Skipping %q for Windows", tt.name)
+			}
+
 			gotSame, err := SameContent(tt.path1, tt.path2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SameContent() error = %v, wantErr %v", err, tt.wantErr)

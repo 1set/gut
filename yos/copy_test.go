@@ -78,6 +78,10 @@ func TestCopyFile(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if strings.Contains(tt.name, "permission") && IsOnWindows() {
+				t.Skipf("Skipping %q for Windows", tt.name)
+			}
+
 			if err := CopyFile(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("CopyFile() error = %v, wantErr %v", err, tt.wantErr)
 				return
