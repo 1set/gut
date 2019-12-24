@@ -31,6 +31,7 @@ func init() {
 		"SvgImage":         JoinPath(TestCaseRootCopy, "image.svg"),
 		"SameName":         JoinPath(TestCaseRootCopy, "same-name"),
 		"SameName2":        JoinPath(TestCaseRootCopy, "same-name2"),
+		"NonePermission":   JoinPath(TestCaseRootCopy, "none_perm.txt"),
 		"Out_ExistingFile": JoinPath(TestCaseOutputCopy, "existing-file.txt"),
 		"Out_SameName2":    JoinPath(TestCaseOutputCopy, "same-name2"),
 	}
@@ -54,6 +55,7 @@ func TestCopyFile(t *testing.T) {
 	}{
 		{"Source is empty", EmptyString, TestCaseOutputCopy, EmptyString, EmptyString, true},
 		{"Source file not exist", JoinPath(TestCaseRootCopy, "__not_exist__"), TestCaseOutputCopy, EmptyString, EmptyString, true},
+		{"Source got permission denied", TestFileMapCopy["NonePermission"], TestCaseOutputCopy, EmptyString, EmptyString, true},
 		{"Source is a dir", TestDirMapCopy["ContentDir"], TestCaseOutputCopy, EmptyString, EmptyString, true},
 		{"Source is a symlink to file", TestFileMapCopy["SymlinkFile"], TestCaseOutputCopy, TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "soft-link.txt"), false},
 		{"Source is a symlink to symlink", TestFileMapCopy["SymlinkLink"], TestCaseOutputCopy, TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "soft-link.txt"), false},
