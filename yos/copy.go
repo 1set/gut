@@ -11,8 +11,10 @@ import (
 )
 
 var (
-	ErrEmptyPath = errors.New("path is empty")
-	ErrSameFile  = errors.New("files are identical")
+	ErrShortRead  = errors.New("short read")
+	ErrEmptyPath  = errors.New("path is empty")
+	ErrSameFile   = errors.New("files are identical")
+	ErrNotRegular = errors.New("file is not regular")
 )
 
 // CopyFile copies a file to a target file or directory. Symbolic links are followed.
@@ -63,7 +65,10 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	defer srcFile.Close()
 
 	var srcInfo, destInfo os.FileInfo
-	if srcInfo, err = os.Stat(src); err != nil {
+	if srcInfo, err = os.Stat(src); err == nil && !srcInfo.Mode().IsRegular() {
+		err = ErrNotRegular
+	}
+	if err != nil {
 		return
 	}
 
@@ -71,6 +76,8 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	if destInfo, err = os.Stat(dest); err == nil {
 		if os.SameFile(srcInfo, destInfo) {
 			err = ErrSameFile
+		} else if !destInfo.Mode().IsRegular() {
+			err = ErrNotRegular
 		}
 	} else if os.IsNotExist(err) {
 		// it's okay if destination file doesn't exist

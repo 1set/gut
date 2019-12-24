@@ -2,14 +2,8 @@ package yos
 
 import (
 	"bytes"
-	"errors"
 	"io"
 	"os"
-)
-
-var (
-	ErrShortRead     = errors.New("short read")
-	ErrPathDirectory = errors.New("path is directory")
 )
 
 // SameContent checks if the two given files have the same content or are the same file. Symbolic links are followed.
@@ -23,8 +17,8 @@ func SameContent(path1, path2 string) (same bool, err error) {
 		return
 	}
 
-	if fi1.IsDir() || fi2.IsDir() {
-		err = ErrPathDirectory
+	if !(fi1.Mode().IsRegular() && fi2.Mode().IsRegular()) {
+		err = ErrNotRegular
 		return
 	}
 
