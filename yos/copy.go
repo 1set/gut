@@ -2,7 +2,9 @@ package yos
 
 import (
 	"errors"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"math/bits"
 	"os"
 	"path/filepath"
@@ -19,6 +21,11 @@ var (
 	ErrSameFile = errors.New("files are identical")
 	// ErrNotRegular means the file is not a regular file.
 	ErrNotRegular = errors.New("file is not regular")
+)
+
+const (
+	defaultDirectoryFileMode = os.FileMode(0755)
+	defaultBufferSize        = 256 * 1024
 )
 
 // CopyFile copies a file to a target file or directory. Symbolic links are followed.
@@ -58,7 +65,7 @@ func CopyFile(src, dest string) (err error) {
 		return
 	}
 
-	return bufferCopyFile(src, dest, 256*1024)
+	return bufferCopyFile(src, dest, defaultBufferSize)
 }
 
 func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
@@ -78,10 +85,10 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 
 	// check if source and destination files are identical
 	if destInfo, err = os.Stat(dest); err == nil {
-		if os.SameFile(srcInfo, destInfo) {
-			err = ErrSameFile
-		} else if !destInfo.Mode().IsRegular() {
+		if !destInfo.Mode().IsRegular() {
 			err = ErrNotRegular
+		} else if os.SameFile(srcInfo, destInfo) {
+			err = ErrSameFile
 		}
 	} else if os.IsNotExist(err) {
 		// it's okay if destination file doesn't exist
@@ -132,5 +139,71 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	}
 
 	// err = destFile.Sync()
+	return
+}
+
+func copySymlink(src, dest string) (err error) {
+	var link string
+	if link, err = os.Readlink(src); err == nil {
+		err = os.Symlink(link, dest)
+	}
+	return
+}
+
+func copyDir(src, dest string) (err error) {
+	var srcInfo, destInfo os.FileInfo
+	// check if source exists and is a directory
+	if srcInfo, err = os.Stat(src); err == nil && !srcInfo.IsDir() {
+		err = fmt.Errorf("%v: source is not a directory", src)
+	}
+	if err != nil {
+		return
+	}
+
+	// check if destination doesn't exist or is not a file or source itself
+	if destInfo, err = os.Stat(dest); err == nil {
+		if destInfo.Mode().IsRegular() {
+			err = fmt.Errorf("%v: destination is a regular file", src)
+		} else if os.SameFile(srcInfo, destInfo) {
+			err = ErrSameFile
+		}
+	} else if os.IsNotExist(err) {
+		err = nil
+	}
+	if err != nil {
+		return
+	}
+
+	// loop through entries in source directory
+	var entries []os.FileInfo
+	entries, err = ioutil.ReadDir(src)
+	for _, entry := range entries {
+		srcPath, destPath := JoinPath(src, entry.Name()), JoinPath(dest, entry.Name())
+		if srcInfo, err = os.Stat(srcPath); err != nil {
+			break
+		}
+
+		switch srcInfo.Mode() & os.ModeType {
+		case os.ModeDir:
+			if err = os.MkdirAll(destPath, defaultDirectoryFileMode); err != nil {
+				break
+			}
+			if err = copyDir(srcPath, destPath); err != nil {
+				break
+			}
+			if err = os.Chmod(destPath, entry.Mode()); err != nil {
+				break
+			}
+		case os.ModeSymlink:
+			if err = copySymlink(srcPath, destPath); err != nil {
+				break
+			}
+		default:
+			if err = bufferCopyFile(srcPath, destPath, defaultBufferSize); err != nil {
+				break
+			}
+		}
+	}
+
 	return
 }
