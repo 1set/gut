@@ -38,14 +38,12 @@ do
         make build PACKAGE="$PACKAGE"
         make test PACKAGE="$PACKAGE"
         make bench PACKAGE="$PACKAGE"
-        make cover PACKAGE="$PACKAGE"
         make doc PACKAGE="$PACKAGE"
         ;;
     ci)
         make build PACKAGE="$PACKAGE"
         make test PACKAGE="$PACKAGE"
         make bench PACKAGE="$PACKAGE"
-        make cover PACKAGE="$PACKAGE"
         ;;
     dev)
         make fmt PACKAGE="$PACKAGE"
