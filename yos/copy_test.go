@@ -21,19 +21,20 @@ func init() {
 	TestCaseBenchmarkCopy = JoinPath(TestCaseOutputCopy, "benchmark")
 
 	TestFileMapCopy = map[string]string{
-		"SymlinkFile":      JoinPath(TestCaseRootCopy, "soft-link.txt"),
-		"SymlinkLink":      JoinPath(TestCaseRootCopy, "soft-link2.txt"),
-		"SymlinkDir":       JoinPath(TestCaseRootCopy, "soft-link-dir"),
-		"EmptyFile":        JoinPath(TestCaseRootCopy, "empty-file.txt"),
-		"SmallText":        JoinPath(TestCaseRootCopy, "small-text.txt"),
-		"LargeText":        JoinPath(TestCaseRootCopy, "large-text.txt"),
-		"PngImage":         JoinPath(TestCaseRootCopy, "image.png"),
-		"SvgImage":         JoinPath(TestCaseRootCopy, "image.svg"),
-		"SameName":         JoinPath(TestCaseRootCopy, "same-name"),
-		"SameName2":        JoinPath(TestCaseRootCopy, "same-name2"),
-		"NonePermission":   JoinPath(TestCaseRootCopy, "none_perm.txt"),
-		"Out_ExistingFile": JoinPath(TestCaseOutputCopy, "existing-file.txt"),
-		"Out_SameName2":    JoinPath(TestCaseOutputCopy, "same-name2"),
+		"SymlinkFile":        JoinPath(TestCaseRootCopy, "soft-link.txt"),
+		"SymlinkLink":        JoinPath(TestCaseRootCopy, "soft-link2.txt"),
+		"SymlinkDir":         JoinPath(TestCaseRootCopy, "soft-link-dir"),
+		"EmptyFile":          JoinPath(TestCaseRootCopy, "empty-file.txt"),
+		"SmallText":          JoinPath(TestCaseRootCopy, "small-text.txt"),
+		"LargeText":          JoinPath(TestCaseRootCopy, "large-text.txt"),
+		"PngImage":           JoinPath(TestCaseRootCopy, "image.png"),
+		"SvgImage":           JoinPath(TestCaseRootCopy, "image.svg"),
+		"SameName":           JoinPath(TestCaseRootCopy, "same-name"),
+		"SameName2":          JoinPath(TestCaseRootCopy, "same-name2"),
+		"NonePermission":     JoinPath(TestCaseRootCopy, "none_perm.txt"),
+		"Out_NonePermission": JoinPath(TestCaseOutputCopy, "none_perm.txt"),
+		"Out_ExistingFile":   JoinPath(TestCaseOutputCopy, "existing-file.txt"),
+		"Out_SameName2":      JoinPath(TestCaseOutputCopy, "same-name2"),
 	}
 	TestDirMapCopy = map[string]string{
 		"EmptyDir":        JoinPath(TestCaseRootCopy, "empty-folder"),
@@ -54,8 +55,8 @@ func TestCopyFile(t *testing.T) {
 		wantErr    bool
 	}{
 		{"Source is empty", EmptyString, TestCaseOutputCopy, EmptyString, EmptyString, true},
+		{"Source got permission denied", TestFileMapCopy["NonePermission"], JoinPath(TestCaseOutputCopy, "whatever.txt"), EmptyString, EmptyString, true},
 		{"Source file not exist", JoinPath(TestCaseRootCopy, "__not_exist__"), TestCaseOutputCopy, EmptyString, EmptyString, true},
-		{"Source got permission denied", TestFileMapCopy["NonePermission"], TestCaseOutputCopy, EmptyString, EmptyString, true},
 		{"Source is a dir", TestDirMapCopy["ContentDir"], TestCaseOutputCopy, EmptyString, EmptyString, true},
 		{"Source is a symlink to file", TestFileMapCopy["SymlinkFile"], TestCaseOutputCopy, TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "soft-link.txt"), false},
 		{"Source is a symlink to symlink", TestFileMapCopy["SymlinkLink"], TestCaseOutputCopy, TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "soft-link.txt"), false},
@@ -63,6 +64,7 @@ func TestCopyFile(t *testing.T) {
 		{"Destination is empty", TestFileMapCopy["SmallText"], EmptyString, EmptyString, EmptyString, true},
 		{"Destination is a dir", TestFileMapCopy["SmallText"], TestDirMapCopy["Out_ExistingDir"], TestFileMapCopy["SmallText"], JoinPath(TestDirMapCopy["Out_ExistingDir"], "small-text.txt"), false},
 		{"Destination is a file", TestFileMapCopy["SmallText"], TestFileMapCopy["Out_ExistingFile"], TestFileMapCopy["SmallText"], TestFileMapCopy["Out_ExistingFile"], false},
+		{"Destination got permission denied", TestFileMapCopy["SmallText"], TestFileMapCopy["Out_NonePermission"], EmptyString, EmptyString, true},
 		{"Destination file not exist", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "not-exist-file.txt"), TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "not-exist-file.txt"), false},
 		{"Destination dir not exist", TestFileMapCopy["SmallText"], JoinPath(TestCaseOutputCopy, "not-exist-dir", "not-exist-file.txt"), EmptyString, EmptyString, true},
 		{"Copy empty file", TestFileMapCopy["EmptyFile"], JoinPath(TestCaseOutputCopy, "empty-file.txt"), TestFileMapCopy["EmptyFile"], JoinPath(TestCaseOutputCopy, "empty-file.txt"), false},
