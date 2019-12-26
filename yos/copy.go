@@ -34,38 +34,10 @@ const (
 // If the target doesn't exist but its parent directory does, the source file will be copied to the parent directory with the target name.
 // ErrSameFile is returned if it detects an attempt to copy a file to itself.
 func CopyFile(src, dest string) (err error) {
-	if ystring.IsBlank(src) || ystring.IsBlank(dest) {
-		err = ErrEmptyPath
-		return
+	if src, dest, err = refinePaths(src, dest); err == nil {
+		err = bufferCopyFile(src, dest, defaultBufferSize)
 	}
-
-	// clean up paths
-	src, dest = filepath.Clean(src), filepath.Clean(dest)
-
-	// check if source exists
-	var srcInfo, destInfo os.FileInfo
-	if srcInfo, err = os.Stat(src); err != nil {
-		return
-	}
-
-	// check if destination exists
-	if destInfo, err = os.Stat(dest); err != nil {
-		// check existence of parent of the missing destination
-		if os.IsNotExist(err) {
-			_, err = os.Stat(filepath.Dir(dest))
-		}
-	} else {
-		// append file name of source to path of the existing destination
-		if destInfo.IsDir() {
-			dest = JoinPath(dest, srcInfo.Name())
-		}
-	}
-
-	if err != nil {
-		return
-	}
-
-	return bufferCopyFile(src, dest, defaultBufferSize)
+	return
 }
 
 func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
@@ -142,6 +114,40 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	return
 }
 
+func refinePaths(srcRaw, destRaw string) (src, dest string, err error) {
+	if ystring.IsBlank(srcRaw) || ystring.IsBlank(destRaw) {
+		err = ErrEmptyPath
+		return
+	}
+
+	// clean up paths
+	srcRaw, destRaw = filepath.Clean(srcRaw), filepath.Clean(destRaw)
+
+	// check if source exists
+	var srcInfo, destInfo os.FileInfo
+	if srcInfo, err = os.Stat(srcRaw); err != nil {
+		return
+	}
+
+	// check if destination exists
+	if destInfo, err = os.Stat(destRaw); err != nil {
+		// check existence of parent of the missing destination
+		if os.IsNotExist(err) {
+			_, err = os.Stat(filepath.Dir(destRaw))
+		}
+	} else {
+		// append file name of source to path of the existing destination
+		if destInfo.IsDir() {
+			destRaw = JoinPath(destRaw, srcInfo.Name())
+		}
+	}
+
+	if err == nil {
+		src, dest = srcRaw, destRaw
+	}
+	return
+}
+
 func copySymlink(src, dest string) (err error) {
 	var link string
 	if link, err = os.Readlink(src); err == nil {
@@ -150,8 +156,24 @@ func copySymlink(src, dest string) (err error) {
 	return
 }
 
+func CopyDir(src, dest string) (err error) {
+	/*
+		if dest dir exist, append src name to dest dir, and copy.
+		if dest dir not exist, check if the parent exists.
+		what if cp -R src1 dest --- the parent dir is .
+		stop if any error occurs
+	*/
+
+	if src, dest, err = refinePaths(src, dest); err == nil {
+		err = copyDir(src, dest)
+	}
+	return
+}
+
+// copyDir copies all entries of source directory to destination directory recursively.
 func copyDir(src, dest string) (err error) {
 	var srcInfo, destInfo os.FileInfo
+
 	// check if source exists and is a directory
 	if srcInfo, err = os.Stat(src); err == nil && !srcInfo.IsDir() {
 		err = fmt.Errorf("%v: source is not a directory", src)
@@ -169,6 +191,10 @@ func copyDir(src, dest string) (err error) {
 		}
 	} else if os.IsNotExist(err) {
 		err = nil
+		if err = os.MkdirAll(dest, defaultDirectoryFileMode); err == nil {
+			originMode := srcInfo.Mode()
+			defer os.Chmod(dest, originMode)
+		}
 	}
 	if err != nil {
 		return
@@ -176,31 +202,26 @@ func copyDir(src, dest string) (err error) {
 
 	// loop through entries in source directory
 	var entries []os.FileInfo
-	entries, err = ioutil.ReadDir(src)
+	if entries, err = ioutil.ReadDir(src); err != nil {
+		return
+	}
+
+IterateEntry:
 	for _, entry := range entries {
 		srcPath, destPath := JoinPath(src, entry.Name()), JoinPath(dest, entry.Name())
-		if srcInfo, err = os.Stat(srcPath); err != nil {
-			break
-		}
 
-		switch srcInfo.Mode() & os.ModeType {
+		switch entry.Mode() & os.ModeType {
 		case os.ModeDir:
-			if err = os.MkdirAll(destPath, defaultDirectoryFileMode); err != nil {
-				break
-			}
 			if err = copyDir(srcPath, destPath); err != nil {
-				break
-			}
-			if err = os.Chmod(destPath, entry.Mode()); err != nil {
-				break
+				break IterateEntry
 			}
 		case os.ModeSymlink:
 			if err = copySymlink(srcPath, destPath); err != nil {
-				break
+				break IterateEntry
 			}
 		default:
 			if err = bufferCopyFile(srcPath, destPath, defaultBufferSize); err != nil {
-				break
+				break IterateEntry
 			}
 		}
 	}
