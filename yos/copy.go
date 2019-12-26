@@ -34,8 +34,20 @@ const (
 // If the target doesn't exist but its parent directory does, the source file will be copied to the parent directory with the target name.
 // ErrSameFile is returned if it detects an attempt to copy a file to itself.
 func CopyFile(src, dest string) (err error) {
-	if src, dest, err = refinePaths(src, dest); err == nil {
+	if src, dest, err = refineCopyPaths(src, dest); err == nil {
 		err = bufferCopyFile(src, dest, defaultBufferSize)
+	}
+	return
+}
+
+// CopyDir copies a directory to a target directory recursively. Symbolic link will be copied instead of being followed.
+// If the target is an existing file, an error will be returned.
+// If the target is an existing directory, the source directory will be copied to the directory with the same name.
+// If the target doesn't exist but its parent directory does, the source directory will be copied to the parent directory with the target name.
+// ErrSameFile is returned if it detects an attempt to copy a file to itself. It stops and returns immediately if any error occurs.
+func CopyDir(src, dest string) (err error) {
+	if src, dest, err = refineCopyPaths(src, dest); err == nil {
+		err = copyDir(src, dest)
 	}
 	return
 }
@@ -114,7 +126,8 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	return
 }
 
-func refinePaths(srcRaw, destRaw string) (src, dest string, err error) {
+// refineCopyPaths validates, cleans up and adjusts the source and destination paths for copy file and copy directory.
+func refineCopyPaths(srcRaw, destRaw string) (src, dest string, err error) {
 	if ystring.IsBlank(srcRaw) || ystring.IsBlank(destRaw) {
 		err = ErrEmptyPath
 		return
@@ -152,20 +165,6 @@ func copySymlink(src, dest string) (err error) {
 	var link string
 	if link, err = os.Readlink(src); err == nil {
 		err = os.Symlink(link, dest)
-	}
-	return
-}
-
-func CopyDir(src, dest string) (err error) {
-	/*
-		if dest dir exist, append src name to dest dir, and copy.
-		if dest dir not exist, check if the parent exists.
-		what if cp -R src1 dest --- the parent dir is .
-		stop if any error occurs
-	*/
-
-	if src, dest, err = refinePaths(src, dest); err == nil {
-		err = copyDir(src, dest)
 	}
 	return
 }
