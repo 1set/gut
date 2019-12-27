@@ -29,9 +29,13 @@ const (
 )
 
 // CopyFile copies a file to a target file or directory. Symbolic links are followed.
+//
 // If the target is an existing file, the target will be overwritten with the source file.
+//
 // If the target is an existing directory, the source file will be copied to the directory with the same file name.
+//
 // If the target doesn't exist but its parent directory does, the source file will be copied to the parent directory with the target name.
+//
 // ErrSameFile is returned if it detects an attempt to copy a file to itself.
 func CopyFile(src, dest string) (err error) {
 	if src, dest, err = refineCopyPaths(src, dest); err == nil {
@@ -41,10 +45,14 @@ func CopyFile(src, dest string) (err error) {
 }
 
 // CopyDir copies a directory to a target directory recursively. Symbolic link will be copied instead of being followed.
+//
 // If the target is an existing file, an error will be returned.
+//
 // If the target is an existing directory, the source directory will be copied to the directory with the same name.
+//
 // If the target doesn't exist but its parent directory does, the source directory will be copied to the parent directory with the target name.
-// ErrSameFile is returned if it detects an attempt to copy a file to itself. It stops and returns immediately if any error occurs.
+//
+// It stops and returns immediately if any error occurs. ErrSameFile is returned if it detects an attempt to copy a file to itself.
 func CopyDir(src, dest string) (err error) {
 	if src, dest, err = refineCopyPaths(src, dest); err == nil {
 		err = copyDir(src, dest)

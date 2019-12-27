@@ -72,10 +72,10 @@ func TestCopyFile(t *testing.T) {
 		{"Copy large text file", TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "large-text.txt"), TestFileMapCopy["LargeText"], JoinPath(TestCaseOutputCopy, "large-text.txt"), false},
 		{"Copy png image file", TestFileMapCopy["PngImage"], JoinPath(TestCaseOutputCopy, "image.png"), TestFileMapCopy["PngImage"], JoinPath(TestCaseOutputCopy, "image.png"), false},
 		{"Copy svg image file", TestFileMapCopy["SvgImage"], JoinPath(TestCaseOutputCopy, "image.svg"), TestFileMapCopy["SvgImage"], JoinPath(TestCaseOutputCopy, "image.svg"), false},
-		{"Source and destination are same", TestFileMapCopy["SmallText"], TestFileMapCopy["SmallText"], EmptyString, EmptyString, true},
-		{"Source and destination root are same", TestFileMapCopy["SmallText"], TestCaseRootCopy, EmptyString, EmptyString, true},
-		{"Source(file) and inferred destination(dir) use the same name", TestFileMapCopy["SameName"], TestCaseOutputCopy, EmptyString, EmptyString, true},
-		{"Source(file) and inferred destination(file) use the same name", TestFileMapCopy["SameName2"], TestCaseOutputCopy, TestFileMapCopy["SameName2"], TestFileMapCopy["Out_SameName2"], false},
+		{"Source and destination are exactly the same", TestFileMapCopy["SmallText"], TestFileMapCopy["SmallText"], EmptyString, EmptyString, true},
+		{"Source and destination are actually the same", TestFileMapCopy["SmallText"], TestCaseRootCopy, EmptyString, EmptyString, true},
+		{"Source and inferred destination(dir) use the same name: can't overwrite dir", TestFileMapCopy["SameName"], TestCaseOutputCopy, EmptyString, EmptyString, true},
+		{"Source and inferred destination(file) use the same name: overwrite the file", TestFileMapCopy["SameName2"], TestCaseOutputCopy, TestFileMapCopy["SameName2"], TestFileMapCopy["Out_SameName2"], false},
 	}
 
 	for _, tt := range tests {
