@@ -50,6 +50,10 @@ do
         make testdev PACKAGE="$PACKAGE"
         make benchdev PACKAGE="$PACKAGE"
         ;;
+    devfast)
+        make fmt PACKAGE="$PACKAGE"
+        make test PACKAGE="$PACKAGE"
+        ;;
     *)
         printf "Unknown build option: [%s]\n" "$CHOICE"
         exit 1
@@ -62,7 +66,7 @@ done
 printf "\n###### Clean Up ######\n"
 
 if [[ ! -z "$TESTRSSDIR" ]] ; then
-    rm -fr "$TESTRSSDIR"
+    chmod -R 700 "$TESTRSSDIR" && rm -fr "$TESTRSSDIR"
 fi
 
 printf "\n====== End at %s, Packages: %d ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$COUNT"

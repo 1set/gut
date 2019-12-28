@@ -32,28 +32,23 @@ func IsNotExist(path string) bool {
 // IsFileExist checks if the specified path exists and is a file.
 // If the path is a symbolic link, it will attempt to follow the link and check.
 func IsFileExist(path string) (exist bool, err error) {
-	exist, err = false, nil
-	var info os.FileInfo
-	if info, err = os.Stat(path); err == nil {
-		if info.IsDir() {
-			err = ErrIsDir
-		} else {
-			exist = true
-		}
-	}
-	return
+	return checkPathExist(path, false, ErrIsDir)
 }
 
 // IsDirExist checks if the specified path exists and is a directory.
 // If the path is a symbolic link, it will attempt to follow the link and check.
 func IsDirExist(path string) (exist bool, err error) {
+	return checkPathExist(path, true, ErrIsFile)
+}
+
+func checkPathExist(path string, expectDir bool, fallbackErr error) (exist bool, err error) {
 	exist, err = false, nil
 	var info os.FileInfo
 	if info, err = os.Stat(path); err == nil {
-		if info.IsDir() {
+		if info.IsDir() == expectDir {
 			exist = true
 		} else {
-			err = ErrIsFile
+			err = fallbackErr
 		}
 	}
 	return

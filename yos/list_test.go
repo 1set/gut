@@ -6,11 +6,14 @@ import (
 	"testing"
 )
 
-var TestCaseRootList, FileInTestCaseRootList string
+var (
+	resourceListRoot     string
+	resourceListFileRoot string
+)
 
 func init() {
-	TestCaseRootList = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "list")
-	FileInTestCaseRootList = JoinPath(TestCaseRootList, "no_ext_name_file")
+	resourceListRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "list")
+	resourceListFileRoot = JoinPath(resourceListRoot, "no_ext_name_file")
 }
 
 func verifyTestResult(t *testing.T, name string, expected []string, actual []*FilePathInfo, err error) {
@@ -47,16 +50,16 @@ func TestListAll(t *testing.T) {
 		}
 	}
 
-	actual, err := ListAll(FileInTestCaseRootList)
+	actual, err := ListAll(resourceListFileRoot)
 	verifyTestResult(t, "ListAll", expectedResultMap["Empty"], actual, err)
 
-	actual, err = ListAll(TestCaseRootList)
+	actual, err = ListAll(resourceListRoot)
 	verifyTestResult(t, "ListAll", expectedResultMap["All"], actual, err)
 }
 
 func BenchmarkListAll(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = ListAll(TestCaseRootList)
+		_, _ = ListAll(resourceListRoot)
 	}
 }
 
@@ -70,16 +73,16 @@ func TestListFile(t *testing.T) {
 		}
 	}
 
-	actual, err := ListFile(FileInTestCaseRootList)
+	actual, err := ListFile(resourceListFileRoot)
 	verifyTestResult(t, "ListFile", expectedResultMap["Empty"], actual, err)
 
-	actual, err = ListFile(TestCaseRootList)
+	actual, err = ListFile(resourceListRoot)
 	verifyTestResult(t, "ListFile", expectedResultMap["AllFiles"], actual, err)
 }
 
 func BenchmarkListFile(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = ListFile(TestCaseRootList)
+		_, _ = ListFile(resourceListRoot)
 	}
 }
 
@@ -93,16 +96,16 @@ func TestListDir(t *testing.T) {
 		}
 	}
 
-	actual, err := ListDir(FileInTestCaseRootList)
+	actual, err := ListDir(resourceListFileRoot)
 	verifyTestResult(t, "ListDir", expectedResultMap["Empty"], actual, err)
 
-	actual, err = ListDir(TestCaseRootList)
+	actual, err = ListDir(resourceListRoot)
 	verifyTestResult(t, "ListDir", expectedResultMap["AllDirs"], actual, err)
 }
 
 func BenchmarkListDir(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = ListDir(TestCaseRootList)
+		_, _ = ListDir(resourceListRoot)
 	}
 }
 
@@ -123,28 +126,28 @@ func TestListMatch(t *testing.T) {
 	}{
 		{"Empty root path", args{"", ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], true},
 		{"Root not exist", args{"__not_found_folder__", ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], true},
-		{"Root is a file", args{FileInTestCaseRootList, ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], false},
-		{"No Flag", args{TestCaseRootList, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
-		{"Flag for file", args{TestCaseRootList, ListIncludeFile, allEntriesPattern}, expectedResultMap["RootFiles"], false},
-		{"Flag for dir", args{TestCaseRootList, ListIncludeDir, allEntriesPattern}, expectedResultMap["RootDirs"], false},
-		{"Flag for file & dir", args{TestCaseRootList, ListIncludeFile | ListIncludeDir, allEntriesPattern}, expectedResultMap["RootAll"], false},
-		{"Flag for recursive & file", args{TestCaseRootList, ListRecursive | ListIncludeFile, allEntriesPattern}, expectedResultMap["AllFiles"], false},
-		{"Flag for recursive & dir", args{TestCaseRootList, ListRecursive | ListIncludeDir, allEntriesPattern}, expectedResultMap["AllDirs"], false},
-		{"Flag with ToLower", args{TestCaseRootList, ListIncludeFile | ListToLower, []string{"file*"}}, expectedResultMap["AllFile*Insensitive"], false},
-		{"Flag without ToLower", args{TestCaseRootList, ListIncludeFile, []string{"file*"}}, expectedResultMap["AllFile*Sensitive"], false},
-		{"No pattern", args{TestCaseRootList, ListIncludeFile, expectedResultMap["Empty"]}, expectedResultMap["Empty"], false},
-		{"Broken pattern", args{TestCaseRootList, ListIncludeFile, []string{"*[1-"}}, expectedResultMap["Empty"], true},
-		{"Empty pattern", args{TestCaseRootList, ListIncludeFile, []string{""}}, expectedResultMap["Empty"], false},
-		{"Pattern for exact match", args{TestCaseRootList, ListRecursive | ListIncludeFile, []string{"file1.txt"}}, expectedResultMap["All file1.txt"], false},
-		{"Pattern for exclude", args{TestCaseRootList, ListRecursive | ListIncludeFile, []string{"[^.]*"}}, expectedResultMap["AllFiles"], false},
-		{"Pattern match none", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.pdf"}}, expectedResultMap["Empty"], false},
-		{"Pattern match txt", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt"}}, expectedResultMap["All *.txt"], false},
-		{"Pattern with slash", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"/*.txt"}}, expectedResultMap["Empty"], false},
-		{"Pattern with case-sensitive match", args{TestCaseRootList, ListIncludeFile, []string{"File*"}}, expectedResultMap["OnlyFile*"], false},
-		{"Pattern with case-insensitive non-match", args{TestCaseRootList, ListIncludeFile | ListToLower, []string{"File*"}}, expectedResultMap["Empty"], false},
-		{"Duplicate patterns", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt", "*.txt", "*.txt"}}, expectedResultMap["All *.txt"], false},
-		{"Multiple matched patterns", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt", "*.md"}}, expectedResultMap["All *.txt *.md"], false},
-		{"Combine of match and non-match patterns", args{TestCaseRootList, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt", "*.pdf", "*.jpg"}}, expectedResultMap["All *.txt"], false},
+		{"Root is a file", args{resourceListFileRoot, ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], false},
+		{"No Flag", args{resourceListRoot, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
+		{"Flag for file", args{resourceListRoot, ListIncludeFile, allEntriesPattern}, expectedResultMap["RootFiles"], false},
+		{"Flag for dir", args{resourceListRoot, ListIncludeDir, allEntriesPattern}, expectedResultMap["RootDirs"], false},
+		{"Flag for file & dir", args{resourceListRoot, ListIncludeFile | ListIncludeDir, allEntriesPattern}, expectedResultMap["RootAll"], false},
+		{"Flag for recursive & file", args{resourceListRoot, ListRecursive | ListIncludeFile, allEntriesPattern}, expectedResultMap["AllFiles"], false},
+		{"Flag for recursive & dir", args{resourceListRoot, ListRecursive | ListIncludeDir, allEntriesPattern}, expectedResultMap["AllDirs"], false},
+		{"Flag with ToLower", args{resourceListRoot, ListIncludeFile | ListToLower, []string{"file*"}}, expectedResultMap["AllFile*Insensitive"], false},
+		{"Flag without ToLower", args{resourceListRoot, ListIncludeFile, []string{"file*"}}, expectedResultMap["AllFile*Sensitive"], false},
+		{"No pattern", args{resourceListRoot, ListIncludeFile, expectedResultMap["Empty"]}, expectedResultMap["Empty"], false},
+		{"Broken pattern", args{resourceListRoot, ListIncludeFile, []string{"*[1-"}}, expectedResultMap["Empty"], true},
+		{"Empty pattern", args{resourceListRoot, ListIncludeFile, []string{""}}, expectedResultMap["Empty"], false},
+		{"Pattern for exact match", args{resourceListRoot, ListRecursive | ListIncludeFile, []string{"file1.txt"}}, expectedResultMap["All file1.txt"], false},
+		{"Pattern for exclude", args{resourceListRoot, ListRecursive | ListIncludeFile, []string{"[^.]*"}}, expectedResultMap["AllFiles"], false},
+		{"Pattern match none", args{resourceListRoot, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.pdf"}}, expectedResultMap["Empty"], false},
+		{"Pattern match txt", args{resourceListRoot, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt"}}, expectedResultMap["All *.txt"], false},
+		{"Pattern with slash", args{resourceListRoot, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"/*.txt"}}, expectedResultMap["Empty"], false},
+		{"Pattern with case-sensitive match", args{resourceListRoot, ListIncludeFile, []string{"File*"}}, expectedResultMap["OnlyFile*"], false},
+		{"Pattern with case-insensitive non-match", args{resourceListRoot, ListIncludeFile | ListToLower, []string{"File*"}}, expectedResultMap["Empty"], false},
+		{"Duplicate patterns", args{resourceListRoot, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt", "*.txt", "*.txt"}}, expectedResultMap["All *.txt"], false},
+		{"Multiple matched patterns", args{resourceListRoot, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt", "*.md"}}, expectedResultMap["All *.txt *.md"], false},
+		{"Combine of match and non-match patterns", args{resourceListRoot, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt", "*.pdf", "*.jpg"}}, expectedResultMap["All *.txt"], false},
 	}
 
 	for _, tt := range tests {
@@ -163,7 +166,7 @@ func TestListMatch(t *testing.T) {
 
 func BenchmarkListMatch(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = ListMatch(TestCaseRootList, ListRecursive|ListIncludeFile|ListIncludeDir, "*.txt", "deep*")
+		_, _ = ListMatch(resourceListRoot, ListRecursive|ListIncludeFile|ListIncludeDir, "*.txt", "deep*")
 	}
 }
 

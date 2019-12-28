@@ -6,10 +6,10 @@ import (
 	"testing"
 )
 
-var TestCaseRootSymlink string
+var resourceSymlinkRoot string
 
 func init() {
-	TestCaseRootSymlink = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "symlink")
+	resourceSymlinkRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "symlink")
 }
 
 func TestIsExistOrNot(t *testing.T) {
@@ -21,11 +21,11 @@ func TestIsExistOrNot(t *testing.T) {
 		{"Check missing", "__do_not_exist__", false},
 		{"Check doc file", "doc.go", true},
 		{"Check current dir", ".", true},
-		{"Check symlink origin", JoinPath(TestCaseRootSymlink, "origin_file.txt"), true},
-		{"Check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), true},
-		{"Check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), true},
-		{"Check symlink of symlink", JoinPath(TestCaseRootSymlink, "2symlink.txt"), true},
-		{"Check broken symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), false},
+		{"Check symlink origin", JoinPath(resourceSymlinkRoot, "origin_file.txt"), true},
+		{"Check symlink of file", JoinPath(resourceSymlinkRoot, "symlink.txt"), true},
+		{"Check symlink of dir", JoinPath(resourceSymlinkRoot, "dir_link"), true},
+		{"Check symlink of symlink", JoinPath(resourceSymlinkRoot, "2symlink.txt"), true},
+		{"Check broken symlink", JoinPath(resourceSymlinkRoot, "broken.txt"), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -61,15 +61,15 @@ func TestIsFileExist(t *testing.T) {
 		{"Check missing", "__do_not_exist__", false, true},
 		{"Check doc file", "doc.go", true, false},
 		{"Check current dir", ".", false, true},
-		{"Check symlink dir", JoinPath(TestCaseRootSymlink), false, true},
-		{"Check symlink origin file", JoinPath(TestCaseRootSymlink, "origin_file.txt"), true, false},
-		{"Check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), true, false},
-		{"Check symlink of symlink of file", JoinPath(TestCaseRootSymlink, "2symlink.txt"), true, false},
-		{"Check symlink origin dir", JoinPath(TestCaseRootSymlink, "target_dir"), false, true},
-		{"Check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), false, true},
-		{"Check symlink of symlink of dir", JoinPath(TestCaseRootSymlink, "2dir_link"), false, true},
-		{"Check broken file symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), false, true},
-		{"Check broken dir symlink", JoinPath(TestCaseRootSymlink, "broken2.txt"), false, true},
+		{"Check symlink dir", JoinPath(resourceSymlinkRoot), false, true},
+		{"Check symlink origin file", JoinPath(resourceSymlinkRoot, "origin_file.txt"), true, false},
+		{"Check symlink of file", JoinPath(resourceSymlinkRoot, "symlink.txt"), true, false},
+		{"Check symlink of symlink of file", JoinPath(resourceSymlinkRoot, "2symlink.txt"), true, false},
+		{"Check symlink origin dir", JoinPath(resourceSymlinkRoot, "target_dir"), false, true},
+		{"Check symlink of dir", JoinPath(resourceSymlinkRoot, "dir_link"), false, true},
+		{"Check symlink of symlink of dir", JoinPath(resourceSymlinkRoot, "2dir_link"), false, true},
+		{"Check broken file symlink", JoinPath(resourceSymlinkRoot, "broken.txt"), false, true},
+		{"Check broken dir symlink", JoinPath(resourceSymlinkRoot, "broken2.txt"), false, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -101,15 +101,15 @@ func TestIsDirExist(t *testing.T) {
 		{"Check missing", "__do_not_exist__", false, true},
 		{"Check doc file", "doc.go", false, true},
 		{"Check current dir", ".", true, false},
-		{"Check symlink dir", JoinPath(TestCaseRootSymlink), true, false},
-		{"Check symlink origin file", JoinPath(TestCaseRootSymlink, "origin_file.txt"), false, true},
-		{"Check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), false, true},
-		{"Check symlink of symlink of file", JoinPath(TestCaseRootSymlink, "2symlink.txt"), false, true},
-		{"Check symlink origin dir", JoinPath(TestCaseRootSymlink, "target_dir"), true, false},
-		{"Check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), true, false},
-		// {"Check symlink of symlink of dir", JoinPath(TestCaseRootSymlink, "2dir_link"), true, false},
-		{"Check broken file symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), false, true},
-		{"Check broken dir symlink", JoinPath(TestCaseRootSymlink, "broken2.txt"), false, true},
+		{"Check symlink dir", JoinPath(resourceSymlinkRoot), true, false},
+		{"Check symlink origin file", JoinPath(resourceSymlinkRoot, "origin_file.txt"), false, true},
+		{"Check symlink of file", JoinPath(resourceSymlinkRoot, "symlink.txt"), false, true},
+		{"Check symlink of symlink of file", JoinPath(resourceSymlinkRoot, "2symlink.txt"), false, true},
+		{"Check symlink origin dir", JoinPath(resourceSymlinkRoot, "target_dir"), true, false},
+		{"Check symlink of dir", JoinPath(resourceSymlinkRoot, "dir_link"), true, false},
+		// {"Check symlink of symlink of dir", JoinPath(resourceSymlinkRoot, "2dir_link"), true, false},
+		{"Check broken file symlink", JoinPath(resourceSymlinkRoot, "broken.txt"), false, true},
+		{"Check broken dir symlink", JoinPath(resourceSymlinkRoot, "broken2.txt"), false, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -127,7 +127,7 @@ func TestIsDirExist(t *testing.T) {
 
 func BenchmarkIsDirExist(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = IsDirExist(TestCaseRootSymlink)
+		_, _ = IsDirExist(resourceSymlinkRoot)
 	}
 }
 
@@ -141,15 +141,15 @@ func TestIsSymlinkExist(t *testing.T) {
 		{"Check missing", "__do_not_exist__", false, true},
 		{"Check doc file", "doc.go", false, true},
 		{"Check current dir", ".", false, true},
-		{"Check symlink dir", JoinPath(TestCaseRootSymlink), false, true},
-		{"Check symlink origin file", JoinPath(TestCaseRootSymlink, "origin_file.txt"), false, true},
-		{"Check symlink of file", JoinPath(TestCaseRootSymlink, "symlink.txt"), true, false},
-		{"Check symlink of symlink of file", JoinPath(TestCaseRootSymlink, "2symlink.txt"), true, false},
-		{"Check symlink origin dir", JoinPath(TestCaseRootSymlink, "target_dir"), false, true},
-		{"Check symlink of dir", JoinPath(TestCaseRootSymlink, "dir_link"), true, false},
-		{"Check symlink of symlink of dir", JoinPath(TestCaseRootSymlink, "2dir_link"), true, false},
-		{"Check broken file symlink", JoinPath(TestCaseRootSymlink, "broken.txt"), true, false},
-		{"Check broken dir symlink", JoinPath(TestCaseRootSymlink, "broken2.txt"), true, false},
+		{"Check symlink dir", JoinPath(resourceSymlinkRoot), false, true},
+		{"Check symlink origin file", JoinPath(resourceSymlinkRoot, "origin_file.txt"), false, true},
+		{"Check symlink of file", JoinPath(resourceSymlinkRoot, "symlink.txt"), true, false},
+		{"Check symlink of symlink of file", JoinPath(resourceSymlinkRoot, "2symlink.txt"), true, false},
+		{"Check symlink origin dir", JoinPath(resourceSymlinkRoot, "target_dir"), false, true},
+		{"Check symlink of dir", JoinPath(resourceSymlinkRoot, "dir_link"), true, false},
+		{"Check symlink of symlink of dir", JoinPath(resourceSymlinkRoot, "2dir_link"), true, false},
+		{"Check broken file symlink", JoinPath(resourceSymlinkRoot, "broken.txt"), true, false},
+		{"Check broken dir symlink", JoinPath(resourceSymlinkRoot, "broken2.txt"), true, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -166,7 +166,7 @@ func TestIsSymlinkExist(t *testing.T) {
 }
 
 func BenchmarkIsSymlinkExist(b *testing.B) {
-	path := JoinPath(TestCaseRootSymlink, "symlink.txt")
+	path := JoinPath(resourceSymlinkRoot, "symlink.txt")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, _ = IsSymlinkExist(path)
