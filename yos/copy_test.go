@@ -65,6 +65,7 @@ func init() {
 		"BrokenSymlink":   JoinPath(resourceCopyDirSourceRoot, "broken-symlink"),
 		"CircularSymlink": JoinPath(resourceCopyDirSourceRoot, "circular-symlink"),
 		"MiscDir":         JoinPath(resourceCopyDirSourceRoot, "misc"),
+		"OneFileDir":      JoinPath(resourceCopyDirSourceRoot, "one-file-dir"),
 	}
 }
 
@@ -168,12 +169,12 @@ func TestCopyDir(t *testing.T) {
 		{"Source directory contains a circular symlink", resourceCopyDirSourceMap["CircularSymlink"], outputRoot, resourceCopyDirSourceMap["CircularSymlink"], JoinPath(outputRoot, "circular-symlink"), false},
 		{"Source directory contains files, symlinks and directories", resourceCopyDirSourceMap["MiscDir"], outputRoot, resourceCopyDirSourceMap["MiscDir"], JoinPath(outputRoot, "misc"), false},
 
-		{"Destination is empty", resourceCopyDirSourceMap["EmptyDir"], emptyStr, emptyStr, emptyStr, true},
-		{"Destination is a file", resourceCopyDirSourceMap["EmptyDir"], JoinPath(outputRoot, "exist", "existing-file.txt"), emptyStr, emptyStr, true},
-		{"Destination is a symlink", resourceCopyDirSourceMap["EmptyDir"], JoinPath(outputRoot, "exist", "existing-link.txt"), emptyStr, emptyStr, true},
-		{"Destination and its parent don't exist", resourceCopyDirSourceMap["EmptyDir"], JoinPath(outputRoot, "non-exist", "non-exist-nested"), emptyStr, emptyStr, true},
-		{"Destination doesn't exist but its parent does", resourceCopyDirSourceMap["EmptyDir"], JoinPath(outputRoot, "exist", "nested-dir"), resourceCopyDirSourceMap["EmptyDir"], JoinPath(outputRoot, "exist", "nested-dir"), false},
-		{"Destination directory exists, and it's empty", resourceCopyDirSourceMap["EmptyDir"], JoinPath(outputRoot, "exist", "empty-dir"), resourceCopyDirSourceMap["EmptyDir"], JoinPath(outputRoot, "exist", "empty-dir", "empty-dir"), false},
+		{"Destination is empty", resourceCopyDirSourceMap["OneFileDir"], emptyStr, emptyStr, emptyStr, true},
+		{"Destination is a file", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "existing-file.txt"), emptyStr, emptyStr, true},
+		{"Destination is a symlink", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "existing-link.txt"), emptyStr, emptyStr, true},
+		{"Destination and its parent don't exist", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "non-exist", "non-exist-nested"), emptyStr, emptyStr, true},
+		{"Destination doesn't exist but its parent does", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "nested-dir"), resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "nested-dir"), false},
+		{"Destination directory exists, and it's empty", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "empty-dir"), resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "empty-dir", "one-file-dir"), false},
 
 		//{ "Destination directory exists and already contains files", resourceCopyDirSourceMap["EmptyDir"], emptyStr, emptyStr, emptyStr, true},
 		//{ "Destination directory exists and already contains the same source", resourceCopyDirSourceMap["EmptyDir"], emptyStr, emptyStr, emptyStr, true},
