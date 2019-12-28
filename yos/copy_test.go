@@ -1,6 +1,7 @@
 package yos
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -23,7 +24,6 @@ var (
 
 func init() {
 	testResourceRoot := os.Getenv("TESTRSSDIR")
-	testResourceRoot = "/var/folders/jy/cfbkpfvn6c9255yvvhfsdwzm0000gn/T/gut_test_resource"
 
 	resourceCopyRoot = JoinPath(testResourceRoot, "yos", "copy")
 	resourceCopyOutputRoot = JoinPath(resourceCopyRoot, "output")
@@ -146,7 +146,7 @@ func BenchmarkCopyFile(b *testing.B) {
 
 func TestCopyDir(t *testing.T) {
 	outputRoot := resourceCopyDirOutputRoot
-	//expectedOutputRoot := JoinPath(resourceCopyDirRoot, "destination")
+	expectedOutputRoot := JoinPath(resourceCopyDirRoot, "destination")
 
 	tests := []struct {
 		name         string
@@ -175,11 +175,12 @@ func TestCopyDir(t *testing.T) {
 		{"Destination and its parent don't exist", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "non-exist", "non-exist-nested"), emptyStr, emptyStr, true},
 		{"Destination doesn't exist but its parent does", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "nested-dir"), resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "nested-dir"), false},
 		{"Destination directory exists, and it's empty", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "empty-dir"), resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "empty-dir", "one-file-dir"), false},
-
-		{"Destination directory exists and already contains files", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-other"), resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-other", "one-file-dir"), false},
+		{"Destination directory exists and already contains files", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-other"), JoinPath(expectedOutputRoot, "exist-other"), JoinPath(outputRoot, "exist-other", "one-file-dir"), false},
 		{"Destination directory exists and already contains the same source", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-same"), resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-same", "one-file-dir"), false},
 		{"Destination directory exists and contains a file with the same name and no permissions", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-no-perm-file"), emptyStr, emptyStr, true},
 		{"Destination directory exists and contains a directory with the same name and no permissions", resourceCopyDirSourceMap["MiscDir"], JoinPath(outputRoot, "exist-no-perm-dir"), emptyStr, emptyStr, true},
+
+		// TODO: override symlink and test with success
 		{"Destination directory exists and contains a symlink with the same name", resourceCopyDirSourceMap["OnlySymlinks"], JoinPath(outputRoot, "exist-symlink"), resourceCopyDirSourceMap["OnlySymlinks"], JoinPath(outputRoot, "exist-symlink", "only-symlinks"), true},
 
 		{"Source and destination are exactly the same", resourceCopyDirSourceMap["OneFileDir"], resourceCopyDirSourceMap["OneFileDir"], emptyStr, emptyStr, true},
@@ -199,15 +200,72 @@ func TestCopyDir(t *testing.T) {
 			}
 
 			if !tt.wantErr {
-				ae, _ := IsDirExist(tt.actualPath)
-				ee, _ := IsDirExist(tt.expectedPath)
-				t.Logf("actual: %v, exist: %v", tt.actualPath, ae)
-				t.Logf("expected: %v, exist: %v", tt.expectedPath, ee)
-				if !(ae && ee) {
-					t.Errorf("failed copy")
+				same, err := isDirectorySame(tt.expectedPath, tt.actualPath)
+				if err != nil {
+					t.Errorf("CopyDir() got error while comparing the directories: %v, %v, error: %v", tt.expectedPath, tt.actualPath, err)
+				} else if !same {
+					t.Errorf("CopyDir() the directories are not the same: %v, %v", tt.expectedPath, tt.actualPath)
 					return
 				}
 			}
 		})
 	}
+}
+
+func BenchmarkCopyDir(b *testing.B) {
+	for name, path := range resourceCopyDirSourceMap {
+		outputPath := JoinPath(resourceCopyDirBenchmarkRoot, name)
+		if err := os.MkdirAll(outputPath, defaultDirectoryFileMode); err != nil {
+			b.Errorf("failed to create the directory for output: %v, error: %v", outputPath, err)
+			continue
+		}
+		b.Run(name, func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				_ = CopyDir(path, outputPath)
+			}
+		})
+	}
+}
+
+func isDirectorySame(path1, path2 string) (same bool, err error) {
+	var exist1, exist2 bool
+	if exist1, err = IsDirExist(path1); err != nil || !exist1 {
+		return
+	}
+	if exist2, err = IsDirExist(path2); err != nil || !exist2 {
+		return
+	}
+
+	var items1, items2 []*FilePathInfo
+	if items1, err = ListAll(path1); err != nil {
+		return
+	}
+	if items2, err = ListAll(path2); err != nil {
+		return
+	}
+
+	if num1, num2 := len(items1), len(items2); num1 != num2 {
+		err = fmt.Errorf("different number of entries, %v got %d, whereas %v got %d", path1, num1, path2, num2)
+		return
+	}
+
+	for idx, info1 := range items1 {
+		info2 := items2[idx]
+		if name1, name2 := info1.Info.Name(), info2.Info.Name(); name1 != name2 {
+			err = fmt.Errorf("different file name of #%d, %s and %s", idx+1, name1, name2)
+			return
+		} else if dir1, dir2 := info1.Info.IsDir(), info2.Info.IsDir(); dir1 != dir2 {
+			err = fmt.Errorf("different type of #%d, %s dir: %v, %s dir: %v", idx+1, name1, dir1, name2, dir2)
+			return
+		} else if !dir1 && !dir2 {
+			// TODO: SameFileContent, SameSymlinkDestination
+			//if same, err = SameContent(info1.Path, info2.Path); err != nil || !same {
+			//	return
+			//}
+		}
+	}
+
+	same = true
+	return
 }

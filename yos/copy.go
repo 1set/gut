@@ -193,8 +193,8 @@ func copyDir(src, dest string) (err error) {
 
 	// check if destination doesn't exist or is not a file or source itself
 	if destInfo, err = os.Stat(dest); err == nil {
-		if destInfo.Mode().IsRegular() {
-			err = fmt.Errorf("%v: destination is a regular file", src)
+		if !destInfo.IsDir() {
+			err = fmt.Errorf("%v: destination is not a directory", src)
 		} else if os.SameFile(srcInfo, destInfo) {
 			err = ErrSameFile
 		}

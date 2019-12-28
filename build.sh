@@ -47,9 +47,12 @@ do
         ;;
     dev)
         make fmt PACKAGE="$PACKAGE"
+        make testdev PACKAGE="$PACKAGE"
+        make benchdev PACKAGE="$PACKAGE"
+        ;;
+    devfast)
+        make fmt PACKAGE="$PACKAGE"
         make test PACKAGE="$PACKAGE"
-#        make testdev PACKAGE="$PACKAGE"
-#        make benchdev PACKAGE="$PACKAGE"
         ;;
     *)
         printf "Unknown build option: [%s]\n" "$CHOICE"
