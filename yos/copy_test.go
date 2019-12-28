@@ -17,12 +17,13 @@ var (
 	resourceCopyDirRoot          string
 	resourceCopyDirOutputRoot    string
 	resourceCopyDirBenchmarkRoot string
+	resourceCopyDirSourceRoot    string
 	resourceCopyDirSourceMap     map[string]string
 )
 
 func init() {
 	testResourceRoot := os.Getenv("TESTRSSDIR")
-	// testResourceRoot = "/var/folders/jy/cfbkpfvn6c9255yvvhfsdwzm0000gn/T/gut_test_resource"
+	testResourceRoot = "/var/folders/jy/cfbkpfvn6c9255yvvhfsdwzm0000gn/T/gut_test_resource"
 
 	resourceCopyRoot = JoinPath(testResourceRoot, "yos", "copy")
 	resourceCopyOutputRoot = JoinPath(resourceCopyRoot, "output")
@@ -52,7 +53,7 @@ func init() {
 	resourceCopyDirRoot = JoinPath(testResourceRoot, "yos", "copydir")
 	resourceCopyDirOutputRoot = JoinPath(resourceCopyDirRoot, "output")
 	resourceCopyDirBenchmarkRoot = JoinPath(resourceCopyDirRoot, "benchmark")
-	resourceCopyDirSourceRoot := JoinPath(resourceCopyDirRoot, "source")
+	resourceCopyDirSourceRoot = JoinPath(resourceCopyDirRoot, "source")
 	resourceCopyDirSourceMap = map[string]string{
 		"TextFile":        JoinPath(resourceCopyDirSourceRoot, "text.txt"),
 		"Symlink":         JoinPath(resourceCopyDirSourceRoot, "link.txt"),
@@ -151,8 +152,8 @@ func TestCopyDir(t *testing.T) {
 		name         string
 		srcPath      string
 		destPath     string
-		actualPath   string
 		expectedPath string
+		actualPath   string
 		wantErr      bool
 	}{
 		{"Source is empty", emptyStr, outputRoot, emptyStr, emptyStr, true},
@@ -168,7 +169,6 @@ func TestCopyDir(t *testing.T) {
 		{"Source directory contains a broken symlink", resourceCopyDirSourceMap["BrokenSymlink"], outputRoot, resourceCopyDirSourceMap["BrokenSymlink"], JoinPath(outputRoot, "broken-symlink"), false},
 		{"Source directory contains a circular symlink", resourceCopyDirSourceMap["CircularSymlink"], outputRoot, resourceCopyDirSourceMap["CircularSymlink"], JoinPath(outputRoot, "circular-symlink"), false},
 		{"Source directory contains files, symlinks and directories", resourceCopyDirSourceMap["MiscDir"], outputRoot, resourceCopyDirSourceMap["MiscDir"], JoinPath(outputRoot, "misc"), false},
-
 		{"Destination is empty", resourceCopyDirSourceMap["OneFileDir"], emptyStr, emptyStr, emptyStr, true},
 		{"Destination is a file", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "existing-file.txt"), emptyStr, emptyStr, true},
 		{"Destination is a symlink", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "existing-link.txt"), emptyStr, emptyStr, true},
@@ -176,12 +176,16 @@ func TestCopyDir(t *testing.T) {
 		{"Destination doesn't exist but its parent does", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "nested-dir"), resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "nested-dir"), false},
 		{"Destination directory exists, and it's empty", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "empty-dir"), resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist", "empty-dir", "one-file-dir"), false},
 
-		//{ "Destination directory exists and already contains files", resourceCopyDirSourceMap["EmptyDir"], emptyStr, emptyStr, emptyStr, true},
-		//{ "Destination directory exists and already contains the same source", resourceCopyDirSourceMap["EmptyDir"], emptyStr, emptyStr, emptyStr, true},
-		//{ "Destination directory exists and contains a file with the same name and no permissions", resourceCopyDirSourceMap["EmptyDir"], emptyStr, emptyStr, emptyStr, true},
-		//{ "Destination directory exists and contains a directory with the same name and no permissions", resourceCopyDirSourceMap["EmptyDir"], emptyStr, emptyStr, emptyStr, true},
-		//{ "Destination directory exists and contains a symlink with the same name", resourceCopyDirSourceMap["EmptyDir"], emptyStr, emptyStr, emptyStr, true},
-		//{ "Destination directory exists and contains a symlink with the same name and no permissions", resourceCopyDirSourceMap["EmptyDir"], emptyStr, emptyStr, emptyStr, true},
+		{"Destination directory exists and already contains files", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-other"), resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-other", "one-file-dir"), false},
+		{"Destination directory exists and already contains the same source", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-same"), resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-same", "one-file-dir"), false},
+		{"Destination directory exists and contains a file with the same name and no permissions", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-no-perm-file"), emptyStr, emptyStr, true},
+		{"Destination directory exists and contains a directory with the same name and no permissions", resourceCopyDirSourceMap["MiscDir"], JoinPath(outputRoot, "exist-no-perm-dir"), emptyStr, emptyStr, true},
+		{"Destination directory exists and contains a symlink with the same name", resourceCopyDirSourceMap["OnlySymlinks"], JoinPath(outputRoot, "exist-symlink"), resourceCopyDirSourceMap["OnlySymlinks"], JoinPath(outputRoot, "exist-symlink", "only-symlinks"), true},
+
+		{"Source and destination are exactly the same", resourceCopyDirSourceMap["OneFileDir"], resourceCopyDirSourceMap["OneFileDir"], emptyStr, emptyStr, true},
+		{"Source and destination are actually the same", resourceCopyDirSourceMap["OneFileDir"], resourceCopyDirSourceRoot, emptyStr, emptyStr, true},
+		{"Source and inferred destination(file) use the same name: can't overwrite file", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-file"), emptyStr, emptyStr, true},
+		{"Source and inferred destination(dir) use the same name: overwrite the dir", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-dir"), resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-dir", "one-file-dir"), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

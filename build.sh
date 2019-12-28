@@ -63,7 +63,7 @@ done
 printf "\n###### Clean Up ######\n"
 
 if [[ ! -z "$TESTRSSDIR" ]] ; then
-    chmod -R +r "$TESTRSSDIR" && rm -fr "$TESTRSSDIR"
+    chmod -R 700 "$TESTRSSDIR" && rm -fr "$TESTRSSDIR"
 fi
 
 printf "\n====== End at %s, Packages: %d ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$COUNT"

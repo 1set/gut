@@ -24,7 +24,7 @@ export OS_NAME="$platform_name"
 echo "$MSYS"
 export MSYS=winsymlinks:nativestrict
 export TESTRSSDIR=${TMPDIR%/}/gut_test_resource
-chmod -R +r "$TESTRSSDIR" && rm -fr "$TESTRSSDIR"
+chmod -R 700 "$TESTRSSDIR" && rm -fr "$TESTRSSDIR"
 unzip -o test_resource.zip -d "$TESTRSSDIR"
 printf "Uncompress test resource: %s\n\n" "$TESTRSSDIR"
 
@@ -32,5 +32,7 @@ chmod 000 "$TESTRSSDIR"/yos/copy/none_perm.txt
 chmod 000 "$TESTRSSDIR"/yos/copy/output/none_perm.txt
 chmod 000 "$TESTRSSDIR"/yos/copydir/source/no-perm-dirs/no_perm_dir
 chmod 000 "$TESTRSSDIR"/yos/copydir/source/no-perm-files/no_perm_file
+chmod 000 "$TESTRSSDIR"/yos/copydir/output/exist-no-perm-file/one-file-dir/text.txt
+chmod 000 "$TESTRSSDIR"/yos/copydir/output/exist-no-perm-dir/misc/deep1
 chmod 000 "$TESTRSSDIR"/yos/same/set1/none_perm.txt
 chmod 000 "$TESTRSSDIR"/yos/same/set2/none_perm.txt

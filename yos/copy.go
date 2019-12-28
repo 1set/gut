@@ -157,8 +157,10 @@ func refineCopyPaths(srcRaw, destRaw string) (src, dest string, err error) {
 			_, err = os.Stat(filepath.Dir(destRaw))
 		}
 	} else {
-		// append file name of source to path of the existing destination
-		if destInfo.IsDir() {
+		if os.SameFile(srcInfo, destInfo) {
+			err = ErrSameFile
+		} else if destInfo.IsDir() {
+			// append file name of source to path of the existing destination
 			destRaw = JoinPath(destRaw, srcInfo.Name())
 		}
 	}
