@@ -6,6 +6,19 @@ import (
 	"os"
 )
 
+// SameSymlinkContent checks if the two symbolic links have the same destination.
+func SameSymlinkContent(path1, path2 string) (same bool, err error) {
+	var link1, link2 string
+	if link1, err = os.Readlink(path1); err != nil {
+		return
+	}
+	if link2, err = os.Readlink(path2); err != nil {
+		return
+	}
+	same = link1 == link2
+	return
+}
+
 // SameContent checks if the two given files have the same content or are the same file. Symbolic links are followed.
 // Errors are returned if any files doesn't exist or is broken.
 func SameContent(path1, path2 string) (same bool, err error) {

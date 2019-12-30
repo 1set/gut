@@ -25,7 +25,7 @@ echo "$MSYS"
 export MSYS=winsymlinks:nativestrict
 export TESTRSSDIR=${TMPDIR%/}/gut_test_resource
 chmod -R 700 "$TESTRSSDIR" && rm -fr "$TESTRSSDIR"
-unzip -o test_resource.zip -d "$TESTRSSDIR"
+unzip -q -o test_resource.zip -d "$TESTRSSDIR"
 printf "Uncompress test resource: %s\n\n" "$TESTRSSDIR"
 
 chmod 000 "$TESTRSSDIR"/yos/copy/none_perm.txt

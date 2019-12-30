@@ -50,7 +50,7 @@ do
         make testdev PACKAGE="$PACKAGE"
         make benchdev PACKAGE="$PACKAGE"
         ;;
-    devfast)
+    fastdev)
         make fmt PACKAGE="$PACKAGE"
         make test PACKAGE="$PACKAGE"
         ;;

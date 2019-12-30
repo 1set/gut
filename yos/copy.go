@@ -60,6 +60,53 @@ func CopyDir(src, dest string) (err error) {
 	return
 }
 
+// CopySymlink copies a symbolic link to a target file.
+// It only copies the contents and makes no attempt to read the referenced file.
+func CopySymlink(src, dest string) (err error) {
+	if src, dest, err = refineCopyPaths(src, dest); err == nil {
+		err = copySymlink(src, dest)
+	}
+	return
+}
+
+// refineCopyPaths validates, cleans up and adjusts the source and destination paths for copy file and copy directory.
+func refineCopyPaths(srcRaw, destRaw string) (src, dest string, err error) {
+	if ystring.IsBlank(srcRaw) || ystring.IsBlank(destRaw) {
+		err = ErrEmptyPath
+		return
+	}
+
+	// clean up paths
+	srcRaw, destRaw = filepath.Clean(srcRaw), filepath.Clean(destRaw)
+
+	// check if source exists
+	var srcInfo, destInfo os.FileInfo
+	if srcInfo, err = os.Stat(srcRaw); err != nil {
+		return
+	}
+
+	// check if destination exists
+	if destInfo, err = os.Stat(destRaw); err != nil {
+		// check existence of parent of the missing destination
+		if os.IsNotExist(err) {
+			_, err = os.Stat(filepath.Dir(destRaw))
+		}
+	} else {
+		if os.SameFile(srcInfo, destInfo) {
+			err = ErrSameFile
+		} else if destInfo.IsDir() {
+			// append file name of source to path of the existing destination
+			destRaw = JoinPath(destRaw, srcInfo.Name())
+		}
+	}
+
+	if err == nil {
+		src, dest = srcRaw, destRaw
+	}
+	return
+}
+
+// bufferCopyFile reads content from the source file and write to the destination file with a buffer.
 func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	var srcFile, destFile *os.File
 	if srcFile, err = os.Open(src); err != nil {
@@ -131,43 +178,6 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	}
 
 	// err = destFile.Sync()
-	return
-}
-
-// refineCopyPaths validates, cleans up and adjusts the source and destination paths for copy file and copy directory.
-func refineCopyPaths(srcRaw, destRaw string) (src, dest string, err error) {
-	if ystring.IsBlank(srcRaw) || ystring.IsBlank(destRaw) {
-		err = ErrEmptyPath
-		return
-	}
-
-	// clean up paths
-	srcRaw, destRaw = filepath.Clean(srcRaw), filepath.Clean(destRaw)
-
-	// check if source exists
-	var srcInfo, destInfo os.FileInfo
-	if srcInfo, err = os.Stat(srcRaw); err != nil {
-		return
-	}
-
-	// check if destination exists
-	if destInfo, err = os.Stat(destRaw); err != nil {
-		// check existence of parent of the missing destination
-		if os.IsNotExist(err) {
-			_, err = os.Stat(filepath.Dir(destRaw))
-		}
-	} else {
-		if os.SameFile(srcInfo, destInfo) {
-			err = ErrSameFile
-		} else if destInfo.IsDir() {
-			// append file name of source to path of the existing destination
-			destRaw = JoinPath(destRaw, srcInfo.Name())
-		}
-	}
-
-	if err == nil {
-		src, dest = srcRaw, destRaw
-	}
 	return
 }
 
