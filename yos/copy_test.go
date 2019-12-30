@@ -8,12 +8,12 @@ import (
 )
 
 var (
-	emptyStr                  string
-	resourceCopyRoot          string
-	resourceCopyOutputRoot    string
-	resourceCopyBenchmarkRoot string
-	resourceCopyFileMap       map[string]string
-	resourceCopyDirMap        map[string]string
+	emptyStr                      string
+	resourceCopyFileRoot          string
+	resourceCopyFileOutputRoot    string
+	resourceCopyFileBenchmarkRoot string
+	resourceCopyFileFileMap       map[string]string
+	resourceCopyFileDirMap        map[string]string
 
 	resourceCopyDirRoot          string
 	resourceCopyDirOutputRoot    string
@@ -25,32 +25,32 @@ var (
 func init() {
 	testResourceRoot := os.Getenv("TESTRSSDIR")
 
-	resourceCopyRoot = JoinPath(testResourceRoot, "yos", "copy")
-	resourceCopyOutputRoot = JoinPath(resourceCopyRoot, "output")
-	resourceCopyBenchmarkRoot = JoinPath(resourceCopyRoot, "benchmark")
-	resourceCopyFileMap = map[string]string{
-		"SymlinkFile":        JoinPath(resourceCopyRoot, "soft-link.txt"),
-		"SymlinkLink":        JoinPath(resourceCopyRoot, "soft-link2.txt"),
-		"SymlinkDir":         JoinPath(resourceCopyRoot, "soft-link-dir"),
-		"EmptyFile":          JoinPath(resourceCopyRoot, "empty-file.txt"),
-		"SmallText":          JoinPath(resourceCopyRoot, "small-text.txt"),
-		"LargeText":          JoinPath(resourceCopyRoot, "large-text.txt"),
-		"PngImage":           JoinPath(resourceCopyRoot, "image.png"),
-		"SvgImage":           JoinPath(resourceCopyRoot, "image.svg"),
-		"SameName":           JoinPath(resourceCopyRoot, "same-name"),
-		"SameName2":          JoinPath(resourceCopyRoot, "same-name2"),
-		"NonePermission":     JoinPath(resourceCopyRoot, "none_perm.txt"),
-		"Out_NonePermission": JoinPath(resourceCopyOutputRoot, "none_perm.txt"),
-		"Out_ExistingFile":   JoinPath(resourceCopyOutputRoot, "existing-file.txt"),
-		"Out_SameName2":      JoinPath(resourceCopyOutputRoot, "same-name2"),
+	resourceCopyFileRoot = JoinPath(testResourceRoot, "yos", "copy_file")
+	resourceCopyFileOutputRoot = JoinPath(resourceCopyFileRoot, "output")
+	resourceCopyFileBenchmarkRoot = JoinPath(resourceCopyFileRoot, "benchmark")
+	resourceCopyFileFileMap = map[string]string{
+		"SymlinkFile":        JoinPath(resourceCopyFileRoot, "soft-link.txt"),
+		"SymlinkLink":        JoinPath(resourceCopyFileRoot, "soft-link2.txt"),
+		"SymlinkDir":         JoinPath(resourceCopyFileRoot, "soft-link-dir"),
+		"EmptyFile":          JoinPath(resourceCopyFileRoot, "empty-file.txt"),
+		"SmallText":          JoinPath(resourceCopyFileRoot, "small-text.txt"),
+		"LargeText":          JoinPath(resourceCopyFileRoot, "large-text.txt"),
+		"PngImage":           JoinPath(resourceCopyFileRoot, "image.png"),
+		"SvgImage":           JoinPath(resourceCopyFileRoot, "image.svg"),
+		"SameName":           JoinPath(resourceCopyFileRoot, "same-name"),
+		"SameName2":          JoinPath(resourceCopyFileRoot, "same-name2"),
+		"NonePermission":     JoinPath(resourceCopyFileRoot, "none_perm.txt"),
+		"Out_NonePermission": JoinPath(resourceCopyFileOutputRoot, "none_perm.txt"),
+		"Out_ExistingFile":   JoinPath(resourceCopyFileOutputRoot, "existing-file.txt"),
+		"Out_SameName2":      JoinPath(resourceCopyFileOutputRoot, "same-name2"),
 	}
-	resourceCopyDirMap = map[string]string{
-		"EmptyDir":        JoinPath(resourceCopyRoot, "empty-folder"),
-		"ContentDir":      JoinPath(resourceCopyRoot, "content-folder"),
-		"Out_ExistingDir": JoinPath(resourceCopyOutputRoot, "existing-dir"),
+	resourceCopyFileDirMap = map[string]string{
+		"EmptyDir":        JoinPath(resourceCopyFileRoot, "empty-folder"),
+		"ContentDir":      JoinPath(resourceCopyFileRoot, "content-folder"),
+		"Out_ExistingDir": JoinPath(resourceCopyFileOutputRoot, "existing-dir"),
 	}
 
-	resourceCopyDirRoot = JoinPath(testResourceRoot, "yos", "copydir")
+	resourceCopyDirRoot = JoinPath(testResourceRoot, "yos", "copy_dir")
 	resourceCopyDirOutputRoot = JoinPath(resourceCopyDirRoot, "output")
 	resourceCopyDirBenchmarkRoot = JoinPath(resourceCopyDirRoot, "benchmark")
 	resourceCopyDirSourceRoot = JoinPath(resourceCopyDirRoot, "source")
@@ -72,7 +72,7 @@ func init() {
 
 func TestCopyFile(t *testing.T) {
 	//t.Parallel()
-	outputRoot := resourceCopyOutputRoot
+	outputRoot := resourceCopyFileOutputRoot
 
 	tests := []struct {
 		name       string
@@ -83,27 +83,27 @@ func TestCopyFile(t *testing.T) {
 		wantErr    bool
 	}{
 		{"Source is empty", emptyStr, outputRoot, emptyStr, emptyStr, true},
-		{"Source got permission denied", resourceCopyFileMap["NonePermission"], JoinPath(outputRoot, "whatever.txt"), emptyStr, emptyStr, true},
-		{"Source file not exist", JoinPath(resourceCopyRoot, "__not_exist__"), outputRoot, emptyStr, emptyStr, true},
-		{"Source is a dir", resourceCopyDirMap["ContentDir"], outputRoot, emptyStr, emptyStr, true},
-		{"Source is a symlink to file", resourceCopyFileMap["SymlinkFile"], outputRoot, resourceCopyFileMap["LargeText"], JoinPath(outputRoot, "soft-link.txt"), false},
-		{"Source is a symlink to symlink", resourceCopyFileMap["SymlinkLink"], outputRoot, resourceCopyFileMap["LargeText"], JoinPath(outputRoot, "soft-link.txt"), false},
-		{"Source is a symlink to dir", resourceCopyFileMap["SymlinkDir"], outputRoot, emptyStr, emptyStr, true},
-		{"Destination is empty", resourceCopyFileMap["SmallText"], emptyStr, emptyStr, emptyStr, true},
-		{"Destination is a dir", resourceCopyFileMap["SmallText"], resourceCopyDirMap["Out_ExistingDir"], resourceCopyFileMap["SmallText"], JoinPath(resourceCopyDirMap["Out_ExistingDir"], "small-text.txt"), false},
-		{"Destination is a file", resourceCopyFileMap["SmallText"], resourceCopyFileMap["Out_ExistingFile"], resourceCopyFileMap["SmallText"], resourceCopyFileMap["Out_ExistingFile"], false},
-		{"Destination got permission denied", resourceCopyFileMap["SmallText"], resourceCopyFileMap["Out_NonePermission"], emptyStr, emptyStr, true},
-		{"Destination file not exist", resourceCopyFileMap["SmallText"], JoinPath(outputRoot, "not-exist-file.txt"), resourceCopyFileMap["SmallText"], JoinPath(outputRoot, "not-exist-file.txt"), false},
-		{"Destination dir not exist", resourceCopyFileMap["SmallText"], JoinPath(outputRoot, "not-exist-dir", "not-exist-file.txt"), emptyStr, emptyStr, true},
-		{"Copy empty file", resourceCopyFileMap["EmptyFile"], JoinPath(outputRoot, "empty-file.txt"), resourceCopyFileMap["EmptyFile"], JoinPath(outputRoot, "empty-file.txt"), false},
-		{"Copy small text file", resourceCopyFileMap["SmallText"], JoinPath(outputRoot, "small-text.txt"), resourceCopyFileMap["SmallText"], JoinPath(outputRoot, "small-text.txt"), false},
-		{"Copy large text file", resourceCopyFileMap["LargeText"], JoinPath(outputRoot, "large-text.txt"), resourceCopyFileMap["LargeText"], JoinPath(outputRoot, "large-text.txt"), false},
-		{"Copy png image file", resourceCopyFileMap["PngImage"], JoinPath(outputRoot, "image.png"), resourceCopyFileMap["PngImage"], JoinPath(outputRoot, "image.png"), false},
-		{"Copy svg image file", resourceCopyFileMap["SvgImage"], JoinPath(outputRoot, "image.svg"), resourceCopyFileMap["SvgImage"], JoinPath(outputRoot, "image.svg"), false},
-		{"Source and destination are exactly the same", resourceCopyFileMap["SmallText"], resourceCopyFileMap["SmallText"], emptyStr, emptyStr, true},
-		{"Source and destination are actually the same", resourceCopyFileMap["SmallText"], resourceCopyRoot, emptyStr, emptyStr, true},
-		{"Source and inferred destination(dir) use the same name: can't overwrite dir", resourceCopyFileMap["SameName"], outputRoot, emptyStr, emptyStr, true},
-		{"Source and inferred destination(file) use the same name: overwrite the file", resourceCopyFileMap["SameName2"], outputRoot, resourceCopyFileMap["SameName2"], resourceCopyFileMap["Out_SameName2"], false},
+		{"Source got permission denied", resourceCopyFileFileMap["NonePermission"], JoinPath(outputRoot, "whatever.txt"), emptyStr, emptyStr, true},
+		{"Source file not exist", JoinPath(resourceCopyFileRoot, "__not_exist__"), outputRoot, emptyStr, emptyStr, true},
+		{"Source is a dir", resourceCopyFileDirMap["ContentDir"], outputRoot, emptyStr, emptyStr, true},
+		{"Source is a symlink to file", resourceCopyFileFileMap["SymlinkFile"], outputRoot, resourceCopyFileFileMap["LargeText"], JoinPath(outputRoot, "soft-link.txt"), false},
+		{"Source is a symlink to symlink", resourceCopyFileFileMap["SymlinkLink"], outputRoot, resourceCopyFileFileMap["LargeText"], JoinPath(outputRoot, "soft-link.txt"), false},
+		{"Source is a symlink to dir", resourceCopyFileFileMap["SymlinkDir"], outputRoot, emptyStr, emptyStr, true},
+		{"Destination is empty", resourceCopyFileFileMap["SmallText"], emptyStr, emptyStr, emptyStr, true},
+		{"Destination is a dir", resourceCopyFileFileMap["SmallText"], resourceCopyFileDirMap["Out_ExistingDir"], resourceCopyFileFileMap["SmallText"], JoinPath(resourceCopyFileDirMap["Out_ExistingDir"], "small-text.txt"), false},
+		{"Destination is a file", resourceCopyFileFileMap["SmallText"], resourceCopyFileFileMap["Out_ExistingFile"], resourceCopyFileFileMap["SmallText"], resourceCopyFileFileMap["Out_ExistingFile"], false},
+		{"Destination got permission denied", resourceCopyFileFileMap["SmallText"], resourceCopyFileFileMap["Out_NonePermission"], emptyStr, emptyStr, true},
+		{"Destination file not exist", resourceCopyFileFileMap["SmallText"], JoinPath(outputRoot, "not-exist-file.txt"), resourceCopyFileFileMap["SmallText"], JoinPath(outputRoot, "not-exist-file.txt"), false},
+		{"Destination dir not exist", resourceCopyFileFileMap["SmallText"], JoinPath(outputRoot, "not-exist-dir", "not-exist-file.txt"), emptyStr, emptyStr, true},
+		{"Copy empty file", resourceCopyFileFileMap["EmptyFile"], JoinPath(outputRoot, "empty-file.txt"), resourceCopyFileFileMap["EmptyFile"], JoinPath(outputRoot, "empty-file.txt"), false},
+		{"Copy small text file", resourceCopyFileFileMap["SmallText"], JoinPath(outputRoot, "small-text.txt"), resourceCopyFileFileMap["SmallText"], JoinPath(outputRoot, "small-text.txt"), false},
+		{"Copy large text file", resourceCopyFileFileMap["LargeText"], JoinPath(outputRoot, "large-text.txt"), resourceCopyFileFileMap["LargeText"], JoinPath(outputRoot, "large-text.txt"), false},
+		{"Copy png image file", resourceCopyFileFileMap["PngImage"], JoinPath(outputRoot, "image.png"), resourceCopyFileFileMap["PngImage"], JoinPath(outputRoot, "image.png"), false},
+		{"Copy svg image file", resourceCopyFileFileMap["SvgImage"], JoinPath(outputRoot, "image.svg"), resourceCopyFileFileMap["SvgImage"], JoinPath(outputRoot, "image.svg"), false},
+		{"Source and destination are exactly the same", resourceCopyFileFileMap["SmallText"], resourceCopyFileFileMap["SmallText"], emptyStr, emptyStr, true},
+		{"Source and destination are actually the same", resourceCopyFileFileMap["SmallText"], resourceCopyFileRoot, emptyStr, emptyStr, true},
+		{"Source and inferred destination(dir) use the same name: can't overwrite dir", resourceCopyFileFileMap["SameName"], outputRoot, emptyStr, emptyStr, true},
+		{"Source and inferred destination(file) use the same name: overwrite the file", resourceCopyFileFileMap["SameName2"], outputRoot, resourceCopyFileFileMap["SameName2"], resourceCopyFileFileMap["Out_SameName2"], false},
 	}
 
 	for _, tt := range tests {
@@ -131,14 +131,14 @@ func TestCopyFile(t *testing.T) {
 }
 
 func BenchmarkCopyFile(b *testing.B) {
-	for name, path := range resourceCopyFileMap {
+	for name, path := range resourceCopyFileFileMap {
 		if strings.HasPrefix(name, "Out_") {
 			continue
 		}
 		b.Run(name, func(b *testing.B) {
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				_ = CopyFile(path, resourceCopyBenchmarkRoot)
+				_ = CopyFile(path, resourceCopyFileBenchmarkRoot)
 			}
 		})
 	}
