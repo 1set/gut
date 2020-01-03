@@ -36,3 +36,5 @@ chmod 000 "$TESTRSSDIR"/yos/copy_dir/output/exist-no-perm-file/one-file-dir/text
 chmod 000 "$TESTRSSDIR"/yos/copy_dir/output/exist-no-perm-dir/misc/deep1
 chmod 000 "$TESTRSSDIR"/yos/same_file/set1/none_perm.txt
 chmod 000 "$TESTRSSDIR"/yos/same_file/set2/none_perm.txt
+chmod 000 "$TESTRSSDIR"/yos/same_link/link1_no_perm.txt
+chmod 000 "$TESTRSSDIR"/yos/same_link/link2_no_perm.txt
