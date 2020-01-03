@@ -162,22 +162,30 @@ func TestSameSymlinkContent(t *testing.T) {
 	//t.Parallel()
 
 	/*
-		resourceSameSymLinkMapSet  = map[string]string{
-
-			"CircularLinkOne" : JoinPath(resourceSameSymLinkRoot, "cycle-link1.txt"),
-			"CircularLinkTwo" : JoinPath(resourceSameSymLinkRoot, "cycle-link2.txt"),
-			"EachOtherLinkA" : JoinPath(resourceSameSymLinkRoot, "each-other-a.txt"),
-			"EachOtherLinkB" : JoinPath(resourceSameSymLinkRoot, "each-other-b.txt"),
-
-			"SymlinkOne" : JoinPath(resourceSameSymLinkRoot, "link1.txt"),
-			"SymlinkOneAlias" : JoinPath(resourceSameSymLinkRoot, "link1a.txt"),
-			"SymlinkTwo" : JoinPath(resourceSameSymLinkRoot, "link2.txt"),
-			"SymlinkTwoAlias" : JoinPath(resourceSameSymLinkRoot, "link2a.txt"),
-
+		resourceSameSymLinkMapSet = map[string]string{
+			"BrokenLinkOne":     JoinPath(resourceSameSymLinkRoot, "broken-link.txt"),
+			"BrokenLinkOneSame": JoinPath(resourceSameSymLinkRoot, "broken-link-same.txt"),
+			"BrokenLinkTwo":     JoinPath(resourceSameSymLinkRoot, "other-broken-link.txt"),
+			"CircularLinkOne":   JoinPath(resourceSameSymLinkRoot, "cycle-link1.txt"),
+			"CircularLinkTwo":   JoinPath(resourceSameSymLinkRoot, "cycle-link2.txt"),
+			"EachOtherLinkA":    JoinPath(resourceSameSymLinkRoot, "each-other-a.txt"),
+			"EachOtherLinkB":    JoinPath(resourceSameSymLinkRoot, "each-other-b.txt"),
+			"EmptyDirOne":       JoinPath(resourceSameSymLinkRoot, "empty-dir1"),
+			"EmptyDirTwo":       JoinPath(resourceSameSymLinkRoot, "empty-dir2"),
+			"SymlinkOne":        JoinPath(resourceSameSymLinkRoot, "link1.txt"),
+			"SymlinkOneAlias":   JoinPath(resourceSameSymLinkRoot, "link1a.txt"),
+			"SymlinkOneSame":    JoinPath(resourceSameSymLinkRoot, "link1_same.txt"),
+			"SymlinkTwo":        JoinPath(resourceSameSymLinkRoot, "link2.txt"),
+			"SymlinkTwoAlias":   JoinPath(resourceSameSymLinkRoot, "link2a.txt"),
+			"NoPermLinkOne":     JoinPath(resourceSameSymLinkRoot, "link1_no_perm.txt"),
+			"NoPermLinkTwo":     JoinPath(resourceSameSymLinkRoot, "link2_no_perm.txt"),
+			"DirLinkOne":        JoinPath(resourceSameSymLinkRoot, "link_dir1.txt"),
+			"DirLinkOneSame":    JoinPath(resourceSameSymLinkRoot, "link_dir1_same.txt"),
+			"DirLinkTwo":        JoinPath(resourceSameSymLinkRoot, "link_dir2.txt"),
+			"TextFileOne":       JoinPath(resourceSameSymLinkRoot, "text1.txt"),
+			"TextFileTwo":       JoinPath(resourceSameSymLinkRoot, "text2.txt"),
 		}
 
-		Dir vs Dir
-		File vs File
 		Sym vs Dest File
 		Sym vs Other File
 		Sym vs Dir
@@ -207,14 +215,22 @@ func TestSameSymlinkContent(t *testing.T) {
 		{"Path2 is a directory", resourceSameSymLinkMapSet["SymlinkOne"], resourceSameSymLinkMapSet["EmptyDirTwo"], false, true},
 		{"Path1 is a broken symlink", resourceSameSymLinkMapSet["BrokenLinkOne"], resourceSameSymLinkMapSet["SymlinkTwo"], false, false},
 		{"Path2 is a broken symlink", resourceSameSymLinkMapSet["SymlinkOne"], resourceSameSymLinkMapSet["BrokenLinkTwo"], false, false},
+		{"Path1 and path2 are the same broken symlink", resourceSameSymLinkMapSet["BrokenLinkOne"], resourceSameSymLinkMapSet["BrokenLinkOne"], true, false},
+		{"Path1 and path2 are the same circular symlink", resourceSameSymLinkMapSet["CircularLinkOne"], resourceSameSymLinkMapSet["CircularLinkOne"], true, false},
+		{"Path1 and path2 are the same file symlink", resourceSameSymLinkMapSet["SymlinkOne"], resourceSameSymLinkMapSet["SymlinkOne"], true, false},
+		{"Path1 and path2 are the same directory symlink", resourceSameSymLinkMapSet["DirLinkOne"], resourceSameSymLinkMapSet["DirLinkOne"], true, false},
 		{"Path1 and path2 are folders with nothing", resourceSameSymLinkMapSet["EmptyDirOne"], resourceSameSymLinkMapSet["EmptyDirTwo"], false, true},
 		{"Path1 and path2 are files with the same content", resourceSameSymLinkMapSet["TextFileOne"], resourceSameSymLinkMapSet["TextFileTwo"], false, true},
-		{"Path1 and path2 are symlinks to the same broken", resourceSameSymLinkMapSet["BrokenLinkOne"], resourceSameSymLinkMapSet["BrokenLinkOneSame"], true, false},
+		{"Path1 and path2 are symlinks to the same missing target", resourceSameSymLinkMapSet["BrokenLinkOne"], resourceSameSymLinkMapSet["BrokenLinkOneSame"], true, false},
 		{"Path1 and path2 are symlinks to the same file", resourceSameSymLinkMapSet["SymlinkOne"], resourceSameSymLinkMapSet["SymlinkOneSame"], true, false},
+		{"Path1 and path2 are symlinks to the same file indirectly", resourceSameSymLinkMapSet["SymlinkOne"], resourceSameSymLinkMapSet["SymlinkOneAlias"], false, false},
 		{"Path1 and path2 are symlinks to the same directory", resourceSameSymLinkMapSet["DirLinkOne"], resourceSameSymLinkMapSet["DirLinkOneSame"], true, false},
+		{"Path1 and path2 are symlinks to different files", resourceSameSymLinkMapSet["SymlinkOne"], resourceSameSymLinkMapSet["SymlinkTwo"], false, false},
+		{"Path1 and path2 are symlinks to different themselves", resourceSameSymLinkMapSet["CircularLinkOne"], resourceSameSymLinkMapSet["CircularLinkTwo"], false, false},
+		{"Path1 is a symlink to a file and path2 is the file", resourceSameSymLinkMapSet["SymlinkOne"], resourceSameSymLinkMapSet["TextFileOne"], false, true},
+		{"Path1 is a symlink to a file and path2 is a file with same content", resourceSameSymLinkMapSet["SymlinkOne"], resourceSameSymLinkMapSet["TextFileTwo"], false, true},
 
 		// {"Path1 and path2 are exactly the same file", resourceSameFileMapSet1["SmallText"], resourceSameFileMapSet1["SmallText"], true, false},
-		// {"Path1 and path2 are actually the same file", resourceSameFileMapSet1["SmallText"], joinPathNoClean(resourceSameFileRoot, "set1", "..", "set1", "small-text.txt"), true, false},
 		// {"Path1 and path2 are files with same content", resourceSameFileMapSet1["SmallText"], resourceSameFileMapSet2["SmallText"], true, false},
 		// {"Path1 and path2 are files with same content and different permissions", resourceSameFileMapSet1["SmallText"], resourceSameFileMapSet2["SmallTextExe"], true, false},
 		// {"Path1 and path2 are empty files", resourceSameFileMapSet1["EmptyFile"], resourceSameFileMapSet2["EmptyFile"], true, false},
@@ -224,8 +240,6 @@ func TestSameSymlinkContent(t *testing.T) {
 		// {"Path1 and path2 are symlinks to the same file", JoinPath(resourceSameFileLinkRoot, "link_content1.txt"), JoinPath(resourceSameFileLinkRoot, "link2_content1.txt"), true, false},
 		// {"Path1 and path2 are symlinks to files with same content", JoinPath(resourceSameFileLinkRoot, "link_content1.txt"), JoinPath(resourceSameFileLinkRoot, "link_content2.txt"), true, false},
 		// {"Path1 is a symlink to a directory", JoinPath(resourceSameFileLinkRoot, "link_folder"), resourceSameFileMapSet2["SmallText"], false, true},
-		// {"Path1 is a symlink to a file and path2 is the file", JoinPath(resourceSameFileLinkRoot, "link_content1.txt"), JoinPath(resourceSameFileLinkRoot, "content1.txt"), true, false},
-		// {"Path1 is a symlink to a file and path2 is a file with same content", JoinPath(resourceSameFileLinkRoot, "link_content1.txt"), JoinPath(resourceSameFileLinkRoot, "content2.txt"), true, false},
 		// {"Path1 is a symlink to a symlink and path2 is the symlink to a file", JoinPath(resourceSameFileLinkRoot, "link_link_content1.txt"), JoinPath(resourceSameFileLinkRoot, "link_content1.txt"), true, false},
 		// {"Path1 is a symlink to a symlink and path2 is the symlink to a directory", JoinPath(resourceSameFileLinkRoot, "link_link_folder"), JoinPath(resourceSameFileLinkRoot, "link_folder"), false, true},
 		// {"Path1 is a symlink to a symlink and path2 is the symlink to path1", JoinPath(resourceSameFileLinkRoot, "circle_link1"), JoinPath(resourceSameFileLinkRoot, "circle_link2"), false, true},
