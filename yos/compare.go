@@ -19,9 +19,9 @@ func SameSymlinkContent(path1, path2 string) (same bool, err error) {
 	return
 }
 
-// SameContent checks if the two given files have the same content or are the same file. Symbolic links are followed.
+// SameFileContent checks if the two given files have the same content or are the same file. Symbolic links are followed.
 // Errors are returned if any files doesn't exist or is broken.
-func SameContent(path1, path2 string) (same bool, err error) {
+func SameFileContent(path1, path2 string) (same bool, err error) {
 	var fi1, fi2 os.FileInfo
 	if fi1, err = os.Stat(path1); err != nil {
 		return

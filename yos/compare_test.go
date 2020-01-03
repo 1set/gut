@@ -46,9 +46,8 @@ func joinPathNoClean(elem ...string) string {
 	return strings.Join(elem, string(os.PathSeparator))
 }
 
-func TestSameContent(t *testing.T) {
-	t.Parallel()
-
+func TestSameFileContent(t *testing.T) {
+	//t.Parallel()
 	tests := []struct {
 		name     string
 		path1    string
@@ -96,24 +95,24 @@ func TestSameContent(t *testing.T) {
 				t.Skipf("Skipping %q for Windows", tt.name)
 			}
 
-			gotSame, err := SameContent(tt.path1, tt.path2)
+			gotSame, err := SameFileContent(tt.path1, tt.path2)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("SameContent() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("SameFileContent() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotSame != tt.wantSame {
-				t.Errorf("SameContent() gotSame = %v, want %v", gotSame, tt.wantSame)
+				t.Errorf("SameFileContent() gotSame = %v, want %v", gotSame, tt.wantSame)
 			}
 		})
 	}
 }
 
-func BenchmarkSameContent(b *testing.B) {
+func BenchmarkSameFileContent(b *testing.B) {
 	b.Run("SameFile", func(b *testing.B) {
 		path := resourceSameFileMapSet1["LargeText"]
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
-			_, _ = SameContent(path, path)
+			_, _ = SameFileContent(path, path)
 		}
 	})
 
@@ -122,7 +121,7 @@ func BenchmarkSameContent(b *testing.B) {
 		b.Run(name, func(b *testing.B) {
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				_, _ = SameContent(path1, path2)
+				_, _ = SameFileContent(path1, path2)
 			}
 		})
 	}

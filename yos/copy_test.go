@@ -118,7 +118,7 @@ func TestCopyFile(t *testing.T) {
 			}
 
 			if !tt.wantErr {
-				same, err := SameContent(tt.inputPath, tt.outputPath)
+				same, err := SameFileContent(tt.inputPath, tt.outputPath)
 				if err != nil {
 					t.Errorf("CopyFile() got error while comparing the files: %v, %v, error: %v", tt.inputPath, tt.outputPath, err)
 				} else if !same {
@@ -260,7 +260,7 @@ func isDirectorySame(path1, path2 string) (same bool, err error) {
 			return
 		} else if !dir1 && !dir2 {
 			// TODO: SameFileContent, SameSymlinkDestination
-			//if same, err = SameContent(info1.Path, info2.Path); err != nil || !same {
+			//if same, err = SameFileContent(info1.Path, info2.Path); err != nil || !same {
 			//	return
 			//}
 		}
