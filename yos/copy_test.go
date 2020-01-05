@@ -71,7 +71,6 @@ func init() {
 }
 
 func TestCopyFile(t *testing.T) {
-	//t.Parallel()
 	outputRoot := resourceCopyFileOutputRoot
 
 	tests := []struct {

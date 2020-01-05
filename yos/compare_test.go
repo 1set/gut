@@ -77,7 +77,6 @@ func joinPathNoClean(elem ...string) string {
 }
 
 func TestSameFileContent(t *testing.T) {
-	//t.Parallel()
 	tests := []struct {
 		name     string
 		path1    string
@@ -158,7 +157,6 @@ func BenchmarkSameFileContent(b *testing.B) {
 }
 
 func TestSameSymlinkContent(t *testing.T) {
-	//t.Parallel()
 	tests := []struct {
 		name     string
 		path1    string
@@ -207,7 +205,6 @@ func TestSameSymlinkContent(t *testing.T) {
 }
 
 func TestSameDirEntries(t *testing.T) {
-	//t.Parallel()
 	rootSource := JoinPath(resourceSameDirRoot, "source")
 	rootSame := JoinPath(resourceSameDirRoot, "same")
 	rootDiff := JoinPath(resourceSameDirRoot, "diff")
@@ -238,6 +235,28 @@ func TestSameDirEntries(t *testing.T) {
 		{"Single file folder: Itself", JoinPath(rootSource, "same-name"), JoinPath(rootSource, "same-name"), true, false},
 		{"Single file folder: Same", JoinPath(rootSource, "same-name"), JoinPath(rootSame, "same-name"), true, false},
 		{"Single file folder: Diff mode for same name", JoinPath(rootSource, "same-name"), JoinPath(rootDiff, "same-name"), false, false},
+
+		{"Contains only folders: Itself", JoinPath(rootSource, "only-dirs"), JoinPath(rootSource, "only-dirs"), true, false},
+		{"Contains only folders: Same", JoinPath(rootSource, "only-dirs"), JoinPath(rootSame, "only-dirs"), true, false},
+		{"Contains only folders: Diff subfolder name", JoinPath(rootSource, "only-dirs"), JoinPath(rootDiff, "only-dirs-name"), false, false},
+		{"Contains only folders: Subfolder contains a file", JoinPath(rootSource, "only-dirs"), JoinPath(rootDiff, "only-dirs-file"), false, false},
+
+		/*
+			Path1 is a inferred path
+			Path2 is a inferred path
+
+			Contains only dirs
+				Same: with different permission
+			Contains only files
+				Same: with different permission
+			Contains only symlinks
+			Contains files, symlinks and directories
+
+			Contains a file with no permissions
+			Contains a directory with no permissions
+			Contains a broken symlink
+			Contains a circular symlink
+		*/
 	}
 
 	for _, tt := range tests {
