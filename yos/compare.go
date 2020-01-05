@@ -2,26 +2,18 @@ package yos
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"strings"
 )
-
-// SameSymlinkContent checks if the two symbolic links have the same destination.
-func SameSymlinkContent(path1, path2 string) (same bool, err error) {
-	var link1, link2 string
-	if link1, err = os.Readlink(path1); err != nil {
-		return
-	}
-	if link2, err = os.Readlink(path2); err != nil {
-		return
-	}
-	same = link1 == link2
-	return
-}
 
 // SameFileContent checks if the two given files have the same content or are the same file. Symbolic links are followed.
 // Errors are returned if any files doesn't exist or is broken.
 func SameFileContent(path1, path2 string) (same bool, err error) {
+	path1, path2 = filepath.Clean(path1), filepath.Clean(path2)
+
 	var fi1, fi2 os.FileInfo
 	if fi1, err = os.Stat(path1); err != nil {
 		return
@@ -30,8 +22,12 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 		return
 	}
 
-	if !(fi1.Mode().IsRegular() && fi2.Mode().IsRegular()) {
-		err = ErrNotRegular
+	if !fi1.Mode().IsRegular() {
+		err = fmt.Errorf("%v: path1 is not a regular file", path1)
+		return
+	}
+	if !fi2.Mode().IsRegular() {
+		err = fmt.Errorf("%v: path2 is not a regular file", path2)
 		return
 	}
 
@@ -81,6 +77,92 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 
 		if same = bytes.Equal(buf1[:nr1], buf2[:nr2]); !same {
 			break
+		}
+	}
+
+	return
+}
+
+// SameSymlinkContent checks if the two symbolic links have the same destination.
+func SameSymlinkContent(path1, path2 string) (same bool, err error) {
+	path1, path2 = filepath.Clean(path1), filepath.Clean(path2)
+
+	var link1, link2 string
+	if link1, err = os.Readlink(path1); err != nil {
+		return
+	}
+	if link2, err = os.Readlink(path2); err != nil {
+		return
+	}
+
+	same = link1 == link2
+	return
+}
+
+// SameDirEntries checks if the two directories have the same entries.
+func SameDirEntries(path1, path2 string) (same bool, err error) {
+	path1, path2 = filepath.Clean(path1), filepath.Clean(path2)
+
+	var fi1, fi2 os.FileInfo
+	if fi1, err = os.Stat(path1); err != nil {
+		return
+	}
+	if fi2, err = os.Stat(path2); err != nil {
+		return
+	}
+
+	if !fi1.IsDir() {
+		err = fmt.Errorf("%v: path1 is not a directory", path1)
+		return
+	}
+	if !fi2.IsDir() {
+		err = fmt.Errorf("%v: path2 is not a directory", path2)
+		return
+	}
+
+	if os.SameFile(fi1, fi2) {
+		same = true
+		return
+	}
+
+	var items1, items2 []*FilePathInfo
+	if items1, err = ListAll(path1); err != nil {
+		return
+	}
+	if items2, err = ListAll(path2); err != nil {
+		return
+	}
+
+	var num1, num2 int
+	if num1, num2 = len(items1), len(items2); num1 != num2 {
+		return
+	}
+
+IterateItems:
+	for idx := 0; idx < num1; idx++ {
+		entry1, entry2 := items1[idx], items2[idx]
+
+		relativePath1, relativePath2 := strings.Replace(entry1.Path, path1, "", 1), strings.Replace(entry2.Path, path2, "", 1)
+		if same = relativePath1 == relativePath2; !same {
+			break
+		}
+
+		entryMode1, entryMode2 := entry1.Info.Mode(), entry2.Info.Mode()
+		if same = entryMode1 == entryMode2; !same {
+			break
+		}
+
+		switch entryMode1 & os.ModeType {
+		case os.ModeDir:
+			break
+		case os.ModeSymlink:
+			if same, err = SameSymlinkContent(entry1.Path, entry2.Path); err != nil || !same {
+				break IterateItems
+			}
+		default:
+			if same, err = SameFileContent(entry1.Path, entry2.Path); err != nil || !same {
+				break IterateItems
+			}
 		}
 	}
 
