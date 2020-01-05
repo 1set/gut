@@ -7,12 +7,16 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/1set/gut/ystring"
 )
 
 // SameFileContent checks if the two given files have the same content or are the same file. Symbolic links are followed.
 // Errors are returned if any files doesn't exist or is broken.
 func SameFileContent(path1, path2 string) (same bool, err error) {
-	path1, path2 = filepath.Clean(path1), filepath.Clean(path2)
+	if path1, path2, err = refineComparePaths(path1, path2); err != nil {
+		return
+	}
 
 	var fi1, fi2 os.FileInfo
 	if fi1, err = os.Stat(path1); err != nil {
@@ -85,7 +89,9 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 
 // SameSymlinkContent checks if the two symbolic links have the same destination.
 func SameSymlinkContent(path1, path2 string) (same bool, err error) {
-	path1, path2 = filepath.Clean(path1), filepath.Clean(path2)
+	if path1, path2, err = refineComparePaths(path1, path2); err != nil {
+		return
+	}
 
 	var link1, link2 string
 	if link1, err = os.Readlink(path1); err != nil {
@@ -101,7 +107,9 @@ func SameSymlinkContent(path1, path2 string) (same bool, err error) {
 
 // SameDirEntries checks if the two directories have the same entries.
 func SameDirEntries(path1, path2 string) (same bool, err error) {
-	path1, path2 = filepath.Clean(path1), filepath.Clean(path2)
+	if path1, path2, err = refineComparePaths(path1, path2); err != nil {
+		return
+	}
 
 	var fi1, fi2 os.FileInfo
 	if fi1, err = os.Stat(path1); err != nil {
@@ -166,5 +174,17 @@ IterateItems:
 		}
 	}
 
+	return
+}
+
+// refineComparePaths validates, cleans up for file comparison.
+func refineComparePaths(pathRaw1, pathRaw2 string) (path1, path2 string, err error) {
+	if ystring.IsBlank(pathRaw1) || ystring.IsBlank(pathRaw2) {
+		err = ErrEmptyPath
+		return
+	}
+
+	// clean up paths
+	path1, path2 = filepath.Clean(pathRaw1), filepath.Clean(pathRaw2)
 	return
 }

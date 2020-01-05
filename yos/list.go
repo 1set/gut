@@ -1,6 +1,7 @@
 package yos
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,6 +15,14 @@ type FilePathInfo struct {
 
 // listCondEntries returns a list of conditional directory entries.
 func listCondEntries(root string, cond func(os.FileInfo) (bool, error)) (entries []*FilePathInfo, err error) {
+	var info os.FileInfo
+	if info, err = os.Lstat(root); err == nil && !info.IsDir() {
+		err = fmt.Errorf("%v: root is not a directory", root)
+	}
+	if err != nil {
+		return
+	}
+
 	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err

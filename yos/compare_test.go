@@ -10,6 +10,7 @@ var (
 	resourceSameFileRoot      string
 	resourceSameFileLinkRoot  string
 	resourceSameSymLinkRoot   string
+	resourceSameDirRoot       string
 	resourceSameFileMapSet1   map[string]string
 	resourceSameFileMapSet2   map[string]string
 	resourceSameSymLinkMapSet map[string]string
@@ -19,6 +20,7 @@ func init() {
 	resourceSameFileRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "same_file")
 	resourceSameFileLinkRoot = JoinPath(resourceSameFileRoot, "link")
 	resourceSameSymLinkRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "same_link")
+	resourceSameDirRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "same_dir")
 
 	resourceSameFileMapSet1 = map[string]string{
 		"EmptyDir":       JoinPath(resourceSameFileRoot, "set1", "empty-folder"),
@@ -199,6 +201,54 @@ func TestSameSymlinkContent(t *testing.T) {
 			}
 			if gotSame != tt.wantSame {
 				t.Errorf("SameSymlinkContent() gotSame = %v, want %v", gotSame, tt.wantSame)
+			}
+		})
+	}
+}
+
+func TestSameDirEntries(t *testing.T) {
+	//t.Parallel()
+	rootSource := JoinPath(resourceSameDirRoot, "source")
+	rootSame := JoinPath(resourceSameDirRoot, "same")
+	rootDiff := JoinPath(resourceSameDirRoot, "diff")
+	t.Logf("path: %v", rootSource)
+	t.Logf("path: %v", rootSame)
+	t.Logf("path: %v", rootDiff)
+
+	tests := []struct {
+		name     string
+		path1    string
+		path2    string
+		wantSame bool
+		wantErr  bool
+	}{
+		{"Path1 is empty", emptyStr, JoinPath(rootSame, "one-file-dir"), false, true},
+		{"Path2 is empty", JoinPath(rootSource, "one-file-dir"), emptyStr, false, true},
+		{"Path1 is not found", "__not_found_file__", JoinPath(rootSame, "one-file-dir"), false, true},
+		{"Path2 is not found", JoinPath(rootSource, "one-file-dir"), "__not_found_file__", false, true},
+		{"Path1 is a file", JoinPath(rootSource, "text.txt"), JoinPath(rootSame, "one-file-dir"), false, true},
+		{"Path2 is a file", JoinPath(rootSource, "one-file-dir"), JoinPath(rootSame, "text.txt"), false, true},
+		{"Path1 is a symlink to file", JoinPath(rootSource, "link.txt"), JoinPath(rootSame, "one-file-dir"), false, true},
+		{"Path2 is a symlink to file", JoinPath(rootSource, "one-file-dir"), JoinPath(rootSame, "link.txt"), false, true},
+		{"Path1 is a symlink to directory", JoinPath(rootSource, "link_dir"), JoinPath(rootSame, "one-file-dir"), false, true},
+		{"Path2 is a symlink to directory", JoinPath(rootSource, "one-file-dir"), JoinPath(rootSame, "link_dir"), false, true},
+		{"Path1 is a symlink to path2 which is a directory", JoinPath(rootSource, "link_dir"), JoinPath(rootSource, "one-file-dir"), true, false},
+		{"Path2 is a symlink to path1 which is a directory", JoinPath(rootSource, "one-file-dir"), JoinPath(rootSource, "link_dir"), true, false},
+
+		{"Single file folder: Itself", JoinPath(rootSource, "same-name"), JoinPath(rootSource, "same-name"), true, false},
+		{"Single file folder: Same", JoinPath(rootSource, "same-name"), JoinPath(rootSame, "same-name"), true, false},
+		{"Single file folder: Diff mode for same name", JoinPath(rootSource, "same-name"), JoinPath(rootDiff, "same-name"), false, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotSame, err := SameDirEntries(tt.path1, tt.path2)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("SameDirEntries() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotSame != tt.wantSame {
+				t.Errorf("SameDirEntries() gotSame = %v, want %v", gotSame, tt.wantSame)
 			}
 		})
 	}
