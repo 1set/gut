@@ -11,6 +11,11 @@ import (
 	"github.com/1set/gut/ystring"
 )
 
+var (
+	// Mask for file mode bits to compare in SameDirEntries.
+	CompareFileModeMask = os.ModeDir | os.ModeSymlink
+)
+
 // SameFileContent checks if the two given files have the same content or are the same file. Symbolic links are followed.
 // Errors are returned if any files doesn't exist or is broken.
 func SameFileContent(path1, path2 string) (same bool, err error) {
@@ -156,7 +161,7 @@ IterateItems:
 		}
 
 		entryMode1, entryMode2 := entry1.Info.Mode(), entry2.Info.Mode()
-		if same = entryMode1 == entryMode2; !same {
+		if same = entryMode1&CompareFileModeMask == entryMode2&CompareFileModeMask; !same {
 			break
 		}
 

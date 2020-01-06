@@ -208,9 +208,6 @@ func TestSameDirEntries(t *testing.T) {
 	rootSource := JoinPath(resourceSameDirRoot, "source")
 	rootSame := JoinPath(resourceSameDirRoot, "same")
 	rootDiff := JoinPath(resourceSameDirRoot, "diff")
-	t.Logf("path: %v", rootSource)
-	t.Logf("path: %v", rootSame)
-	t.Logf("path: %v", rootDiff)
 
 	tests := []struct {
 		name     string
@@ -238,18 +235,25 @@ func TestSameDirEntries(t *testing.T) {
 
 		{"Contains only folders: Itself", JoinPath(rootSource, "only-dirs"), JoinPath(rootSource, "only-dirs"), true, false},
 		{"Contains only folders: Same", JoinPath(rootSource, "only-dirs"), JoinPath(rootSame, "only-dirs"), true, false},
+		{"Contains only folders: Same content but different permissions", JoinPath(rootSource, "only-dirs"), JoinPath(rootSame, "only-dirs-perm"), true, false},
 		{"Contains only folders: Diff subfolder name", JoinPath(rootSource, "only-dirs"), JoinPath(rootDiff, "only-dirs-name"), false, false},
 		{"Contains only folders: Subfolder contains a file", JoinPath(rootSource, "only-dirs"), JoinPath(rootDiff, "only-dirs-file"), false, false},
 
-		/*
-			Path1 is a inferred path
-			Path2 is a inferred path
+		{"Contains only files: Itself", JoinPath(rootSource, "only-files"), JoinPath(rootSource, "only-files"), true, false},
+		{"Contains only files: Same", JoinPath(rootSource, "only-files"), JoinPath(rootSame, "only-files"), true, false},
+		{"Contains only files: Same content but different permissions", JoinPath(rootSource, "only-files"), JoinPath(rootSame, "only-files-perm"), true, false},
+		{"Contains only files: Diff filename", JoinPath(rootSource, "only-files"), JoinPath(rootDiff, "only-files-rename"), false, false},
+		{"Contains only files: Diff file content", JoinPath(rootSource, "only-files"), JoinPath(rootDiff, "only-files-content"), false, false},
 
-			Contains only dirs
-				Same: with different permission
-			Contains only files
-				Same: with different permission
-			Contains only symlinks
+		{"Contains only symlinks: Itself", JoinPath(rootSource, "only-symlinks"), JoinPath(rootSource, "only-symlinks"), true, false},
+		{"Contains only symlinks: Same", JoinPath(rootSource, "only-symlinks"), JoinPath(rootSame, "only-symlinks"), true, false},
+		{"Contains only symlinks: Remove one file", JoinPath(rootSource, "only-symlinks"), JoinPath(rootDiff, "only-symlinks-remove"), false, false},
+		{"Contains only symlinks: Diff content", JoinPath(rootSource, "only-symlinks"), JoinPath(rootDiff, "only-symlinks-content"), false, false},
+
+		/*
+			Path1 is an inferred path
+			Path2 is an inferred path
+
 			Contains files, symlinks and directories
 
 			Contains a file with no permissions
@@ -261,6 +265,10 @@ func TestSameDirEntries(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if strings.Contains(tt.name, "permission") && IsOnWindows() {
+				t.Skipf("Skipping %q for Windows", tt.name)
+			}
+
 			gotSame, err := SameDirEntries(tt.path1, tt.path2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SameDirEntries() error = %v, wantErr %v", err, tt.wantErr)
