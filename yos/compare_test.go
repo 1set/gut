@@ -228,6 +228,8 @@ func TestSameDirEntries(t *testing.T) {
 		{"Path2 is a symlink to directory", JoinPath(rootSource, "one-file-dir"), JoinPath(rootSame, "link_dir"), false, true},
 		{"Path1 is a symlink to path2 which is a directory", JoinPath(rootSource, "link_dir"), JoinPath(rootSource, "one-file-dir"), true, false},
 		{"Path2 is a symlink to path1 which is a directory", JoinPath(rootSource, "one-file-dir"), JoinPath(rootSource, "link_dir"), true, false},
+		{"Path1 is an inferred path", joinPathNoClean(rootSource, "..", "source", "only-dirs"), JoinPath(rootSame, "only-dirs"), true, false},
+		{"Path2 is an inferred path", JoinPath(rootSource, "only-dirs"), joinPathNoClean(rootSame, "..", "same", "only-dirs"), true, false},
 
 		{"Single file folder: Itself", JoinPath(rootSource, "same-name"), JoinPath(rootSource, "same-name"), true, false},
 		{"Single file folder: Same", JoinPath(rootSource, "same-name"), JoinPath(rootSame, "same-name"), true, false},
@@ -250,17 +252,18 @@ func TestSameDirEntries(t *testing.T) {
 		{"Contains only symlinks: Remove one file", JoinPath(rootSource, "only-symlinks"), JoinPath(rootDiff, "only-symlinks-remove"), false, false},
 		{"Contains only symlinks: Diff content", JoinPath(rootSource, "only-symlinks"), JoinPath(rootDiff, "only-symlinks-content"), false, false},
 
-		/*
-			Path1 is an inferred path
-			Path2 is an inferred path
+		{"Contains files, symlinks and directories: Itself", JoinPath(rootSource, "misc"), JoinPath(rootSource, "misc"), true, false},
+		{"Contains files, symlinks and directories: Same", JoinPath(rootSource, "misc"), JoinPath(rootSame, "misc"), true, false},
+		{"Contains files, symlinks and directories: Move file to a nested folder", JoinPath(rootSource, "misc"), JoinPath(rootDiff, "misc-deep"), false, false},
+		{"Contains files, symlinks and directories: Remove nested folder", JoinPath(rootSource, "misc"), JoinPath(rootDiff, "misc-less"), false, false},
+		{"Contains files, symlinks and directories: Diff content", JoinPath(rootSource, "misc"), JoinPath(rootDiff, "misc-content"), false, false},
 
-			Contains files, symlinks and directories
-
-			Contains a file with no permissions
-			Contains a directory with no permissions
-			Contains a broken symlink
-			Contains a circular symlink
-		*/
+		{"Contains a broken symlink: Itself", JoinPath(rootSource, "broken-symlink"), JoinPath(rootSource, "broken-symlink"), true, false},
+		{"Contains a broken symlink: Same", JoinPath(rootSource, "broken-symlink"), JoinPath(rootSame, "broken-symlink"), true, false},
+		{"Contains a circular symlink: Itself", JoinPath(rootSource, "circular-symlink"), JoinPath(rootSource, "circular-symlink"), true, false},
+		{"Contains a circular symlink: Same", JoinPath(rootSource, "circular-symlink"), JoinPath(rootSame, "circular-symlink"), true, false},
+		{"Contains a file with no permissions", JoinPath(rootSource, "no-perm-files"), JoinPath(rootSame, "no-perm-files"), false, true},
+		{"Contains a directory with no permissions", JoinPath(rootSource, "no-perm-dirs"), JoinPath(rootSame, "no-perm-dirs"), false, true},
 	}
 
 	for _, tt := range tests {
