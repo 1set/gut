@@ -204,6 +204,14 @@ func TestSameSymlinkContent(t *testing.T) {
 	}
 }
 
+func BenchmarkSameSymlinkContent(b *testing.B) {
+	path1, path2 := resourceSameSymLinkMapSet["SymlinkOne"], resourceSameSymLinkMapSet["SymlinkOneSame"]
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = SameSymlinkContent(path1, path2)
+	}
+}
+
 func TestSameDirEntries(t *testing.T) {
 	rootSource := JoinPath(resourceSameDirRoot, "source")
 	rootSame := JoinPath(resourceSameDirRoot, "same")
@@ -281,5 +289,13 @@ func TestSameDirEntries(t *testing.T) {
 				t.Errorf("SameDirEntries() gotSame = %v, want %v", gotSame, tt.wantSame)
 			}
 		})
+	}
+}
+
+func BenchmarkSameDirEntries(b *testing.B) {
+	path1, path2 := JoinPath(resourceSameDirRoot, "source", "misc"), JoinPath(resourceSameDirRoot, "same", "misc")
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = SameDirEntries(path1, path2)
 	}
 }
