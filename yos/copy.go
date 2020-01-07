@@ -181,7 +181,24 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	return
 }
 
+// copySymlink reads content from the source symbolic link and write to the destination symbolic link.
 func copySymlink(src, dest string) (err error) {
+	var destInfo os.FileInfo
+	if destInfo, err = os.Lstat(dest); err != nil {
+		if os.IsNotExist(err) {
+			err = nil
+		}
+	} else {
+		if destInfo.IsDir() {
+			err = fmt.Errorf("%v: destination is a directory", src)
+		} else {
+			err = os.Remove(dest)
+		}
+	}
+	if err != nil {
+		return
+	}
+
 	var link string
 	if link, err = os.Readlink(src); err == nil {
 		err = os.Symlink(link, dest)

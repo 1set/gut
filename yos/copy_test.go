@@ -177,10 +177,7 @@ func TestCopyDir(t *testing.T) {
 		{"Destination directory exists and already contains the same source", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-same"), resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-same", "one-file-dir"), false},
 		{"Destination directory exists and contains a file with the same name and no permissions", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-no-perm-file"), emptyStr, emptyStr, true},
 		{"Destination directory exists and contains a directory with the same name and no permissions", resourceCopyDirSourceMap["MiscDir"], JoinPath(outputRoot, "exist-no-perm-dir"), emptyStr, emptyStr, true},
-
-		// TODO: override symlink and test with success
-		{"Destination directory exists and contains a symlink with the same name", resourceCopyDirSourceMap["OnlySymlinks"], JoinPath(outputRoot, "exist-symlink"), resourceCopyDirSourceMap["OnlySymlinks"], JoinPath(outputRoot, "exist-symlink", "only-symlinks"), true},
-
+		{"Destination directory exists and contains a symlink with the same name", resourceCopyDirSourceMap["OnlySymlinks"], JoinPath(outputRoot, "exist-symlink"), resourceCopyDirSourceMap["OnlySymlinks"], JoinPath(outputRoot, "exist-symlink", "only-symlinks"), false},
 		{"Source and destination are exactly the same", resourceCopyDirSourceMap["OneFileDir"], resourceCopyDirSourceMap["OneFileDir"], emptyStr, emptyStr, true},
 		{"Source and destination are actually the same", resourceCopyDirSourceMap["OneFileDir"], resourceCopyDirSourceRoot, emptyStr, emptyStr, true},
 		{"Source and inferred destination(file) use the same name: can't overwrite file", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-file"), emptyStr, emptyStr, true},
@@ -225,3 +222,30 @@ func BenchmarkCopyDir(b *testing.B) {
 		})
 	}
 }
+
+/*
+Source is empty
+Source path is inferred
+Source got permission denied
+Source is a file
+Source is a empty directory
+Source is a directory with content
+Source is a symlink to file
+Source is a symlink to directory
+Source is a circular symlink
+Source is a broken symlink
+Source doesn't exist
+Source and destination path are the same
+Destination is empty
+Destination path is inferred
+Destination got permission denied
+Destination exists and it's a file
+Destination exists and it's a empty directory
+Destination exists and it's a directory with content
+Destination exists and it's a symlink to file
+Destination exists and it's a symlink to directory
+Destination exists and it's a circular symlink
+Destination exists and it's a broken symlink
+Destination doesn't exist but its parent does
+Destination and its parent don't exist
+*/
