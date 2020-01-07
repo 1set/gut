@@ -1,7 +1,6 @@
 package yos
 
 import (
-	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -199,7 +198,7 @@ func TestCopyDir(t *testing.T) {
 			}
 
 			if !tt.wantErr {
-				same, err := isDirectorySame(tt.expectedPath, tt.actualPath)
+				same, err := SameDirEntries(tt.expectedPath, tt.actualPath)
 				if err != nil {
 					t.Errorf("CopyDir() got error while comparing the directories: %v, %v, error: %v", tt.expectedPath, tt.actualPath, err)
 				} else if !same {
@@ -225,46 +224,4 @@ func BenchmarkCopyDir(b *testing.B) {
 			}
 		})
 	}
-}
-
-func isDirectorySame(path1, path2 string) (same bool, err error) {
-	var exist1, exist2 bool
-	if exist1, err = IsDirExist(path1); err != nil || !exist1 {
-		return
-	}
-	if exist2, err = IsDirExist(path2); err != nil || !exist2 {
-		return
-	}
-
-	var items1, items2 []*FilePathInfo
-	if items1, err = ListAll(path1); err != nil {
-		return
-	}
-	if items2, err = ListAll(path2); err != nil {
-		return
-	}
-
-	if num1, num2 := len(items1), len(items2); num1 != num2 {
-		err = fmt.Errorf("different number of entries, %v got %d, whereas %v got %d", path1, num1, path2, num2)
-		return
-	}
-
-	for idx, info1 := range items1 {
-		info2 := items2[idx]
-		if name1, name2 := info1.Info.Name(), info2.Info.Name(); name1 != name2 {
-			err = fmt.Errorf("different file name of #%d, %s and %s", idx+1, name1, name2)
-			return
-		} else if dir1, dir2 := info1.Info.IsDir(), info2.Info.IsDir(); dir1 != dir2 {
-			err = fmt.Errorf("different type of #%d, %s dir: %v, %s dir: %v", idx+1, name1, dir1, name2, dir2)
-			return
-		} else if !dir1 && !dir2 {
-			// TODO: SameFileContent, SameSymlinkDestination
-			//if same, err = SameFileContent(info1.Path, info2.Path); err != nil || !same {
-			//	return
-			//}
-		}
-	}
-
-	same = true
-	return
 }

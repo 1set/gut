@@ -146,8 +146,8 @@ func SameDirEntries(path1, path2 string) (same bool, err error) {
 		return
 	}
 
-	var num1, num2 int
-	if num1, num2 = len(items1), len(items2); num1 != num2 {
+	num1, num2 := len(items1), len(items2)
+	if same = num1 == num2; !same {
 		return
 	}
 

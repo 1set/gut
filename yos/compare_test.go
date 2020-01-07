@@ -239,6 +239,9 @@ func TestSameDirEntries(t *testing.T) {
 		{"Path1 is an inferred path", joinPathNoClean(rootSource, "..", "source", "only-dirs"), JoinPath(rootSame, "only-dirs"), true, false},
 		{"Path2 is an inferred path", JoinPath(rootSource, "only-dirs"), joinPathNoClean(rootSame, "..", "same", "only-dirs"), true, false},
 
+		{"Empty folder: Itself", JoinPath(rootSource, "empty-dir"), JoinPath(rootSource, "empty-dir"), true, false},
+		{"Empty folder: Same", JoinPath(rootSource, "empty-dir"), JoinPath(rootSame, "empty-dir"), true, false},
+
 		{"Single file folder: Itself", JoinPath(rootSource, "same-name"), JoinPath(rootSource, "same-name"), true, false},
 		{"Single file folder: Same", JoinPath(rootSource, "same-name"), JoinPath(rootSame, "same-name"), true, false},
 		{"Single file folder: Diff mode for same name", JoinPath(rootSource, "same-name"), JoinPath(rootDiff, "same-name"), false, false},
