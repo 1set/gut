@@ -236,6 +236,8 @@ func TestSameDirEntries(t *testing.T) {
 		{"Path2 is a symlink to directory", JoinPath(rootSource, "one-file-dir"), JoinPath(rootSame, "link_dir"), false, true},
 		{"Path1 is a symlink to path2 which is a directory", JoinPath(rootSource, "link_dir"), JoinPath(rootSource, "one-file-dir"), true, false},
 		{"Path2 is a symlink to path1 which is a directory", JoinPath(rootSource, "one-file-dir"), JoinPath(rootSource, "link_dir"), true, false},
+		{"Path1 and path2 are symlinks to the same directory", JoinPath(rootSource, "link_dir"), JoinPath(rootSource, "link_dir2"), true, false},
+		{"Path1 and path2 are symlinks to directory with same content", JoinPath(rootSource, "link_dir"), JoinPath(rootSame, "link_dir"), false, true},
 		{"Path1 is an inferred path", joinPathNoClean(rootSource, "..", "source", "only-dirs"), JoinPath(rootSame, "only-dirs"), true, false},
 		{"Path2 is an inferred path", JoinPath(rootSource, "only-dirs"), joinPathNoClean(rootSame, "..", "same", "only-dirs"), true, false},
 

@@ -110,7 +110,7 @@ func SameSymlinkContent(path1, path2 string) (same bool, err error) {
 	return
 }
 
-// SameDirEntries checks if the two directories have the same entries.
+// SameDirEntries checks if the two directories have the same entries. Symbolic links will be not be followed, and only compares the contents.
 func SameDirEntries(path1, path2 string) (same bool, err error) {
 	if path1, path2, err = refineComparePaths(path1, path2); err != nil {
 		return
