@@ -180,7 +180,7 @@ func TestSameSymlinkContent(t *testing.T) {
 		{"Path1 and path2 are files with the same content", resourceSameSymLinkMapSet["TextFileOne"], resourceSameSymLinkMapSet["TextFileTwo"], false, true},
 		{"Path1 and path2 are symlinks to the same missing target", resourceSameSymLinkMapSet["BrokenLinkOne"], resourceSameSymLinkMapSet["BrokenLinkOneSame"], true, false},
 		{"Path1 and path2 are symlinks to the same file", resourceSameSymLinkMapSet["SymlinkOne"], resourceSameSymLinkMapSet["SymlinkOneSame"], true, false},
-		{"Path1 and path2 are symlinks to the same file indirectly", resourceSameSymLinkMapSet["SymlinkOne"], resourceSameSymLinkMapSet["SymlinkOneAlias"], false, false},
+		{"Path1 and path2 are symlinks to the same file indirectly (non-Windows)", resourceSameSymLinkMapSet["SymlinkOne"], resourceSameSymLinkMapSet["SymlinkOneAlias"], false, false},
 		{"Path1 and path2 are symlinks to the same directory", resourceSameSymLinkMapSet["DirLinkOne"], resourceSameSymLinkMapSet["DirLinkOneSame"], true, false},
 		{"Path1 and path2 are symlinks to different files", resourceSameSymLinkMapSet["SymlinkOne"], resourceSameSymLinkMapSet["SymlinkTwo"], false, false},
 		{"Path1 and path2 are symlinks to different themselves", resourceSameSymLinkMapSet["CircularLinkOne"], resourceSameSymLinkMapSet["CircularLinkTwo"], false, false},
@@ -192,6 +192,10 @@ func TestSameSymlinkContent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if (strings.Contains(tt.name, "permission") || strings.Contains(tt.name, "non-Windows")) && IsOnWindows() {
+				t.Skipf("Skipping %q for Windows", tt.name)
+			}
+
 			gotSame, err := SameSymlinkContent(tt.path1, tt.path2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SameSymlinkContent() error = %v, wantErr %v", err, tt.wantErr)

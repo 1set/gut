@@ -107,12 +107,16 @@ func TestIsDirExist(t *testing.T) {
 		{"Check symlink of symlink of file", JoinPath(resourceExistRoot, "2symlink.txt"), false, true},
 		{"Check symlink origin dir", JoinPath(resourceExistRoot, "target_dir"), true, false},
 		{"Check symlink of dir", JoinPath(resourceExistRoot, "dir_link"), true, false},
-		{"Check symlink of symlink of dir", JoinPath(resourceExistRoot, "2dir_link"), true, false},
+		{"Check symlink of symlink of dir (non-Windows)", JoinPath(resourceExistRoot, "2dir_link"), true, false},
 		{"Check broken file symlink", JoinPath(resourceExistRoot, "broken.txt"), false, true},
 		{"Check broken dir symlink", JoinPath(resourceExistRoot, "broken2.txt"), false, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if (strings.Contains(tt.name, "permission") || strings.Contains(tt.name, "non-Windows")) && IsOnWindows() {
+				t.Skipf("Skipping %q for Windows", tt.name)
+			}
+
 			gotExist, err := IsDirExist(tt.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsDirExist() error = %v, wantErr %v", err, tt.wantErr)
