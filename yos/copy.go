@@ -16,7 +16,7 @@ var (
 	// ErrShortRead means a read accepted fewer bytes than expected.
 	ErrShortRead = errors.New("short read")
 	// ErrEmptyPath means the given path is empty or blank.
-	ErrEmptyPath = errors.New("path is empty")
+	ErrEmptyPath = errors.New("path is empty or blank")
 	// ErrSameFile means the given two files are actually the same one.
 	ErrSameFile = errors.New("files are identical")
 	// ErrNotRegular means the file is not a regular file.
@@ -38,13 +38,13 @@ const (
 //
 // ErrSameFile is returned if it detects an attempt to copy a file to itself.
 func CopyFile(src, dest string) (err error) {
-	if src, dest, err = refineCopyPaths(src, dest); err == nil {
+	if src, dest, err = refineCopyPaths(src, dest, true); err == nil {
 		err = bufferCopyFile(src, dest, defaultBufferSize)
 	}
 	return
 }
 
-// CopyDir copies a directory to a target directory recursively. Symbolic link will be copied instead of being followed.
+// CopyDir copies a directory to a target directory recursively. Symbolic links inside the directories will be copied instead of being followed.
 //
 // If the target is an existing file, an error will be returned.
 //
@@ -54,12 +54,65 @@ func CopyFile(src, dest string) (err error) {
 //
 // It stops and returns immediately if any error occurs. ErrSameFile is returned if it detects an attempt to copy a file to itself.
 func CopyDir(src, dest string) (err error) {
-	if src, dest, err = refineCopyPaths(src, dest); err == nil {
+	if src, dest, err = refineCopyPaths(src, dest, true); err == nil {
 		err = copyDir(src, dest)
 	}
 	return
 }
 
+// CopySymlink copies a symbolic link to a target file.
+// It only copies the contents and makes no attempt to read the referenced file.
+func CopySymlink(src, dest string) (err error) {
+	if src, dest, err = refineCopyPaths(src, dest, false); err == nil {
+		err = copySymlink(src, dest)
+	}
+	return
+}
+
+// refineCopyPaths validates, cleans up and adjusts the source and destination paths for copy file and copy directory.
+func refineCopyPaths(srcRaw, destRaw string, followLink bool) (src, dest string, err error) {
+	if ystring.IsBlank(srcRaw) || ystring.IsBlank(destRaw) {
+		err = ErrEmptyPath
+		return
+	}
+
+	// clean up paths
+	srcRaw, destRaw = filepath.Clean(srcRaw), filepath.Clean(destRaw)
+
+	// use os.Lstat instead if not following symbolic links
+	statFunc := os.Stat
+	if !followLink {
+		statFunc = os.Lstat
+	}
+
+	// check if source exists
+	var srcInfo, destInfo os.FileInfo
+	if srcInfo, err = statFunc(srcRaw); err != nil {
+		return
+	}
+
+	// check if destination exists
+	if destInfo, err = statFunc(destRaw); err != nil {
+		// check existence of parent of the missing destination
+		if os.IsNotExist(err) {
+			_, err = os.Stat(filepath.Dir(destRaw))
+		}
+	} else {
+		if os.SameFile(srcInfo, destInfo) {
+			err = ErrSameFile
+		} else if destInfo.IsDir() {
+			// append file name of source to path of the existing destination
+			destRaw = JoinPath(destRaw, srcInfo.Name())
+		}
+	}
+
+	if err == nil {
+		src, dest = srcRaw, destRaw
+	}
+	return
+}
+
+// bufferCopyFile reads content from the source file and write to the destination file with a buffer.
 func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	var srcFile, destFile *os.File
 	if srcFile, err = os.Open(src); err != nil {
@@ -134,44 +187,24 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	return
 }
 
-// refineCopyPaths validates, cleans up and adjusts the source and destination paths for copy file and copy directory.
-func refineCopyPaths(srcRaw, destRaw string) (src, dest string, err error) {
-	if ystring.IsBlank(srcRaw) || ystring.IsBlank(destRaw) {
-		err = ErrEmptyPath
-		return
-	}
-
-	// clean up paths
-	srcRaw, destRaw = filepath.Clean(srcRaw), filepath.Clean(destRaw)
-
-	// check if source exists
-	var srcInfo, destInfo os.FileInfo
-	if srcInfo, err = os.Stat(srcRaw); err != nil {
-		return
-	}
-
-	// check if destination exists
-	if destInfo, err = os.Stat(destRaw); err != nil {
-		// check existence of parent of the missing destination
+// copySymlink reads content from the source symbolic link and write to the destination symbolic link.
+func copySymlink(src, dest string) (err error) {
+	var destInfo os.FileInfo
+	if destInfo, err = os.Lstat(dest); err != nil {
 		if os.IsNotExist(err) {
-			_, err = os.Stat(filepath.Dir(destRaw))
+			err = nil
 		}
 	} else {
-		if os.SameFile(srcInfo, destInfo) {
-			err = ErrSameFile
-		} else if destInfo.IsDir() {
-			// append file name of source to path of the existing destination
-			destRaw = JoinPath(destRaw, srcInfo.Name())
+		if destInfo.IsDir() {
+			err = fmt.Errorf("%v: destination is a directory", src)
+		} else {
+			err = os.Remove(dest)
 		}
 	}
-
-	if err == nil {
-		src, dest = srcRaw, destRaw
+	if err != nil {
+		return
 	}
-	return
-}
 
-func copySymlink(src, dest string) (err error) {
 	var link string
 	if link, err = os.Readlink(src); err == nil {
 		err = os.Symlink(link, dest)

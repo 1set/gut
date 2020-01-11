@@ -1,6 +1,7 @@
 package yos
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,27 +11,6 @@ import (
 type FilePathInfo struct {
 	Path string
 	Info os.FileInfo
-}
-
-// listCondEntries returns a list of conditional directory entries.
-func listCondEntries(root string, cond func(os.FileInfo) (bool, error)) (entries []*FilePathInfo, err error) {
-	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if root == path {
-			return nil
-		}
-		var ok bool
-		if ok, err = cond(info); ok {
-			entries = append(entries, &FilePathInfo{
-				Path: path,
-				Info: info,
-			})
-		}
-		return err
-	})
-	return
 }
 
 // ListAll returns a list of all directory entries in the given directory in lexical order.
@@ -90,4 +70,33 @@ func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathIn
 		}
 		return
 	})
+}
+
+// listCondEntries returns a list of conditional directory entries.
+func listCondEntries(root string, cond func(os.FileInfo) (bool, error)) (entries []*FilePathInfo, err error) {
+	var info os.FileInfo
+	if info, err = os.Lstat(root); err == nil && !info.IsDir() {
+		err = fmt.Errorf("%v: root is not a directory", root)
+	}
+	if err != nil {
+		return
+	}
+
+	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if root == path {
+			return nil
+		}
+		var ok bool
+		if ok, err = cond(info); ok {
+			entries = append(entries, &FilePathInfo{
+				Path: path,
+				Info: info,
+			})
+		}
+		return err
+	})
+	return
 }
