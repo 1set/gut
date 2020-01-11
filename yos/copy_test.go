@@ -19,6 +19,11 @@ var (
 	resourceCopyDirBenchmarkRoot string
 	resourceCopyDirSourceRoot    string
 	resourceCopyDirSourceMap     map[string]string
+
+	resourceCopySymlinkRoot          string
+	resourceCopySymlinkSourceRoot    string
+	resourceCopySymlinkOutputRoot    string
+	resourceCopySymlinkBenchmarkRoot string
 )
 
 func init() {
@@ -72,6 +77,11 @@ func init() {
 		"MiscDir":         JoinPath(resourceCopyDirSourceRoot, "misc"),
 		"OneFileDir":      JoinPath(resourceCopyDirSourceRoot, "one-file-dir"),
 	}
+
+	resourceCopySymlinkRoot = JoinPath(testResourceRoot, "yos", "copy_link")
+	resourceCopySymlinkOutputRoot = JoinPath(resourceCopySymlinkRoot, "output")
+	resourceCopySymlinkSourceRoot = JoinPath(resourceCopySymlinkRoot, "source")
+	resourceCopySymlinkBenchmarkRoot = JoinPath(resourceCopySymlinkRoot, "benchmark")
 }
 
 func TestCopyFile(t *testing.T) {
@@ -244,29 +254,64 @@ func BenchmarkCopyDir(b *testing.B) {
 	}
 }
 
-/*
-Source is empty
-Source path is inferred
-Source got permission denied
-Source is a file
-Source is a empty directory
-Source is a directory with content
-Source is a symlink to file
-Source is a symlink to directory
-Source is a circular symlink
-Source is a broken symlink
-Source doesn't exist
-Source and destination path are the same
-Destination is empty
-Destination path is inferred
-Destination got permission denied
-Destination exists and it's a file
-Destination exists and it's a empty directory
-Destination exists and it's a directory with content
-Destination exists and it's a symlink to file
-Destination exists and it's a symlink to directory
-Destination exists and it's a circular symlink
-Destination exists and it's a broken symlink
-Destination doesn't exist but its parent does
-Destination and its parent don't exist
-*/
+func TestCopySymlink(t *testing.T) {
+	outputRoot := resourceCopySymlinkOutputRoot
+	sourceRoot := resourceCopySymlinkSourceRoot
+
+	tests := []struct {
+		name       string
+		srcPath    string
+		destPath   string
+		inputPath  string
+		outputPath string
+		wantErr    bool
+	}{
+		{"Source is empty", emptyStr, outputRoot, emptyStr, emptyStr, true},
+		{"Source path is inferred", joinPathNoClean(sourceRoot, "..", "source", "link-file.txt"), JoinPath(outputRoot, "link1.txt"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(outputRoot, "link1.txt"), false},
+		{"Source got permission denied", JoinPath(sourceRoot, "no_perm_file"), outputRoot, emptyStr, emptyStr, true},
+		{"Source is a file", JoinPath(sourceRoot, "text-file.txt"), outputRoot, emptyStr, emptyStr, true},
+		{"Source is a empty directory", JoinPath(sourceRoot, "empty-dir"), outputRoot, emptyStr, emptyStr, true},
+		{"Source is a directory with content", JoinPath(sourceRoot, "one-file-dir"), outputRoot, emptyStr, emptyStr, true},
+		// {"Source is a symlink to file", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Source is a symlink to directory", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Source is a circular symlink", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Source is a broken symlink", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Source doesn't exist", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Source and destination path are the same", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Destination is empty", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Destination path is inferred", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Destination got permission denied", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Destination exists and it's a file", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Destination exists and it's a empty directory", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Destination exists and it's a directory with content", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Destination exists and it's a symlink to file", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Destination exists and it's a symlink to directory", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Destination exists and it's a circular symlink", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Destination exists and it's a broken symlink", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Destination doesn't exist but its parent does", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		// {"Destination and its parent don't exist", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if strings.Contains(tt.name, "permission") && IsOnWindows() {
+				t.Skipf("Skipping %q for Windows", tt.name)
+			}
+
+			if err := CopySymlink(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
+				t.Errorf("CopySymlink() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if !tt.wantErr {
+				same, err := SameSymlinkContent(tt.inputPath, tt.outputPath)
+				if err != nil {
+					t.Errorf("CopySymlink() got error while comparing the files: %v, %v, error: %v", tt.inputPath, tt.outputPath, err)
+				} else if !same {
+					t.Errorf("CopySymlink() the files are not the same: %v, %v", tt.inputPath, tt.outputPath)
+					return
+				}
+			}
+		})
+	}
+}
