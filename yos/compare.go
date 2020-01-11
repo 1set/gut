@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	// Mask for file mode bits to compare in SameDirEntries.
+	// CompareFileModeMask is a mask for file mode bits to compare in SameDirEntries.
 	CompareFileModeMask = os.ModeDir | os.ModeSymlink
 )
 
@@ -166,12 +166,11 @@ IterateItems:
 		}
 
 		switch entryMode1 & os.ModeType {
-		case os.ModeDir:
-			break
 		case os.ModeSymlink:
 			if same, err = SameSymlinkContent(entry1.Path, entry2.Path); err != nil || !same {
 				break IterateItems
 			}
+		case os.ModeDir:
 		default:
 			if same, err = SameFileContent(entry1.Path, entry2.Path); err != nil || !same {
 				break IterateItems
