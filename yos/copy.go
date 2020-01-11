@@ -44,7 +44,7 @@ func CopyFile(src, dest string) (err error) {
 	return
 }
 
-// CopyDir copies a directory to a target directory recursively. Symbolic links will be copied instead of being followed.
+// CopyDir copies a directory to a target directory recursively. Symbolic links inside the directories will be copied instead of being followed.
 //
 // If the target is an existing file, an error will be returned.
 //
