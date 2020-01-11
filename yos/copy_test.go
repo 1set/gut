@@ -256,6 +256,7 @@ func BenchmarkCopyDir(b *testing.B) {
 
 func TestCopySymlink(t *testing.T) {
 	outputRoot := resourceCopySymlinkOutputRoot
+	existRoot := JoinPath(resourceCopySymlinkOutputRoot, "exist")
 	sourceRoot := resourceCopySymlinkSourceRoot
 
 	tests := []struct {
@@ -269,27 +270,28 @@ func TestCopySymlink(t *testing.T) {
 		{"Source is empty", emptyStr, outputRoot, emptyStr, emptyStr, true},
 		{"Source path is inferred", joinPathNoClean(sourceRoot, "..", "source", "link-file.txt"), JoinPath(outputRoot, "link1.txt"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(outputRoot, "link1.txt"), false},
 		{"Source got permission denied", JoinPath(sourceRoot, "no_perm_file"), outputRoot, emptyStr, emptyStr, true},
+		{"Source doesn't exist", JoinPath(sourceRoot, "__not_exist__"), outputRoot, emptyStr, emptyStr, true},
 		{"Source is a file", JoinPath(sourceRoot, "text-file.txt"), outputRoot, emptyStr, emptyStr, true},
 		{"Source is a empty directory", JoinPath(sourceRoot, "empty-dir"), outputRoot, emptyStr, emptyStr, true},
 		{"Source is a directory with content", JoinPath(sourceRoot, "one-file-dir"), outputRoot, emptyStr, emptyStr, true},
-		// {"Source is a symlink to file", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Source is a symlink to directory", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Source is a circular symlink", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Source is a broken symlink", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Source doesn't exist", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Source and destination path are the same", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Destination is empty", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Destination path is inferred", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Destination got permission denied", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Destination exists and it's a file", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Destination exists and it's a empty directory", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Destination exists and it's a directory with content", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Destination exists and it's a symlink to file", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Destination exists and it's a symlink to directory", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Destination exists and it's a circular symlink", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Destination exists and it's a broken symlink", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Destination doesn't exist but its parent does", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
-		// {"Destination and its parent don't exist", JoinPath(sourceRoot, ""), outputRoot, emptyStr, emptyStr, true},
+		{"Source is a symlink to file", JoinPath(sourceRoot, "link-file.txt"), JoinPath(outputRoot, "link2.txt"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(outputRoot, "link2.txt"), false},
+		{"Source is a symlink to directory", JoinPath(sourceRoot, "link-dir"), JoinPath(outputRoot, "link3.txt"), JoinPath(sourceRoot, "link-dir"), JoinPath(outputRoot, "link3.txt"), false},
+		{"Source is a circular symlink", JoinPath(sourceRoot, "link-circular"), JoinPath(outputRoot, "link4.txt"), JoinPath(sourceRoot, "link-circular"), JoinPath(outputRoot, "link4.txt"), false},
+		{"Source is a broken symlink", JoinPath(sourceRoot, "link-broken"), JoinPath(outputRoot, "link5.txt"), JoinPath(sourceRoot, "link-broken"), JoinPath(outputRoot, "link5.txt"), false},
+		{"Source and destination path are the same", JoinPath(sourceRoot, "link-file.txt"), JoinPath(sourceRoot, "link-file.txt"), emptyStr, emptyStr, true},
+
+		{"Destination is empty", JoinPath(sourceRoot, "link-file.txt"), emptyStr, emptyStr, emptyStr, true},
+		{"Destination path is inferred", JoinPath(sourceRoot, "link-file.txt"), joinPathNoClean(outputRoot, "..", "output", "out1.txt"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(outputRoot, "out1.txt"), false},
+		{"Destination got permission denied", JoinPath(sourceRoot, "link-file.txt"), JoinPath(outputRoot, "no_perm_dir"), emptyStr, emptyStr, true},
+		{"Destination exists and it's a file", JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "text.txt"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "text.txt"), false},
+		{"Destination exists and it's a empty directory", JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "empty-dir"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "empty-dir", "link-file.txt"), false},
+		{"Destination exists and it's a directory with content", JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "one-file-dir"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "one-file-dir", "link-file.txt"), false},
+		{"Destination exists and it's a symlink to file", JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "link-file.txt"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "link-file.txt"), false},
+		{"Destination exists and it's a symlink to directory", JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "link-dir"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "link-dir"), false},
+		{"Destination exists and it's a broken symlink", JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "link-broken"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "link-broken"), false},
+		{"Destination exists and it's a circular symlink", JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "link-circular"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "link-circular"), false},
+		{"Destination doesn't exist but its parent does", JoinPath(sourceRoot, "link-file.txt"), JoinPath(outputRoot, "target.lnk"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(outputRoot, "target.lnk"), false},
+		{"Destination and its parent don't exist", JoinPath(sourceRoot, "link-file.txt"), JoinPath(resourceCopySymlinkRoot, "missing1", "missing2"), emptyStr, emptyStr, true},
 	}
 
 	for _, tt := range tests {
@@ -313,5 +315,13 @@ func TestCopySymlink(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func BenchmarkCopySymlink(b *testing.B) {
+	inputPath, outputPath := JoinPath(resourceCopySymlinkSourceRoot, "link-file.txt"), resourceCopySymlinkBenchmarkRoot
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = CopySymlink(inputPath, outputPath)
 	}
 }
