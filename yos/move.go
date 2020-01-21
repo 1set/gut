@@ -21,7 +21,7 @@ func moveFile(src, dest string) (err error) {
 		return
 	}
 
-	// attempts to `move` by renaming links
+	// attempts to move file by renaming links
 	if err = os.Rename(src, dest); os.IsExist(err) {
 		// remove destination if fails for its existence
 		os.Remove(dest)
