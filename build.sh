@@ -13,7 +13,7 @@ else
 fi
 
 # prepare environment
-source ./prepare.sh
+source ./script/prepare.sh
 set -eu
 
 printf "====== Begin at %s, OS: %s, Mode: %s - %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$OS_NAME" "$CHOICE" "$TARGET"
@@ -65,8 +65,6 @@ done
 
 printf "\n###### Clean Up ######\n"
 
-if [[ ! -z "$TESTRSSDIR" ]] ; then
-    chmod -R 700 "$TESTRSSDIR" && rm -fr "$TESTRSSDIR"
-fi
+source ./script/cleanup.sh
 
 printf "\n====== End at %s, Packages: %d ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$COUNT"
