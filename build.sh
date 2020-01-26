@@ -19,8 +19,7 @@ set -eu
 printf "====== Begin at %s, OS: %s, Mode: %s - %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$OS_NAME" "$CHOICE" "$TARGET"
 
 COUNT=0
-for FOLDER in $TARGET
-do
+for FOLDER in $TARGET; do
     PACKAGE="${FOLDER##*/}"
     if [[ ! -d "$PACKAGE" ]]; then
         continue
@@ -60,7 +59,7 @@ do
         ;;
     esac
 
-    COUNT=$((COUNT+1))
+    COUNT=$((COUNT + 1))
 done
 
 printf "\n###### Clean Up ######\n"
