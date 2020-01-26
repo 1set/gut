@@ -2,23 +2,33 @@
 
 set -e
 # get system temp dir
-for TMPDIR in "$TMPDIR" "$TMP" /var/tmp /tmp
-do
+for TMPDIR in "$TMPDIR" "$TMP" /var/tmp /tmp; do
     test -d "$TMPDIR" && break
 done
 
 # set platform name
 system_name=$(uname -s)
-if [[ $system_name == MINGW64_NT* ]] ; then
+if [[ $system_name == MINGW64_NT* ]]; then
     platform_name="WINDOWS"
-elif [[ $system_name == Linux* ]] ; then
+elif [[ $system_name == Linux* ]]; then
     platform_name="LINUX"
-elif [[ $system_name == Darwin* ]] ; then
+elif [[ $system_name == Darwin* ]]; then
     platform_name="MACOS"
 else
     platform_name="UNKNOWN"
 fi
 export OS_NAME="$platform_name"
+
+# create ram disk
+./ramdisk.sh create GutRamDisk 64
+./ramdisk.sh create GutReadOnlyDisk 16 ReadOnly
+if [[ $OS_NAME == "MACOS" ]]; then
+    export RAMDISK_WRITE=/Volumes/GutRamDisk
+    export RAMDISK_READONLY=/Volumes/GutReadOnlyDisk
+elif [[ $OS_NAME == "LINUX" ]]; then
+    export RAMDISK_WRITE=/mnt/GutRamDisk
+    export RAMDISK_READONLY=/mnt/GutReadOnlyDisk
+fi
 
 # uncompress test resource to temp dir
 echo "$MSYS"
