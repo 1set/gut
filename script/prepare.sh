@@ -20,16 +20,16 @@ fi
 export OS_NAME="$platform_name"
 
 # create ram disk
-if [ $OS_NAME == "MACOS" ] || [ $OS_NAME == "LINUX" ]; then
+if [[ $OS_NAME == "MACOS" ]]; then
     script/ramdisk.sh create GutRamDisk 64
     script/ramdisk.sh create GutReadOnlyDisk 16 ReadOnly
-    if [[ $OS_NAME == "MACOS" ]]; then
-        export RAMDISK_WRITE=/Volumes/GutRamDisk
-        export RAMDISK_READONLY=/Volumes/GutReadOnlyDisk
-    elif [[ $OS_NAME == "LINUX" ]]; then
-        export RAMDISK_WRITE=/mnt/GutRamDisk
-        export RAMDISK_READONLY=/mnt/GutReadOnlyDisk
-    fi
+    export RAMDISK_WRITE=/Volumes/GutRamDisk
+    export RAMDISK_READONLY=/Volumes/GutReadOnlyDisk
+elif [[ $OS_NAME == "LINUX" ]]; then
+    sudo script/ramdisk.sh create GutRamDisk 64
+    sudo script/ramdisk.sh create GutReadOnlyDisk 16 ReadOnly
+    export RAMDISK_WRITE=/mnt/GutRamDisk
+    export RAMDISK_READONLY=/mnt/GutReadOnlyDisk
 fi
 
 # uncompress test resource to temp dir
