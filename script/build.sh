@@ -5,6 +5,8 @@ set -e
 CHOICE="$1"
 TARGET="$2"
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 # define target
 if [[ -z "$TARGET" ]]; then
     TARGET="./y*"
@@ -13,7 +15,7 @@ else
 fi
 
 # prepare environment
-source ./script/prepare.sh
+source "$SCRIPT_DIR"/prepare.sh
 set -eu
 
 printf "====== Begin at %s, OS: %s, Mode: %s - %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$OS_NAME" "$CHOICE" "$TARGET"
@@ -64,6 +66,6 @@ done
 
 printf "\n###### Clean Up ######\n"
 
-source ./script/cleanup.sh
+source "$SCRIPT_DIR"/cleanup.sh
 
 printf "\n====== End at %s, Packages: %d ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$COUNT"
