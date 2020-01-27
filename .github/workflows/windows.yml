@@ -41,4 +41,4 @@ jobs:
 
     - name: Build & Test
       shell: bash
-      run: ./build.sh ci
+      run: script/build.sh ci
