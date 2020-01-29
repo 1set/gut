@@ -2,6 +2,7 @@ package yos
 
 import (
 	"os"
+	"syscall"
 )
 
 func MoveFile(src, dest string) (err error) {
@@ -33,9 +34,16 @@ func moveFile(src, dest string) (err error) {
 		return
 	}
 
-	// move == copy to dest + remove src
-	if err = bufferCopyFile(src, dest, defaultBufferSize); err == nil {
-		err = os.Remove(src)
+	// cross device: move == remove dest + copy to dest + remove src
+	if lerr, ok := err.(*os.LinkError); ok && lerr.Err == syscall.EXDEV {
+		// remove destination file, and ignore the non-existence error
+		if err = os.Remove(dest); err != nil && !os.IsNotExist(err) {
+			return
+		}
+		if err = bufferCopyFile(src, dest, defaultBufferSize); err == nil {
+			err = os.Remove(src)
+		}
 	}
+
 	return
 }
