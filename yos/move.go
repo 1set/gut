@@ -5,6 +5,15 @@ import (
 	"syscall"
 )
 
+// MoveFile moves a file to a target file or directory. Symbolic links will be not be followed.
+//
+// If the target is an existing file, the target will be overwritten with the source file.
+//
+// If the target is an existing directory, the source file will be moved to the directory with the same file name.
+//
+// If the target doesn't exist but its parent directory does, the source file will be moved to the parent directory with the target name.
+//
+// ErrSameFile is returned if it detects an attempt to copy a file to itself.
 func MoveFile(src, dest string) (err error) {
 	if src, dest, err = refineCopyPaths(src, dest, false); err == nil {
 		err = moveFile(src, dest)
