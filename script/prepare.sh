@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 # get system temp dir
@@ -23,11 +24,17 @@ export OS_NAME="$platform_name"
 
 # create ram disk
 if [[ $OS_NAME == "MACOS" ]]; then
+    "$SCRIPT_DIR"/ramdisk.sh destroy GutRamDisk || true
+    "$SCRIPT_DIR"/ramdisk.sh destroy GutReadOnlyDisk || true
+
     "$SCRIPT_DIR"/ramdisk.sh create GutRamDisk 64
     "$SCRIPT_DIR"/ramdisk.sh create GutReadOnlyDisk 16 ReadOnly
     export RAMDISK_WRITE=/Volumes/GutRamDisk
     export RAMDISK_READONLY=/Volumes/GutReadOnlyDisk
 elif [[ $OS_NAME == "LINUX" ]]; then
+    sudo "$SCRIPT_DIR"/ramdisk.sh destroy GutRamDisk || true
+    sudo "$SCRIPT_DIR"/ramdisk.sh destroy GutReadOnlyDisk || true
+
     sudo "$SCRIPT_DIR"/ramdisk.sh create GutRamDisk 64
     sudo "$SCRIPT_DIR"/ramdisk.sh create GutReadOnlyDisk 16 ReadOnly
     export RAMDISK_WRITE=/mnt/GutRamDisk
