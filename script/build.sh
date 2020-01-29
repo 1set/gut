@@ -51,7 +51,7 @@ for FOLDER in $TARGET; do
     dev)
         make fmt PACKAGE="$PACKAGE"
         make testdev PACKAGE="$PACKAGE"
-        make benchdev PACKAGE="$PACKAGE"
+#        make benchdev PACKAGE="$PACKAGE"
         ;;
     fastdev)
         make fmt PACKAGE="$PACKAGE"
