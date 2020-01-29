@@ -1,6 +1,7 @@
 package yos
 
 import (
+	"fmt"
 	"os"
 	"syscall"
 )
@@ -15,22 +16,37 @@ import (
 //
 // ErrSameFile is returned if it detects an attempt to copy a file to itself.
 func MoveFile(src, dest string) (err error) {
-	if src, dest, err = refineCopyPaths(src, dest, false); err == nil {
-		err = moveFile(src, dest)
+	if src, dest, err = refineOpPaths(src, dest, false); err == nil {
+		// check if source exists and is a file
+		var srcInfo os.FileInfo
+		if srcInfo, err = os.Lstat(src); err == nil && !srcInfo.Mode().IsRegular() {
+			err = ErrNotRegular
+		}
+
+		if err == nil {
+			err = moveEntry(src, dest)
+		}
 	}
 	return
 }
 
-func moveFile(src, dest string) (err error) {
-	// check if source exists and is a file
-	var srcInfo os.FileInfo
-	if srcInfo, err = os.Lstat(src); err == nil && !srcInfo.Mode().IsRegular() {
-		err = ErrNotRegular
-	}
-	if err != nil {
-		return
-	}
+func MoveSymlink(src, dest string) (err error) {
+	if src, dest, err = refineOpPaths(src, dest, false); err == nil {
+		// check if source exists and is a symbolic link
+		var srcInfo os.FileInfo
+		if srcInfo, err = os.Lstat(src); err == nil && srcInfo.Mode()&os.ModeType != os.ModeSymlink {
+			err = fmt.Errorf("%v: source is not a symbolic link", src)
+		}
 
+		if err == nil {
+			err = moveEntry(src, dest)
+		}
+	}
+	return
+}
+
+// moveEntry moves a source file to a target file by renaming or copying.
+func moveEntry(src, dest string) (err error) {
 	// attempts to move file by renaming links
 	if err = os.Rename(src, dest); os.IsExist(err) {
 		// remove destination if fails for its existence
