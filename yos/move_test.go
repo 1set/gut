@@ -54,7 +54,7 @@ func TestMoveFile(t *testing.T) {
 		{"Destination and its parent directory don't exist", JoinPath(srcRoot, "text.txt"), JoinPath(destRoot, "missing-dir", "new-file.txt"), emptyStr, emptyStr, true},
 		{"Destination is a file", JoinPath(srcRoot, "text2.txt"), JoinPath(destRoot, "text.txt"), JoinPath(bkRoot, "text2.txt"), JoinPath(destRoot, "text.txt"), false},
 		{"Destination is a symlink to file", JoinPath(srcRoot, "text3.txt"), JoinPath(destRoot, "link.txt"), JoinPath(bkRoot, "text3.txt"), JoinPath(destRoot, "link.txt"), false},
-		{"Destination is a symlink to directory", JoinPath(srcRoot, "text4.txt"), JoinPath(destRoot, "link-dir"), JoinPath(bkRoot, "text4.txt"), JoinPath(destRoot, "link-dir"), false},
+		{"Destination is a symlink to directory (non-Windows)", JoinPath(srcRoot, "text4.txt"), JoinPath(destRoot, "link-dir"), JoinPath(bkRoot, "text4.txt"), JoinPath(destRoot, "link-dir"), false},
 		{"Destination is a circular symlink", JoinPath(srcRoot, "text5.txt"), JoinPath(destRoot, "link-circular"), JoinPath(bkRoot, "text5.txt"), JoinPath(destRoot, "link-circular"), false},
 		{"Destination is a broken symlink", JoinPath(srcRoot, "text6.txt"), JoinPath(destRoot, "link-broken"), JoinPath(bkRoot, "text6.txt"), JoinPath(destRoot, "link-broken"), false},
 		{"Destination is an empty directory", JoinPath(srcRoot, "text7.txt"), JoinPath(destRoot, "empty-dir"), JoinPath(bkRoot, "text7.txt"), JoinPath(destRoot, "empty-dir", "text7.txt"), false},
@@ -87,7 +87,7 @@ func TestMoveFile(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if strings.Contains(tt.name, "permission") && IsOnWindows() {
+			if (strings.Contains(tt.name, "permission") || strings.Contains(tt.name, "non-Windows")) && IsOnWindows() {
 				t.Skipf("Skipping %q for Windows", tt.name)
 			}
 			if strings.Contains(tt.name, "Cross-device") && (ystring.IsBlank(resourceReadWriteDevice) || ystring.IsBlank(resourceReadOnlyDevice)) {
