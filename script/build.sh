@@ -5,7 +5,7 @@ set -e
 CHOICE="$1"
 TARGET="$2"
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 # define target
 if [[ -z "$TARGET" ]]; then
@@ -15,10 +15,12 @@ else
 fi
 
 # prepare environment
+printf "\n###### Prepare ######\n"
 source "$SCRIPT_DIR"/prepare.sh
+
 set -eu
 
-printf "====== Begin at %s, OS: %s, Mode: %s - %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$OS_NAME" "$CHOICE" "$TARGET"
+printf "\n====== Begin at %s, OS: %s, Mode: %s - %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$OS_NAME" "$CHOICE" "$TARGET"
 
 COUNT=0
 for FOLDER in $TARGET; do

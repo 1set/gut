@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 # get system temp dir
 for TMPDIR in "$TMPDIR" "$TMP" /var/tmp /tmp; do
@@ -40,7 +40,12 @@ export MSYS=winsymlinks:nativestrict
 export TESTRSSDIR=${TMPDIR%/}/gut_test_resource
 chmod -R 700 "$TESTRSSDIR" && rm -fr "$TESTRSSDIR"
 unzip -q -o test_resource.zip -d "$TESTRSSDIR"
-printf "Uncompress test resource: %s\n\n" "$TESTRSSDIR"
+
+if [[ ! -z $RAMDISK_WRITE ]]; then
+    cp -R "$TESTRSSDIR"/yos/move_file/destination "$RAMDISK_WRITE"/move_file
+fi
+
+printf "Uncompress test resource: ${TESTRSSDIR} ${RAMDISK_WRITE}\n"
 
 # set permission for ad hoc files
 chmod 000 "$TESTRSSDIR"/yos/copy_file/none_perm.txt
@@ -54,8 +59,19 @@ chmod 000 "$TESTRSSDIR"/yos/copy_dir/output/exist-no-perm-dir/misc/deep1
 chmod 000 "$TESTRSSDIR"/yos/copy_link/source/no_perm_file
 chmod 000 "$TESTRSSDIR"/yos/copy_link/output/no_perm_dir
 
+chmod 000 "$TESTRSSDIR"/yos/move_file/source/no_perm
+chmod 000 "$TESTRSSDIR"/yos/move_file/destination/no_perm_file
+chmod 000 "$TESTRSSDIR"/yos/move_file/destination/no_perm_dir
+
+if [[ ! -z $RAMDISK_WRITE ]]; then
+    chmod 000 "$RAMDISK_WRITE"/move_file/no_perm_file
+    chmod 000 "$RAMDISK_WRITE"/move_file/no_perm_dir
+fi
+
 chmod 000 "$TESTRSSDIR"/yos/same_file/set1/none_perm.txt
 chmod 000 "$TESTRSSDIR"/yos/same_file/set2/none_perm.txt
 
 chmod 000 "$TESTRSSDIR"/yos/same_dir/source/no-perm-dirs/no_perm_dir
 chmod 000 "$TESTRSSDIR"/yos/same_dir/source/no-perm-files/no_perm_file
+
+printf "Change file modes for test resource: ${TESTRSSDIR} ${RAMDISK_WRITE}\n"
