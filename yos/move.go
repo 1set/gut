@@ -49,6 +49,23 @@ func MoveSymlink(src, dest string) (err error) {
 	return
 }
 
+func MoveDir(src, dest string) (err error) {
+	if src, dest, err = refineOpPaths(src, dest, false); err == nil {
+		// check if source exists and is a directory
+		var srcInfo os.FileInfo
+		if srcInfo, err = os.Lstat(src); err == nil && srcInfo.Mode()&os.ModeType != os.ModeDir {
+			err = fmt.Errorf("%v: source is not a directory", src)
+		}
+
+		if err == nil {
+			err = moveEntry(src, dest, func(src, dest string) error {
+				return copyDir(src, dest)
+			})
+		}
+	}
+	return
+}
+
 // moveEntry moves source to target by renaming or copying.
 func moveEntry(src, dest string, copyFunc func(src, dest string) error) (err error) {
 	// attempts to move file by renaming links
