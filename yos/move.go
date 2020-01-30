@@ -24,7 +24,9 @@ func MoveFile(src, dest string) (err error) {
 		}
 
 		if err == nil {
-			err = moveEntry(src, dest)
+			err = moveEntry(src, dest, func(src, dest string) error {
+				return bufferCopyFile(src, dest, defaultBufferSize)
+			})
 		}
 	}
 	return
@@ -39,14 +41,16 @@ func MoveSymlink(src, dest string) (err error) {
 		}
 
 		if err == nil {
-			err = moveEntry(src, dest)
+			err = moveEntry(src, dest, func(src, dest string) error {
+				return copySymlink(src, dest)
+			})
 		}
 	}
 	return
 }
 
-// moveEntry moves a source file to a target file by renaming or copying.
-func moveEntry(src, dest string) (err error) {
+// moveEntry moves source to target by renaming or copying.
+func moveEntry(src, dest string, copyFunc func(src, dest string) error) (err error) {
 	// attempts to move file by renaming links
 	if err = os.Rename(src, dest); os.IsExist(err) {
 		// remove destination if fails for its existence
@@ -65,7 +69,7 @@ func moveEntry(src, dest string) (err error) {
 		if err = os.Remove(dest); err != nil && !os.IsNotExist(err) {
 			return
 		}
-		if err = bufferCopyFile(src, dest, defaultBufferSize); err == nil {
+		if err = copyFunc(src, dest); err == nil {
 			err = os.Remove(src)
 		}
 	}
