@@ -122,6 +122,14 @@ func TestMoveFile(t *testing.T) {
 	}
 }
 
+func BenchmarkMoveFile(b *testing.B) {
+	inputPath, outputPath := JoinPath(resourceMoveFileRoot, "source", "benchmark.txt"), resourceReadWriteDevice
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = MoveFile(inputPath, outputPath)
+	}
+}
+
 func TestMoveSymlink(t *testing.T) {
 	var (
 		bkRoot         = JoinPath(resourceMoveSymlinkRoot, "backup")
@@ -211,6 +219,14 @@ func TestMoveSymlink(t *testing.T) {
 	if err := os.RemoveAll(writeDevice); err != nil {
 		t.Errorf("MoveSymlink() fail to remove output directory %v: %v", writeDevice, err)
 		return
+	}
+}
+
+func BenchmarkMoveSymlink(b *testing.B) {
+	inputPath, outputPath := JoinPath(resourceMoveSymlinkRoot, "source1", "benchmark.link"), resourceReadWriteDevice
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = MoveSymlink(inputPath, outputPath)
 	}
 }
 
@@ -309,5 +325,13 @@ func TestMoveDir(t *testing.T) {
 	if err := os.RemoveAll(writeDevice); err != nil {
 		t.Errorf("MoveDir() fail to remove output directory %v: %v", writeDevice, err)
 		return
+	}
+}
+
+func BenchmarkMoveDir(b *testing.B) {
+	inputPath, outputPath := JoinPath(resourceMoveDirRoot, "source1", "dir12"), resourceReadWriteDevice
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = MoveDir(inputPath, outputPath)
 	}
 }
