@@ -24,7 +24,7 @@ func MoveFile(src, dest string) (err error) {
 		}
 
 		if err == nil {
-			err = moveEntry(src, dest, func(src, dest string) error {
+			err = moveEntry(src, dest, os.Remove, func(src, dest string) error {
 				return bufferCopyFile(src, dest, defaultBufferSize)
 			})
 		}
@@ -41,7 +41,7 @@ func MoveSymlink(src, dest string) (err error) {
 		}
 
 		if err == nil {
-			err = moveEntry(src, dest, func(src, dest string) error {
+			err = moveEntry(src, dest, os.Remove, func(src, dest string) error {
 				return copySymlink(src, dest)
 			})
 		}
@@ -58,7 +58,7 @@ func MoveDir(src, dest string) (err error) {
 		}
 
 		if err == nil {
-			err = moveEntry(src, dest, func(src, dest string) error {
+			err = moveEntry(src, dest, os.RemoveAll, func(src, dest string) error {
 				return copyDir(src, dest)
 			})
 		}
@@ -67,11 +67,11 @@ func MoveDir(src, dest string) (err error) {
 }
 
 // moveEntry moves source to target by renaming or copying.
-func moveEntry(src, dest string, copyFunc func(src, dest string) error) (err error) {
+func moveEntry(src, dest string, removeFunc func(path string) error, copyFunc func(src, dest string) error) (err error) {
 	// attempts to move file by renaming links
-	if err = os.Rename(src, dest); os.IsExist(err) {
-		// remove destination if fails for its existence
-		os.Remove(dest)
+	if err = os.Rename(src, dest); os.IsExist(err) || isNotDirectory(err) {
+		// remove destination if fails for its existence or not directory
+		_ = removeFunc(dest)
 		err = os.Rename(src, dest)
 	}
 
@@ -81,15 +81,25 @@ func moveEntry(src, dest string, copyFunc func(src, dest string) error) (err err
 	}
 
 	// cross device: move == remove dest + copy to dest + remove src
-	if lerr, ok := err.(*os.LinkError); ok && lerr.Err == syscall.EXDEV {
+	if isCrossDeviceLink(err) {
 		// remove destination file, and ignore the non-existence error
-		if err = os.Remove(dest); err != nil && !os.IsNotExist(err) {
+		if err = removeFunc(dest); err != nil && !os.IsNotExist(err) {
 			return
 		}
 		if err = copyFunc(src, dest); err == nil {
-			err = os.Remove(src)
+			err = removeFunc(src)
 		}
 	}
 
 	return
+}
+
+func isCrossDeviceLink(err error) bool {
+	lerr, ok := err.(*os.LinkError)
+	return ok && lerr.Err == syscall.EXDEV
+}
+
+func isNotDirectory(err error) bool {
+	lerr, ok := err.(*os.LinkError)
+	return ok && lerr.Err == syscall.ENOTDIR
 }

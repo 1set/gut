@@ -176,7 +176,6 @@ func TestMoveSymlink(t *testing.T) {
 		{"Cross-device: destination directory got no permissions", JoinPath(src2Root, "link.txt"), JoinPath(writeDevice, "no_perm_dir"), emptyStr, emptyStr, true},
 		{"Cross-device: destination file got no permissions", JoinPath(src2Root, "link8.txt"), JoinPath(writeDevice, "no_perm_file"), JoinPath(bkRoot, "link8.txt"), JoinPath(writeDevice, "no_perm_file"), false},
 		{"Cross-device: destination is a read-only device", JoinPath(src2Root, "link.txt"), JoinPath(readOnlyDevice, "new-link.txt"), emptyStr, emptyStr, true},
-
 		{"Cross-device: source is a symlink to file", JoinPath(src2Root, "link.txt"), JoinPath(writeDevice, "cd-link1.txt"), JoinPath(bkRoot, "link.txt"), JoinPath(writeDevice, "cd-link1.txt"), false},
 		{"Cross-device: source is a symlink to directory", JoinPath(src2Root, "link-dir"), JoinPath(writeDevice, "cd-link2.txt"), JoinPath(bkRoot, "link-dir"), JoinPath(writeDevice, "cd-link2.txt"), false},
 		{"Cross-device: source is a circular symlink", JoinPath(src2Root, "link-circular"), JoinPath(writeDevice, "cd-link3.txt"), JoinPath(bkRoot, "link-circular"), JoinPath(writeDevice, "cd-link3.txt"), false},
@@ -225,8 +224,6 @@ func TestMoveDir(t *testing.T) {
 		readOnlyDevice = JoinPath(resourceReadOnlyDevice, "move_dir")
 	)
 
-	t.SkipNow()
-
 	tests := []struct {
 		name       string
 		srcPath    string
@@ -235,53 +232,52 @@ func TestMoveDir(t *testing.T) {
 		outputPath string
 		wantErr    bool
 	}{
-		{"Source is empty", emptyStr, JoinPath(destRoot, "text.txt"), emptyStr, emptyStr, true},
-		{"Source doesn't exist", JoinPath(src1Root, "missing-text.txt"), JoinPath(destRoot, "text.txt"), emptyStr, emptyStr, true},
-		{"Source is a symlink to file", JoinPath(src1Root, "link.txt"), JoinPath(destRoot, "text.txt"), emptyStr, emptyStr, true},
-		{"Source is a symlink to directory", JoinPath(src1Root, "link-dir"), JoinPath(destRoot, "text.txt"), emptyStr, emptyStr, true},
-		{"Source is a circular symlink", JoinPath(src1Root, "link-circular"), JoinPath(destRoot, "text.txt"), emptyStr, emptyStr, true},
-		{"Source is a broken symlink", JoinPath(src1Root, "link-broken"), JoinPath(destRoot, "text.txt"), emptyStr, emptyStr, true},
-		{"Source directory contains file got no permissions", JoinPath(src1Root, "link-broken"), JoinPath(destRoot, "text.txt"), emptyStr, emptyStr, true},
+		{"Source is empty", emptyStr, JoinPath(destRoot, "new-dir"), emptyStr, emptyStr, true},
+		{"Source doesn't exist", JoinPath(src1Root, "missing-dir"), JoinPath(destRoot, "new-dir"), emptyStr, emptyStr, true},
+		{"Source is a symlink to file", JoinPath(src1Root, "link.txt"), JoinPath(destRoot, "new-dir"), emptyStr, emptyStr, true},
+		{"Source is a symlink to directory", JoinPath(src1Root, "link-dir"), JoinPath(destRoot, "new-dir"), emptyStr, emptyStr, true},
+		{"Source is a circular symlink", JoinPath(src1Root, "link-circular"), JoinPath(destRoot, "new-dir"), emptyStr, emptyStr, true},
+		{"Source is a broken symlink", JoinPath(src1Root, "link-broken"), JoinPath(destRoot, "new-dir"), emptyStr, emptyStr, true},
 		{"Source and destination is the same file", JoinPath(src1Root, "text.txt"), JoinPath(src1Root, "text.txt"), emptyStr, emptyStr, true},
 		{"Source and destination is the same symlink", JoinPath(src1Root, "link.txt"), JoinPath(src1Root, "link.txt"), emptyStr, emptyStr, true},
 		{"Source and destination is the same directory", JoinPath(src1Root, "empty-dir"), JoinPath(src1Root, "empty-dir"), emptyStr, emptyStr, true},
+		// {"Source directory contains file got no permissions", JoinPath(src1Root, "dir-file-no-perm"), JoinPath(destRoot, "new-no-perm"), emptyStr, emptyStr, true},
 
-		{"Destination is empty", JoinPath(src1Root, "text.txt"), emptyStr, emptyStr, emptyStr, true},
-		{"Destination doesn't exist but its parent directory does", JoinPath(src1Root, "text1.txt"), JoinPath(destRoot, "new1.txt"), JoinPath(bkRoot, "text1.txt"), JoinPath(destRoot, "new1.txt"), false},
-		{"Destination and its parent directory don't exist", JoinPath(src1Root, "text.txt"), JoinPath(destRoot, "missing-dir", "new-file.txt"), emptyStr, emptyStr, true},
-		{"Destination is a file", JoinPath(src1Root, "text2.txt"), JoinPath(destRoot, "text.txt"), JoinPath(bkRoot, "text2.txt"), JoinPath(destRoot, "text.txt"), false},
-		{"Destination is a symlink to file", JoinPath(src1Root, "text3.txt"), JoinPath(destRoot, "link.txt"), JoinPath(bkRoot, "text3.txt"), JoinPath(destRoot, "link.txt"), false},
-		{"Destination is a symlink to directory (non-Windows)", JoinPath(src1Root, "text4.txt"), JoinPath(destRoot, "link-dir"), JoinPath(bkRoot, "text4.txt"), JoinPath(destRoot, "link-dir"), false},
-		{"Destination is a circular symlink", JoinPath(src1Root, "text5.txt"), JoinPath(destRoot, "link-circular"), JoinPath(bkRoot, "text5.txt"), JoinPath(destRoot, "link-circular"), false},
-		{"Destination is a broken symlink", JoinPath(src1Root, "text6.txt"), JoinPath(destRoot, "link-broken"), JoinPath(bkRoot, "text6.txt"), JoinPath(destRoot, "link-broken"), false},
-		{"Destination is an empty directory", JoinPath(src1Root, "text7.txt"), JoinPath(destRoot, "empty-dir"), JoinPath(bkRoot, "text7.txt"), JoinPath(destRoot, "empty-dir", "text7.txt"), false},
-		{"Destination is a directory containing other files", JoinPath(src1Root, "text8.txt"), JoinPath(destRoot, "other-dir"), JoinPath(bkRoot, "text8.txt"), JoinPath(destRoot, "other-dir", "text8.txt"), false},
-		{"Destination is a directory containing a file with the same name", JoinPath(src1Root, "text9.txt"), JoinPath(destRoot, "same-dir"), JoinPath(bkRoot, "text9.txt"), JoinPath(destRoot, "same-dir", "text9.txt"), false},
-		{"Destination file got no permissions", JoinPath(src1Root, "text10.txt"), JoinPath(destRoot, "no_perm_file"), JoinPath(bkRoot, "text10.txt"), JoinPath(destRoot, "no_perm_file"), false},
+		{"Destination is empty", JoinPath(src1Root, "dir0"), emptyStr, emptyStr, emptyStr, true},
+		{"Destination and its parent directory don't exist", JoinPath(src1Root, "dir0"), JoinPath(destRoot, "missing-dir", "new-dir"), emptyStr, emptyStr, true},
+		{"Destination doesn't exist but its parent directory does", JoinPath(src1Root, "dir1"), JoinPath(destRoot, "new-dir1"), JoinPath(bkRoot, "dir1"), JoinPath(destRoot, "new-dir1"), false},
+		{"Destination is a file", JoinPath(src1Root, "dir2"), JoinPath(destRoot, "text.txt"), JoinPath(bkRoot, "dir2"), JoinPath(destRoot, "text.txt"), false},
+		{"Destination is a symlink to file", JoinPath(src1Root, "dir3"), JoinPath(destRoot, "link.txt"), JoinPath(bkRoot, "dir3"), JoinPath(destRoot, "link.txt"), false},
+		{"Destination is a symlink to directory (non-Windows)", JoinPath(src1Root, "dir4"), JoinPath(destRoot, "link-dir"), JoinPath(bkRoot, "dir4"), JoinPath(destRoot, "link-dir"), false},
+		{"Destination is a circular symlink", JoinPath(src1Root, "dir5"), JoinPath(destRoot, "link-circular"), JoinPath(bkRoot, "dir5"), JoinPath(destRoot, "link-circular"), false},
+		{"Destination is a broken symlink", JoinPath(src1Root, "dir6"), JoinPath(destRoot, "link-broken"), JoinPath(bkRoot, "dir6"), JoinPath(destRoot, "link-broken"), false},
+		{"Destination is an empty directory", JoinPath(src1Root, "dir7"), JoinPath(destRoot, "empty-dir"), JoinPath(bkRoot, "dir7"), JoinPath(destRoot, "empty-dir", "dir7"), false},
+		{"Destination is a directory containing other files", JoinPath(src1Root, "dir8"), JoinPath(destRoot, "other-dir"), JoinPath(bkRoot, "dir8"), JoinPath(destRoot, "other-dir", "dir8"), false},
+		{"Destination is a directory containing a file with the same name", JoinPath(src1Root, "dir9"), JoinPath(destRoot, "same-dir"), JoinPath(bkRoot, "dir9"), JoinPath(destRoot, "same-dir", "dir9"), false},
+		{"Destination file got no permissions", JoinPath(src1Root, "dir10"), JoinPath(destRoot, "no_perm_file"), JoinPath(bkRoot, "dir10"), JoinPath(destRoot, "no_perm_file"), false},
 		{"Destination directory got no permissions", JoinPath(src1Root, "text.txt"), JoinPath(destRoot, "no_perm_dir"), emptyStr, emptyStr, true},
-		{"Destination is a symlink to source file (non-Windows)", JoinPath(src1Root, "self_text.txt"), JoinPath(src1Root, "self_link.txt"), JoinPath(bkRoot, "self_text.txt"), JoinPath(src1Root, "self_link.txt"), false},
+		{"Destination is a symlink to source directory (non-Windows)", JoinPath(src1Root, "self-dir"), JoinPath(src1Root, "self-link"), JoinPath(bkRoot, "self-dir"), JoinPath(src1Root, "self-link"), false},
+		{"Rename: move an empty directory", JoinPath(src1Root, "empty-dir"), JoinPath(destRoot, "new-empty-dir"), JoinPath(bkRoot, "empty-dir"), JoinPath(destRoot, "new-empty-dir"), false},
+		{"Rename: move a directory contains only files", JoinPath(src1Root, "only-files"), JoinPath(destRoot, "new-only-files"), JoinPath(bkRoot, "only-files"), JoinPath(destRoot, "new-only-files"), false},
+		{"Rename: move a directory contains files, symlinks and directories", JoinPath(src1Root, "misc"), JoinPath(destRoot, "new-misc"), JoinPath(bkRoot, "misc"), JoinPath(destRoot, "new-misc"), false},
 
-		{"Rename: move an empty directory", JoinPath(src1Root, "empty1.txt"), JoinPath(destRoot, "empty1.txt"), JoinPath(bkRoot, "empty1.txt"), JoinPath(destRoot, "empty1.txt"), false},
-		{"Rename: move a directory contains only files", JoinPath(src1Root, "large1.txt"), JoinPath(destRoot, "large1.txt"), JoinPath(bkRoot, "large1.txt"), JoinPath(destRoot, "large1.txt"), false},
-		{"Rename: move a directory contains files, symlinks and directories", JoinPath(src1Root, "image1.png"), JoinPath(destRoot, "image1.png"), JoinPath(bkRoot, "image1.png"), JoinPath(destRoot, "image1.png"), false},
-
-		{"Cross-device: destination doesn't exist but its parent directory does", JoinPath(src2Root, "file1.txt"), JoinPath(writeDevice, "new1.txt"), JoinPath(bkRoot, "file1.txt"), JoinPath(writeDevice, "new1.txt"), false},
-		{"Cross-device: destination and its parent directory don't exist", JoinPath(src2Root, "text.txt"), JoinPath(writeDevice, "missing-dir", "new-file.txt"), emptyStr, emptyStr, true},
-		{"Cross-device: destination exists and is a file", JoinPath(src2Root, "file2.txt"), JoinPath(writeDevice, "text.txt"), JoinPath(bkRoot, "file2.txt"), JoinPath(writeDevice, "text.txt"), false},
-		{"Cross-device: destination exists and is a symlink to file", JoinPath(src2Root, "file3.txt"), JoinPath(writeDevice, "link.txt"), JoinPath(bkRoot, "file3.txt"), JoinPath(writeDevice, "link.txt"), false},
-		{"Cross-device: destination exists and is a symlink to directory", JoinPath(src2Root, "file4.txt"), JoinPath(writeDevice, "link-dir"), JoinPath(bkRoot, "file4.txt"), JoinPath(writeDevice, "link-dir"), false},
-		{"Cross-device: destination exists and is a circular symlink", JoinPath(src2Root, "file5.txt"), JoinPath(writeDevice, "link-circular"), JoinPath(bkRoot, "file5.txt"), JoinPath(writeDevice, "link-circular"), false},
-		{"Cross-device: destination exists and is a broken symlink", JoinPath(src2Root, "file6.txt"), JoinPath(writeDevice, "link-broken"), JoinPath(bkRoot, "file6.txt"), JoinPath(writeDevice, "link-broken"), false},
-		{"Cross-device: destination exists and is a directory", JoinPath(src2Root, "file7.txt"), JoinPath(writeDevice), JoinPath(bkRoot, "file7.txt"), JoinPath(writeDevice, "file7.txt"), false},
-		{"Cross-device: source contains file got no permissions", JoinPath(src2Root, "no_perm"), JoinPath(writeDevice, "new_noperm.txt"), emptyStr, emptyStr, true},
-		{"Cross-device: destination directory got no permissions", JoinPath(src2Root, "text.txt"), JoinPath(writeDevice, "no_perm_dir"), emptyStr, emptyStr, true},
-		{"Cross-device: destination file got no permissions", JoinPath(src2Root, "file8.txt"), JoinPath(writeDevice, "no_perm_file"), JoinPath(bkRoot, "file8.txt"), JoinPath(writeDevice, "no_perm_file"), false},
-		{"Cross-device: destination got no spaces for large file", JoinPath(src2Root, "xlarge-text.txt"), JoinPath(writeDevice, "text.txt"), emptyStr, emptyStr, true},
-		{"Cross-device: destination is a read-only device", JoinPath(src2Root, "text.txt"), JoinPath(readOnlyDevice, "new.txt"), emptyStr, emptyStr, true},
-
-		{"Cross-device: move an empty directory", JoinPath(src2Root, "empty2.txt"), JoinPath(writeDevice, "empty2.txt"), JoinPath(bkRoot, "empty2.txt"), JoinPath(writeDevice, "empty2.txt"), false},
-		{"Cross-device: move a directory contains only files", JoinPath(src2Root, "large2.txt"), JoinPath(writeDevice, "large2.txt"), JoinPath(bkRoot, "large2.txt"), JoinPath(writeDevice, "large2.txt"), false},
-		{"Cross-device: move a directory contains files, symlinks and directories", JoinPath(src2Root, "image2.png"), JoinPath(writeDevice, "image2.png"), JoinPath(bkRoot, "image2.png"), JoinPath(writeDevice, "image2.png"), false},
+		{"Cross-device: destination and its parent directory don't exist", JoinPath(src2Root, "dir0"), JoinPath(writeDevice, "missing-dir", "new-dir"), emptyStr, emptyStr, true},
+		{"Cross-device: destination doesn't exist but its parent directory does", JoinPath(src2Root, "dir1"), JoinPath(writeDevice, "new-dir1"), JoinPath(bkRoot, "dir1"), JoinPath(writeDevice, "new-dir1"), false},
+		{"Cross-device: destination exists and is a file", JoinPath(src2Root, "dir2"), JoinPath(writeDevice, "text.txt"), JoinPath(bkRoot, "dir2"), JoinPath(writeDevice, "text.txt"), false},
+		{"Cross-device: destination exists and is a symlink to file", JoinPath(src2Root, "dir3"), JoinPath(writeDevice, "link.txt"), JoinPath(bkRoot, "dir3"), JoinPath(writeDevice, "link.txt"), false},
+		{"Cross-device: destination exists and is a symlink to directory", JoinPath(src2Root, "dir4"), JoinPath(writeDevice, "link-dir"), JoinPath(bkRoot, "dir4"), JoinPath(writeDevice, "link-dir"), false},
+		{"Cross-device: destination exists and is a circular symlink", JoinPath(src2Root, "dir5"), JoinPath(writeDevice, "link-circular"), JoinPath(bkRoot, "dir5"), JoinPath(writeDevice, "link-circular"), false},
+		{"Cross-device: destination exists and is a broken symlink", JoinPath(src2Root, "dir6"), JoinPath(writeDevice, "link-broken"), JoinPath(bkRoot, "dir6"), JoinPath(writeDevice, "link-broken"), false},
+		{"Cross-device: destination exists and is an empty directory", JoinPath(src2Root, "dir7"), JoinPath(writeDevice), JoinPath(bkRoot, "dir7"), JoinPath(writeDevice, "dir7"), false},
+		{"Cross-device: destination exists and is a directory containing other files", JoinPath(src2Root, "dir8"), JoinPath(writeDevice, "other-dir"), JoinPath(bkRoot, "dir8"), JoinPath(writeDevice, "other-dir", "dir8"), false},
+		{"Cross-device: destination exists and is a directory containing a file with the same name", JoinPath(src2Root, "dir9"), JoinPath(writeDevice, "same-dir"), JoinPath(bkRoot, "dir9"), JoinPath(writeDevice, "same-dir", "dir9"), false},
+		{"Cross-device: source contains file got no permissions", JoinPath(src2Root, "dir-file-no-perm"), JoinPath(writeDevice, "new-no-perm"), emptyStr, emptyStr, true},
+		{"Cross-device: destination directory got no permissions", JoinPath(src2Root, "dir10"), JoinPath(writeDevice, "no_perm_dir"), emptyStr, emptyStr, true},
+		{"Cross-device: destination file got no permissions", JoinPath(src2Root, "dir11"), JoinPath(writeDevice, "no_perm_file"), JoinPath(bkRoot, "dir11"), JoinPath(writeDevice, "no_perm_file"), false},
+		{"Cross-device: destination is a read-only device", JoinPath(src2Root, "dir0"), JoinPath(readOnlyDevice, "new-dir"), emptyStr, emptyStr, true},
+		{"Cross-device: move an empty directory", JoinPath(src2Root, "empty-dir"), JoinPath(writeDevice, "new-empty-dir"), JoinPath(bkRoot, "empty-dir"), JoinPath(writeDevice, "new-empty-dir"), false},
+		{"Cross-device: move a directory contains only files", JoinPath(src2Root, "only-files"), JoinPath(writeDevice, "new-only-files"), JoinPath(bkRoot, "only-files"), JoinPath(writeDevice, "new-only-files"), false},
+		{"Cross-device: move a directory contains files, symlinks and directories", JoinPath(src2Root, "misc"), JoinPath(writeDevice, "new-misc"), JoinPath(bkRoot, "misc"), JoinPath(writeDevice, "new-misc"), false},
 	}
 
 	for _, tt := range tests {

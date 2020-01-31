@@ -51,6 +51,7 @@ unzip -q -o test_resource.zip -d "$TESTRSSDIR"
 if [[ ! -z $RAMDISK_WRITE ]]; then
     cp -R "$TESTRSSDIR"/yos/move_file/destination "$RAMDISK_WRITE"/move_file
     cp -R "$TESTRSSDIR"/yos/move_link/destination "$RAMDISK_WRITE"/move_link
+    cp -R "$TESTRSSDIR"/yos/move_dir/destination "$RAMDISK_WRITE"/move_dir
 fi
 
 printf "Uncompress test resource: ${TESTRSSDIR} ${RAMDISK_WRITE}\n"
@@ -76,11 +77,18 @@ chmod 000 "$TESTRSSDIR"/yos/move_link/source2/no_perm
 chmod 000 "$TESTRSSDIR"/yos/move_link/destination/no_perm_file
 chmod 000 "$TESTRSSDIR"/yos/move_link/destination/no_perm_dir
 
+chmod 000 "$TESTRSSDIR"/yos/move_dir/source1/dir-file-no-perm/no_perm_file
+chmod 000 "$TESTRSSDIR"/yos/move_dir/source2/dir-file-no-perm/no_perm_file
+chmod 000 "$TESTRSSDIR"/yos/move_dir/destination/no_perm_file
+chmod 000 "$TESTRSSDIR"/yos/move_dir/destination/no_perm_dir
+
 if [[ ! -z $RAMDISK_WRITE ]]; then
     chmod 000 "$RAMDISK_WRITE"/move_file/no_perm_file
     chmod 000 "$RAMDISK_WRITE"/move_file/no_perm_dir
     chmod 000 "$RAMDISK_WRITE"/move_link/no_perm_file
     chmod 000 "$RAMDISK_WRITE"/move_link/no_perm_dir
+    chmod 000 "$RAMDISK_WRITE"/move_dir/no_perm_file
+    chmod 000 "$RAMDISK_WRITE"/move_dir/no_perm_dir
 fi
 
 chmod 000 "$TESTRSSDIR"/yos/same_file/set1/none_perm.txt
