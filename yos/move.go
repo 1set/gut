@@ -69,7 +69,7 @@ func MoveDir(src, dest string) (err error) {
 // moveEntry moves source to target by renaming or copying.
 func moveEntry(src, dest string, removeFunc func(path string) error, copyFunc func(src, dest string) error) (err error) {
 	// attempts to move file by renaming links
-	if err = os.Rename(src, dest); os.IsExist(err) || isNotDirectory(err) {
+	if err = os.Rename(src, dest); os.IsExist(err) || isLinkErrorNotDirectory(err) {
 		// remove destination if fails for its existence or not directory
 		_ = removeFunc(dest)
 		err = os.Rename(src, dest)
@@ -81,7 +81,7 @@ func moveEntry(src, dest string, removeFunc func(path string) error, copyFunc fu
 	}
 
 	// cross device: move == remove dest + copy to dest + remove src
-	if isCrossDeviceLink(err) {
+	if isLinkErrorCrossDevice(err) {
 		// remove destination file, and ignore the non-existence error
 		if err = removeFunc(dest); err != nil && !os.IsNotExist(err) {
 			return
@@ -94,12 +94,12 @@ func moveEntry(src, dest string, removeFunc func(path string) error, copyFunc fu
 	return
 }
 
-func isCrossDeviceLink(err error) bool {
+func isLinkErrorCrossDevice(err error) bool {
 	lerr, ok := err.(*os.LinkError)
 	return ok && lerr.Err == syscall.EXDEV
 }
 
-func isNotDirectory(err error) bool {
+func isLinkErrorNotDirectory(err error) bool {
 	lerr, ok := err.(*os.LinkError)
 	return ok && lerr.Err == syscall.ENOTDIR
 }

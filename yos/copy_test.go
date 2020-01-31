@@ -213,6 +213,7 @@ func TestCopyDir(t *testing.T) {
 		{"Source and destination are actually the same", resourceCopyDirSourceMap["OneFileDir"], resourceCopyDirSourceRoot, emptyStr, emptyStr, true},
 		{"Source and inferred destination(file) use the same name: can't overwrite file", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-file"), emptyStr, emptyStr, true},
 		{"Source and inferred destination(dir) use the same name: overwrite the dir", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-dir"), resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-dir", "one-file-dir"), false},
+		{"Source is the parent of destination directory", JoinPath(outputRoot, "infinite1"), JoinPath(outputRoot, "infinite1", "infinite2"), emptyStr, emptyStr, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

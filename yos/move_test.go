@@ -241,7 +241,7 @@ func TestMoveDir(t *testing.T) {
 		{"Source and destination is the same file", JoinPath(src1Root, "text.txt"), JoinPath(src1Root, "text.txt"), emptyStr, emptyStr, true},
 		{"Source and destination is the same symlink", JoinPath(src1Root, "link.txt"), JoinPath(src1Root, "link.txt"), emptyStr, emptyStr, true},
 		{"Source and destination is the same directory", JoinPath(src1Root, "empty-dir"), JoinPath(src1Root, "empty-dir"), emptyStr, emptyStr, true},
-		// {"Source directory contains file got no permissions", JoinPath(src1Root, "dir-file-no-perm"), JoinPath(destRoot, "new-no-perm"), emptyStr, emptyStr, true},
+		{"Source is the parent of destination directory", JoinPath(destRoot, "infinite1"), JoinPath(destRoot, "infinite1", "infinite2"), emptyStr, emptyStr, true},
 
 		{"Destination is empty", JoinPath(src1Root, "dir0"), emptyStr, emptyStr, emptyStr, true},
 		{"Destination and its parent directory don't exist", JoinPath(src1Root, "dir0"), JoinPath(destRoot, "missing-dir", "new-dir"), emptyStr, emptyStr, true},
