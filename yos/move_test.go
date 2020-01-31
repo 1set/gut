@@ -115,6 +115,11 @@ func TestMoveFile(t *testing.T) {
 			}
 		})
 	}
+
+	if err := os.RemoveAll(writeDevice); err != nil {
+		t.Errorf("MoveFile() fail to remove output directory %v: %v", writeDevice, err)
+		return
+	}
 }
 
 func TestMoveSymlink(t *testing.T) {
@@ -203,6 +208,11 @@ func TestMoveSymlink(t *testing.T) {
 			}
 		})
 	}
+
+	if err := os.RemoveAll(writeDevice); err != nil {
+		t.Errorf("MoveSymlink() fail to remove output directory %v: %v", writeDevice, err)
+		return
+	}
 }
 
 func TestMoveDir(t *testing.T) {
@@ -211,9 +221,11 @@ func TestMoveDir(t *testing.T) {
 		src1Root       = JoinPath(resourceMoveDirRoot, "source1")
 		src2Root       = JoinPath(resourceMoveDirRoot, "source2")
 		destRoot       = JoinPath(resourceMoveDirRoot, "destination")
-		writeDevice    = JoinPath(resourceReadWriteDevice, "move_file")
-		readOnlyDevice = JoinPath(resourceReadOnlyDevice, "move_file")
+		writeDevice    = JoinPath(resourceReadWriteDevice, "move_dir")
+		readOnlyDevice = JoinPath(resourceReadOnlyDevice, "move_dir")
 	)
+
+	t.SkipNow()
 
 	tests := []struct {
 		name       string
@@ -296,5 +308,10 @@ func TestMoveDir(t *testing.T) {
 				}
 			}
 		})
+	}
+
+	if err := os.RemoveAll(writeDevice); err != nil {
+		t.Errorf("MoveDir() fail to remove output directory %v: %v", writeDevice, err)
+		return
 	}
 }
