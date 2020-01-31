@@ -96,9 +96,9 @@ function macos_create_ramdisk() {
         printf "ramdisk '${DISK_NAME}' already exists: ${DISK_ID}\n"
         exit 10
     else
-        local DISK_SECTORS=$((2048 * $DISK_SIZE_MB))
+        local DISK_SECTORS=$((2048 * DISK_SIZE_MB))
         DISK_ID=$(hdiutil attach -nomount ram://$DISK_SECTORS)
-        diskutil partitionDisk $DISK_ID 1 GPTFormat APFS "$DISK_NAME" '100%'
+        diskutil partitionDisk ${DISK_ID} 1 GPTFormat APFS "$DISK_NAME" '100%'
         if ! macos_exist_ramdisk; then
             printf "failed to create ramdisk '${DISK_NAME}'\n"
             exit 11
@@ -107,8 +107,8 @@ function macos_create_ramdisk() {
         if [[ $ACCESS_TYPE == "ReadWrite" ]]; then
             printf "ramdisk '${DISK_NAME}' just created: ${DISK_ID}\n"
         elif [[ $ACCESS_TYPE == "ReadOnly" ]]; then
-            diskutil umount $DISK_ID
-            diskutil mount readOnly $DISK_ID
+            diskutil umount ${DISK_ID}
+            diskutil mount readOnly ${DISK_ID}
             printf "read-only ramdisk '${DISK_NAME}' just created: ${DISK_ID}\n"
         fi
     fi
@@ -116,8 +116,8 @@ function macos_create_ramdisk() {
 
 function macos_destroy_ramdisk() {
     if macos_exist_ramdisk; then
-        diskutil umount $DISK_ID
-        hdiutil detach $DISK_ID
+        diskutil umount ${DISK_ID}
+        hdiutil detach ${DISK_ID}
         if macos_exist_ramdisk; then
             printf "failed to detach ramdisk '${DISK_NAME}'\n"
             exit 21
@@ -154,10 +154,10 @@ function linux_create_ramdisk() {
         fi
 
         if [[ $ACCESS_TYPE == "ReadWrite" ]]; then
-            mount -t tmpfs -o size=${DISK_SIZE_MB}m tmpfs $DISK_ID
+            mount -t tmpfs -o size=${DISK_SIZE_MB}m tmpfs ${DISK_ID}
             printf "ramdisk '${DISK_NAME}' just created: ${DISK_ID}\n"
         elif [[ $ACCESS_TYPE == "ReadOnly" ]]; then
-            mount -t tmpfs -o ro,size=${DISK_SIZE_MB}m tmpfs $DISK_ID
+            mount -t tmpfs -o ro,size=${DISK_SIZE_MB}m tmpfs ${DISK_ID}
             printf "read-only ramdisk '${DISK_NAME}' just created: ${DISK_ID}\n"
         fi
     fi
@@ -165,8 +165,8 @@ function linux_create_ramdisk() {
 
 function linux_destroy_ramdisk() {
     if linux_exist_ramdisk; then
-        umount $DISK_ID
-        rmdir $DISK_ID
+        umount ${DISK_ID}
+        rmdir ${DISK_ID}
         if linux_exist_ramdisk; then
             printf "failed to detach ramdisk '${DISK_NAME}'\n"
             exit 41
@@ -180,8 +180,12 @@ function linux_destroy_ramdisk() {
 }
 
 # Main logic
-
-printf "Task: [${OS_NAME}] ${ACTION} ${ACCESS_TYPE} ramdisk '${DISK_NAME}' of ${DISK_SIZE_MB} MiB\n"
+printf "Task: [${OS_NAME}] ${ACTION} "
+if [[ $ACTION == "CREATE" ]]; then
+    printf "${ACCESS_TYPE} ramdisk '${DISK_NAME}' of ${DISK_SIZE_MB} MiB\n\n"
+elif [[ $ACTION == "DESTROY" ]]; then
+    printf "ramdisk '${DISK_NAME}'\n\n"
+fi
 
 if [[ $OS_NAME == "MACOS" ]]; then
     case "$ACTION" in
