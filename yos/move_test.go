@@ -2,10 +2,7 @@ package yos
 
 import (
 	"os"
-	"strings"
 	"testing"
-
-	"github.com/1set/gut/ystring"
 )
 
 var (
@@ -92,12 +89,7 @@ func TestMoveFile(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if (strings.Contains(tt.name, "permission") || strings.Contains(tt.name, "non-Windows")) && IsOnWindows() {
-				t.Skipf("Skipping %q for Windows", tt.name)
-			}
-			if strings.Contains(tt.name, "Cross-device") && (ystring.IsBlank(resourceReadWriteDevice) || ystring.IsBlank(resourceReadOnlyDevice)) {
-				t.Skipf("Skipping %q for missing RAM disk", tt.name)
-			}
+			preconditionCheck(t, tt.name)
 
 			if err := MoveFile(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("MoveFile() error = %v, wantErr %v", err, tt.wantErr)
@@ -192,12 +184,7 @@ func TestMoveSymlink(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if (strings.Contains(tt.name, "permission") || strings.Contains(tt.name, "non-Windows")) && IsOnWindows() {
-				t.Skipf("Skipping %q for Windows", tt.name)
-			}
-			if strings.Contains(tt.name, "Cross-device") && (ystring.IsBlank(resourceReadWriteDevice) || ystring.IsBlank(resourceReadOnlyDevice)) {
-				t.Skipf("Skipping %q for missing RAM disk", tt.name)
-			}
+			preconditionCheck(t, tt.name)
 
 			if err := MoveSymlink(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("MoveSymlink() error = %v, wantErr %v", err, tt.wantErr)
@@ -298,12 +285,7 @@ func TestMoveDir(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if (strings.Contains(tt.name, "permission") || strings.Contains(tt.name, "non-Windows")) && IsOnWindows() {
-				t.Skipf("Skipping %q for Windows", tt.name)
-			}
-			if strings.Contains(tt.name, "Cross-device") && (ystring.IsBlank(resourceReadWriteDevice) || ystring.IsBlank(resourceReadOnlyDevice)) {
-				t.Skipf("Skipping %q for missing RAM disk", tt.name)
-			}
+			preconditionCheck(t, tt.name)
 
 			if err := MoveDir(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("MoveDir() error = %v, wantErr %v", err, tt.wantErr)

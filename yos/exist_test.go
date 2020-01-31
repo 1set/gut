@@ -113,9 +113,7 @@ func TestIsDirExist(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if (strings.Contains(tt.name, "permission") || strings.Contains(tt.name, "non-Windows")) && IsOnWindows() {
-				t.Skipf("Skipping %q for Windows", tt.name)
-			}
+			preconditionCheck(t, tt.name)
 
 			gotExist, err := IsDirExist(tt.path)
 			if (err != nil) != tt.wantErr {

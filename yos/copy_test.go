@@ -129,9 +129,7 @@ func TestCopyFile(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if strings.Contains(tt.name, "permission") && IsOnWindows() {
-				t.Skipf("Skipping %q for Windows", tt.name)
-			}
+			preconditionCheck(t, tt.name)
 
 			if err := CopyFile(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("CopyFile() error = %v, wantErr %v", err, tt.wantErr)
@@ -217,9 +215,7 @@ func TestCopyDir(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if strings.Contains(tt.name, "permission") && IsOnWindows() {
-				t.Skipf("Skipping %q for Windows", tt.name)
-			}
+			preconditionCheck(t, tt.name)
 
 			if err := CopyDir(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("CopyDir() error = %v, wantErr %v", err, tt.wantErr)
@@ -297,9 +293,7 @@ func TestCopySymlink(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if strings.Contains(tt.name, "permission") && IsOnWindows() {
-				t.Skipf("Skipping %q for Windows", tt.name)
-			}
+			preconditionCheck(t, tt.name)
 
 			if err := CopySymlink(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("CopySymlink() error = %v, wantErr %v", err, tt.wantErr)
