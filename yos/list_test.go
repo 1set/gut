@@ -13,9 +13,9 @@ var (
 )
 
 func init() {
-	resourceListRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "list")
+	resourceListRoot = JoinPath(testResourceRoot, "yos", "list")
 	resourceListFileInRoot = JoinPath(resourceListRoot, "no_ext_name_file")
-	resourceListSymlinkToRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "link_list_dir")
+	resourceListSymlinkToRoot = JoinPath(testResourceRoot, "yos", "link_list_dir")
 }
 
 func verifyTestResult(t *testing.T, name string, expected []string, actual []*FilePathInfo, err error) {

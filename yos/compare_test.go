@@ -17,10 +17,10 @@ var (
 )
 
 func init() {
-	resourceSameFileRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "same_file")
+	resourceSameFileRoot = JoinPath(testResourceRoot, "yos", "same_file")
 	resourceSameFileLinkRoot = JoinPath(resourceSameFileRoot, "link")
-	resourceSameSymLinkRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "same_link")
-	resourceSameDirRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "same_dir")
+	resourceSameSymLinkRoot = JoinPath(testResourceRoot, "yos", "same_link")
+	resourceSameDirRoot = JoinPath(testResourceRoot, "yos", "same_dir")
 
 	resourceSameFileMapSet1 = map[string]string{
 		"EmptyDir":       JoinPath(resourceSameFileRoot, "set1", "empty-folder"),

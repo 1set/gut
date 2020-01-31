@@ -6,18 +6,12 @@ import (
 )
 
 var (
-	resourceReadWriteDevice string
-	resourceReadOnlyDevice  string
 	resourceMoveFileRoot    string
 	resourceMoveSymlinkRoot string
 	resourceMoveDirRoot     string
 )
 
 func init() {
-	resourceReadWriteDevice = os.Getenv("RAMDISK_WRITE")
-	resourceReadOnlyDevice = os.Getenv("RAMDISK_READONLY")
-
-	testResourceRoot := os.Getenv("TESTRSSDIR")
 	resourceMoveFileRoot = JoinPath(testResourceRoot, "yos", "move_file")
 	resourceMoveSymlinkRoot = JoinPath(testResourceRoot, "yos", "move_link")
 	resourceMoveDirRoot = JoinPath(testResourceRoot, "yos", "move_dir")

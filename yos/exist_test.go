@@ -9,7 +9,7 @@ import (
 var resourceExistRoot string
 
 func init() {
-	resourceExistRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "exist")
+	resourceExistRoot = JoinPath(testResourceRoot, "yos", "exist")
 }
 
 func TestIsExistOrNot(t *testing.T) {

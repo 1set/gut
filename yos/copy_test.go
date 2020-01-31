@@ -7,7 +7,6 @@ import (
 )
 
 var (
-	emptyStr                      string
 	resourceCopyFileRoot          string
 	resourceCopyFileOutputRoot    string
 	resourceCopyFileBenchmarkRoot string
@@ -27,8 +26,6 @@ var (
 )
 
 func init() {
-	testResourceRoot := os.Getenv("TESTRSSDIR")
-
 	resourceCopyFileRoot = JoinPath(testResourceRoot, "yos", "copy_file")
 	resourceCopyFileOutputRoot = JoinPath(resourceCopyFileRoot, "output")
 	resourceCopyFileBenchmarkRoot = JoinPath(resourceCopyFileRoot, "benchmark")
