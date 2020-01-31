@@ -17,10 +17,10 @@ var (
 )
 
 func init() {
-	resourceSameFileRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "same_file")
+	resourceSameFileRoot = JoinPath(testResourceRoot, "yos", "same_file")
 	resourceSameFileLinkRoot = JoinPath(resourceSameFileRoot, "link")
-	resourceSameSymLinkRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "same_link")
-	resourceSameDirRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "same_dir")
+	resourceSameSymLinkRoot = JoinPath(testResourceRoot, "yos", "same_link")
+	resourceSameDirRoot = JoinPath(testResourceRoot, "yos", "same_dir")
 
 	resourceSameFileMapSet1 = map[string]string{
 		"EmptyDir":       JoinPath(resourceSameFileRoot, "set1", "empty-folder"),
@@ -120,9 +120,7 @@ func TestSameFileContent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if strings.Contains(tt.name, "permission") && IsOnWindows() {
-				t.Skipf("Skipping %q for Windows", tt.name)
-			}
+			preconditionCheck(t, tt.name)
 
 			gotSame, err := SameFileContent(tt.path1, tt.path2)
 			if (err != nil) != tt.wantErr {
@@ -192,9 +190,7 @@ func TestSameSymlinkContent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if (strings.Contains(tt.name, "permission") || strings.Contains(tt.name, "non-Windows")) && IsOnWindows() {
-				t.Skipf("Skipping %q for Windows", tt.name)
-			}
+			preconditionCheck(t, tt.name)
 
 			gotSame, err := SameSymlinkContent(tt.path1, tt.path2)
 			if (err != nil) != tt.wantErr {
@@ -285,9 +281,7 @@ func TestSameDirEntries(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if strings.Contains(tt.name, "permission") && IsOnWindows() {
-				t.Skipf("Skipping %q for Windows", tt.name)
-			}
+			preconditionCheck(t, tt.name)
 
 			gotSame, err := SameDirEntries(tt.path1, tt.path2)
 			if (err != nil) != tt.wantErr {

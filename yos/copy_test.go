@@ -7,7 +7,6 @@ import (
 )
 
 var (
-	emptyStr                      string
 	resourceCopyFileRoot          string
 	resourceCopyFileOutputRoot    string
 	resourceCopyFileBenchmarkRoot string
@@ -27,8 +26,6 @@ var (
 )
 
 func init() {
-	testResourceRoot := os.Getenv("TESTRSSDIR")
-
 	resourceCopyFileRoot = JoinPath(testResourceRoot, "yos", "copy_file")
 	resourceCopyFileOutputRoot = JoinPath(resourceCopyFileRoot, "output")
 	resourceCopyFileBenchmarkRoot = JoinPath(resourceCopyFileRoot, "benchmark")
@@ -86,6 +83,7 @@ func init() {
 
 func TestCopyFile(t *testing.T) {
 	outputRoot := resourceCopyFileOutputRoot
+	writeDevice := JoinPath(resourceReadWriteDevice, "copy_file")
 
 	tests := []struct {
 		name       string
@@ -125,13 +123,15 @@ func TestCopyFile(t *testing.T) {
 		{"Source and destination are actually the same", resourceCopyFileFileMap["SmallText"], resourceCopyFileRoot, emptyStr, emptyStr, true},
 		{"Source and inferred destination(dir) use the same name: can't overwrite dir", resourceCopyFileFileMap["SameName"], outputRoot, emptyStr, emptyStr, true},
 		{"Source and inferred destination(file) use the same name: overwrite the file", resourceCopyFileFileMap["SameName2"], outputRoot, resourceCopyFileFileMap["SameName2"], resourceCopyFileFileMap["Out_SameName2"], false},
+
+		{"Cross-device: destination is on another device", resourceCopyFileFileMap["SmallText"], JoinPath(writeDevice, "text.txt"), resourceCopyFileFileMap["SmallText"], JoinPath(writeDevice, "text.txt"), false},
+		{"Cross-device: destination is on a read-only device", resourceCopyFileFileMap["SmallText"], JoinPath(resourceReadOnlyDevice, "copy-file.txt"), emptyStr, emptyStr, true},
+		{"Cross-device: destination got no spaces for large file", JoinPath(resourceCopyFileRoot, "xlarge-text.txt"), JoinPath(writeDevice, "xlarge.txt"), emptyStr, emptyStr, true},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if strings.Contains(tt.name, "permission") && IsOnWindows() {
-				t.Skipf("Skipping %q for Windows", tt.name)
-			}
+			preconditionCheck(t, tt.name)
 
 			if err := CopyFile(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("CopyFile() error = %v, wantErr %v", err, tt.wantErr)
@@ -148,6 +148,11 @@ func TestCopyFile(t *testing.T) {
 				}
 			}
 		})
+	}
+
+	if err := os.RemoveAll(writeDevice); err != nil {
+		t.Errorf("CopyFile() fail to remove output directory %v: %v", writeDevice, err)
+		return
 	}
 }
 
@@ -213,12 +218,11 @@ func TestCopyDir(t *testing.T) {
 		{"Source and destination are actually the same", resourceCopyDirSourceMap["OneFileDir"], resourceCopyDirSourceRoot, emptyStr, emptyStr, true},
 		{"Source and inferred destination(file) use the same name: can't overwrite file", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-file"), emptyStr, emptyStr, true},
 		{"Source and inferred destination(dir) use the same name: overwrite the dir", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-dir"), resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-dir", "one-file-dir"), false},
+		{"Source is the parent of destination directory", JoinPath(outputRoot, "infinite1"), JoinPath(outputRoot, "infinite1", "infinite2"), emptyStr, emptyStr, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if strings.Contains(tt.name, "permission") && IsOnWindows() {
-				t.Skipf("Skipping %q for Windows", tt.name)
-			}
+			preconditionCheck(t, tt.name)
 
 			if err := CopyDir(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("CopyDir() error = %v, wantErr %v", err, tt.wantErr)
@@ -272,7 +276,7 @@ func TestCopySymlink(t *testing.T) {
 		{"Source got permission denied", JoinPath(sourceRoot, "no_perm_file"), outputRoot, emptyStr, emptyStr, true},
 		{"Source doesn't exist", JoinPath(sourceRoot, "__not_exist__"), outputRoot, emptyStr, emptyStr, true},
 		{"Source is a file", JoinPath(sourceRoot, "text-file.txt"), outputRoot, emptyStr, emptyStr, true},
-		{"Source is a empty directory", JoinPath(sourceRoot, "empty-dir"), outputRoot, emptyStr, emptyStr, true},
+		{"Source is an empty directory", JoinPath(sourceRoot, "empty-dir"), outputRoot, emptyStr, emptyStr, true},
 		{"Source is a directory with content", JoinPath(sourceRoot, "one-file-dir"), outputRoot, emptyStr, emptyStr, true},
 		{"Source is a symlink to file", JoinPath(sourceRoot, "link-file.txt"), JoinPath(outputRoot, "link2.txt"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(outputRoot, "link2.txt"), false},
 		{"Source is a symlink to directory", JoinPath(sourceRoot, "link-dir"), JoinPath(outputRoot, "link3.txt"), JoinPath(sourceRoot, "link-dir"), JoinPath(outputRoot, "link3.txt"), false},
@@ -284,7 +288,7 @@ func TestCopySymlink(t *testing.T) {
 		{"Destination path is inferred", JoinPath(sourceRoot, "link-file.txt"), joinPathNoClean(outputRoot, "..", "output", "out1.txt"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(outputRoot, "out1.txt"), false},
 		{"Destination got permission denied", JoinPath(sourceRoot, "link-file.txt"), JoinPath(outputRoot, "no_perm_dir"), emptyStr, emptyStr, true},
 		{"Destination exists and it's a file", JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "text.txt"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "text.txt"), false},
-		{"Destination exists and it's a empty directory", JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "empty-dir"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "empty-dir", "link-file.txt"), false},
+		{"Destination exists and it's an empty directory", JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "empty-dir"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "empty-dir", "link-file.txt"), false},
 		{"Destination exists and it's a directory with content", JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "one-file-dir"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "one-file-dir", "link-file.txt"), false},
 		{"Destination exists and it's a symlink to file", JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "link-file.txt"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "link-file.txt"), false},
 		{"Destination exists and it's a symlink to directory", JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "link-dir"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "link-dir"), false},
@@ -296,9 +300,7 @@ func TestCopySymlink(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if strings.Contains(tt.name, "permission") && IsOnWindows() {
-				t.Skipf("Skipping %q for Windows", tt.name)
-			}
+			preconditionCheck(t, tt.name)
 
 			if err := CopySymlink(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("CopySymlink() error = %v, wantErr %v", err, tt.wantErr)

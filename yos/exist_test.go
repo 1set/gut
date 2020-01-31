@@ -9,7 +9,7 @@ import (
 var resourceExistRoot string
 
 func init() {
-	resourceExistRoot = JoinPath(os.Getenv("TESTRSSDIR"), "yos", "exist")
+	resourceExistRoot = JoinPath(testResourceRoot, "yos", "exist")
 }
 
 func TestIsExistOrNot(t *testing.T) {
@@ -113,9 +113,7 @@ func TestIsDirExist(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if (strings.Contains(tt.name, "permission") || strings.Contains(tt.name, "non-Windows")) && IsOnWindows() {
-				t.Skipf("Skipping %q for Windows", tt.name)
-			}
+			preconditionCheck(t, tt.name)
 
 			gotExist, err := IsDirExist(tt.path)
 			if (err != nil) != tt.wantErr {
@@ -188,6 +186,9 @@ func TestJoinPath(t *testing.T) {
 		{"Single part", []string{"abc"}, "abc"},
 		{"Two parts", []string{"ab", "cd"}, strings.Join([]string{"ab", "cd"}, string(os.PathSeparator))},
 		{"Three parts", []string{"ab", "cd", "ef"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
+		{"Contains heading empty part", []string{"", "cd", "ef"}, strings.Join([]string{"cd", "ef"}, string(os.PathSeparator))},
+		{"Contains trailing empty part", []string{"ab", "cd", ""}, strings.Join([]string{"ab", "cd"}, string(os.PathSeparator))},
+		{"Contains empty part in the middle", []string{"abc", "", "ef"}, strings.Join([]string{"abc", "ef"}, string(os.PathSeparator))},
 		{"Contains trailing slash", []string{"ab/", "cd/", "ef/"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
 		{"Contains heading slash", []string{"ab", "/cd", "/ef"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
 		{"Contains heading & trailing slash", []string{"ab/", "/cd/", "/ef/"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
