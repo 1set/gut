@@ -83,6 +83,7 @@ func init() {
 
 func TestCopyFile(t *testing.T) {
 	outputRoot := resourceCopyFileOutputRoot
+	writeDevice := JoinPath(resourceReadWriteDevice, "copy_file")
 
 	tests := []struct {
 		name       string
@@ -122,6 +123,10 @@ func TestCopyFile(t *testing.T) {
 		{"Source and destination are actually the same", resourceCopyFileFileMap["SmallText"], resourceCopyFileRoot, emptyStr, emptyStr, true},
 		{"Source and inferred destination(dir) use the same name: can't overwrite dir", resourceCopyFileFileMap["SameName"], outputRoot, emptyStr, emptyStr, true},
 		{"Source and inferred destination(file) use the same name: overwrite the file", resourceCopyFileFileMap["SameName2"], outputRoot, resourceCopyFileFileMap["SameName2"], resourceCopyFileFileMap["Out_SameName2"], false},
+
+		{"Cross-device: destination is on another device", resourceCopyFileFileMap["SmallText"], JoinPath(writeDevice, "text.txt"), resourceCopyFileFileMap["SmallText"], JoinPath(writeDevice, "text.txt"), false},
+		{"Cross-device: destination is on a read-only device", resourceCopyFileFileMap["SmallText"], JoinPath(resourceReadOnlyDevice, "copy-file.txt"), emptyStr, emptyStr, true},
+		{"Cross-device: destination got no spaces for large file", JoinPath(resourceCopyFileRoot, "xlarge-text.txt"), JoinPath(writeDevice, "xlarge.txt"), emptyStr, emptyStr, true},
 	}
 
 	for _, tt := range tests {
@@ -143,6 +148,11 @@ func TestCopyFile(t *testing.T) {
 				}
 			}
 		})
+	}
+
+	if err := os.RemoveAll(writeDevice); err != nil {
+		t.Errorf("CopyFile() fail to remove output directory %v: %v", writeDevice, err)
+		return
 	}
 }
 

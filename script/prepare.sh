@@ -49,6 +49,7 @@ chmod -R 700 "$TESTRSSDIR" && rm -fr "$TESTRSSDIR"
 unzip -q -o test_resource.zip -d "$TESTRSSDIR"
 
 if [[ ! -z $RAMDISK_WRITE ]]; then
+    mkdir "$RAMDISK_WRITE"/copy_file
     cp -R "$TESTRSSDIR"/yos/move_file/destination "$RAMDISK_WRITE"/move_file
     cp -R "$TESTRSSDIR"/yos/move_link/destination "$RAMDISK_WRITE"/move_link
     cp -R "$TESTRSSDIR"/yos/move_dir/destination "$RAMDISK_WRITE"/move_dir
