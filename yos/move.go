@@ -32,6 +32,8 @@ func MoveFile(src, dest string) (err error) {
 	return
 }
 
+// MoveSymlink moves a symbolic link to a target file.
+// It makes no attempt to read the referenced file.
 func MoveSymlink(src, dest string) (err error) {
 	if src, dest, err = refineOpPaths(src, dest, false); err == nil {
 		// check if source exists and is a symbolic link
@@ -49,6 +51,15 @@ func MoveSymlink(src, dest string) (err error) {
 	return
 }
 
+// MoveDir moves a directory to a target directory recursively. Symbolic links inside the directories will not be followed.
+//
+// If the target is an existing file, it will be replaced by the source directory under the same target name.
+//
+// If the target is an existing directory, the source directory will be moved to the directory with the same name.
+//
+// If the target doesn't exist but its parent directory does, the source directory will be moved to the parent directory with the target name.
+//
+// It stops and returns immediately if any error occurs. ErrSameFile is returned if it detects an attempt to move a file to itself.
 func MoveDir(src, dest string) (err error) {
 	if src, dest, err = refineOpPaths(src, dest, false); err == nil {
 		// check if source exists and is a directory

@@ -269,7 +269,7 @@ func TestMoveDir(t *testing.T) {
 		{"Destination is a broken symlink", JoinPath(src1Root, "dir6"), JoinPath(destRoot, "link-broken"), JoinPath(bkRoot, "dir6"), JoinPath(destRoot, "link-broken"), false},
 		{"Destination is an empty directory", JoinPath(src1Root, "dir7"), JoinPath(destRoot, "empty-dir"), JoinPath(bkRoot, "dir7"), JoinPath(destRoot, "empty-dir", "dir7"), false},
 		{"Destination is a directory containing other files", JoinPath(src1Root, "dir8"), JoinPath(destRoot, "other-dir"), JoinPath(bkRoot, "dir8"), JoinPath(destRoot, "other-dir", "dir8"), false},
-		{"Destination is a directory containing a file with the same name", JoinPath(src1Root, "dir9"), JoinPath(destRoot, "same-dir"), JoinPath(bkRoot, "dir9"), JoinPath(destRoot, "same-dir", "dir9"), false},
+		{"Destination is a directory containing a file with the same name (non-Windows)", JoinPath(src1Root, "dir9"), JoinPath(destRoot, "same-dir"), JoinPath(bkRoot, "dir9"), JoinPath(destRoot, "same-dir", "dir9"), false},
 		{"Destination file got no permissions", JoinPath(src1Root, "dir10"), JoinPath(destRoot, "no_perm_file"), JoinPath(bkRoot, "dir10"), JoinPath(destRoot, "no_perm_file"), false},
 		{"Destination directory got no permissions", JoinPath(src1Root, "text.txt"), JoinPath(destRoot, "no_perm_dir"), emptyStr, emptyStr, true},
 		{"Destination is a symlink to source directory (non-Windows)", JoinPath(src1Root, "self-dir"), JoinPath(src1Root, "self-link"), JoinPath(bkRoot, "self-dir"), JoinPath(src1Root, "self-link"), false},
