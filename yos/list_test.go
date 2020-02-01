@@ -47,6 +47,8 @@ func TestListAll(t *testing.T) {
 		if _, err := ListAll(path); err == nil {
 			t.Errorf("ListAll(%q) got no error, diff from expected", path)
 			return
+		} else {
+			expectedErrorCheck(t, err)
 		}
 	}
 
@@ -65,6 +67,8 @@ func TestListFile(t *testing.T) {
 		if _, err := ListFile(path); err == nil {
 			t.Errorf("ListFile(%q) got no error, diff from expected", path)
 			return
+		} else {
+			expectedErrorCheck(t, err)
 		}
 	}
 
@@ -85,6 +89,8 @@ func TestListDir(t *testing.T) {
 		if _, err := ListFile(path); err == nil {
 			t.Errorf("ListFile(%q) got no error, diff from expected", path)
 			return
+		} else {
+			expectedErrorCheck(t, err)
 		}
 	}
 
@@ -147,8 +153,11 @@ func TestListMatch(t *testing.T) {
 				t.Errorf("ListMatch() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+
 			if !tt.wantErr {
 				verifyTestResult(t, "ListMatch", tt.wantSuffix, actual, err)
+			} else {
+				expectedErrorCheck(t, err)
 			}
 		})
 	}

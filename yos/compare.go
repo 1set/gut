@@ -22,7 +22,6 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 
 	var fi1, fi2 os.FileInfo
 	if fi1, err = os.Stat(path1); err != nil {
-		err = opError(opnCompare, path1, err)
 		return
 	} else if !isFileFi(&fi1) {
 		err = opError(opnCompare, path1, errNotRegularFile)
@@ -30,7 +29,6 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 	}
 
 	if fi2, err = os.Stat(path2); err != nil {
-		err = opError(opnCompare, path2, err)
 		return
 	} else if !isFileFi(&fi2) {
 		err = opError(opnCompare, path2, errNotRegularFile)
@@ -48,13 +46,11 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 
 	var file1, file2 *os.File
 	if file1, err = os.Open(path1); err != nil {
-		err = opError(opnCompare, path1, err)
 		return
 	}
 	defer file1.Close()
 
 	if file2, err = os.Open(path2); err != nil {
-		err = opError(opnCompare, path2, err)
 		return
 	}
 	defer file2.Close()
@@ -106,11 +102,9 @@ func SameSymlinkContent(path1, path2 string) (same bool, err error) {
 
 	var link1, link2 string
 	if link1, err = os.Readlink(path1); err != nil {
-		err = opError(opnCompare, path1, err)
 		return
 	}
 	if link2, err = os.Readlink(path2); err != nil {
-		err = opError(opnCompare, path2, err)
 		return
 	}
 
@@ -126,7 +120,6 @@ func SameDirEntries(path1, path2 string) (same bool, err error) {
 
 	var fi1, fi2 os.FileInfo
 	if fi1, err = os.Stat(path1); err != nil {
-		err = opError(opnCompare, path1, err)
 		return
 	} else if !isDirFi(&fi1) {
 		err = opError(opnCompare, path1, errNotDirectory)
@@ -134,7 +127,6 @@ func SameDirEntries(path1, path2 string) (same bool, err error) {
 	}
 
 	if fi2, err = os.Stat(path2); err != nil {
-		err = opError(opnCompare, path2, err)
 		return
 	} else if !isDirFi(&fi2) {
 		err = opError(opnCompare, path2, errNotDirectory)
@@ -148,11 +140,9 @@ func SameDirEntries(path1, path2 string) (same bool, err error) {
 
 	var items1, items2 []*FilePathInfo
 	if items1, err = ListAll(path1); err != nil {
-		err = opError(opnCompare, path1, err)
 		return
 	}
 	if items2, err = ListAll(path2); err != nil {
-		err = opError(opnCompare, path2, err)
 		return
 	}
 

@@ -88,6 +88,8 @@ func TestMoveFile(t *testing.T) {
 			if err := MoveFile(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("MoveFile() error = %v, wantErr %v", err, tt.wantErr)
 				return
+			} else {
+				expectedErrorCheck(t, err)
 			}
 
 			if !tt.wantErr {
@@ -183,6 +185,8 @@ func TestMoveSymlink(t *testing.T) {
 			if err := MoveSymlink(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("MoveSymlink() error = %v, wantErr %v", err, tt.wantErr)
 				return
+			} else {
+				expectedErrorCheck(t, err)
 			}
 
 			if !tt.wantErr {
@@ -284,6 +288,8 @@ func TestMoveDir(t *testing.T) {
 			if err := MoveDir(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("MoveDir() error = %v, wantErr %v", err, tt.wantErr)
 				return
+			} else {
+				expectedErrorCheck(t, err)
 			}
 
 			if !tt.wantErr {

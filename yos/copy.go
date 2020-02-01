@@ -57,7 +57,6 @@ func CopySymlink(src, dest string) (err error) {
 func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	var srcFile, destFile *os.File
 	if srcFile, err = os.Open(src); err != nil {
-		err = opError(opnCopy, src, err)
 		return
 	}
 	defer srcFile.Close()
@@ -67,8 +66,6 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 		if !isFileFi(&srcInfo) {
 			err = opError(opnCopy, src, errNotRegularFile)
 		}
-	} else {
-		err = opError(opnCopy, src, err)
 	}
 	if err != nil {
 		return
@@ -84,10 +81,7 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	} else if os.IsNotExist(err) {
 		// it's okay if destination file doesn't exist
 		err = nil
-	} else {
-		err = opError(opnCopy, dest, err)
 	}
-
 	if err != nil {
 		return
 	}
@@ -99,12 +93,11 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	}
 
 	if destFile, err = os.OpenFile(dest, os.O_RDWR|os.O_CREATE|os.O_TRUNC, srcInfo.Mode()); err != nil {
-		err = opError(opnCopy, dest, err)
 		return
 	}
 	defer func() {
 		if fe := destFile.Close(); fe != nil {
-			err = opError(opnCopy, dest, fe)
+			err = fe
 		}
 	}()
 
@@ -121,7 +114,6 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 		}
 
 		if nw, err = destFile.Write(buf[:nr]); err != nil {
-			err = opError(opnCopy, dest, err)
 			break
 		} else if nw != nr {
 			err = opError(opnCopy, dest, io.ErrShortWrite)
@@ -143,17 +135,13 @@ func copySymlink(src, dest string) (err error) {
 	if destInfo, err = os.Lstat(dest); err != nil {
 		if os.IsNotExist(err) {
 			err = nil
-		} else {
-			err = opError(opnCopy, dest, err)
 		}
 	} else {
 		if isDirFi(&destInfo) {
 			// avoid overwriting directory
 			err = opError(opnCopy, dest, errIsDirectory)
 		} else {
-			if err = os.Remove(dest); err != nil {
-				err = opError(opnCopy, dest, err)
-			}
+			err = os.Remove(dest)
 		}
 	}
 	if err != nil {
@@ -163,10 +151,9 @@ func copySymlink(src, dest string) (err error) {
 	var link string
 	if link, err = os.Readlink(src); err == nil {
 		if err = os.Symlink(link, dest); err != nil {
+			// FIXME: LinkError -> PathError
 			err = opError(opnCopy, dest, err)
 		}
-	} else {
-		err = opError(opnCopy, src, err)
 	}
 	return
 }
@@ -180,8 +167,6 @@ func copyDir(src, dest string) (err error) {
 		if !isDirFi(&srcInfo) {
 			err = opError(opnCopy, src, errNotDirectory)
 		}
-	} else {
-		err = opError(opnCopy, src, err)
 	}
 	if err != nil {
 		return
@@ -199,8 +184,6 @@ func copyDir(src, dest string) (err error) {
 		if err = os.MkdirAll(dest, defaultDirectoryFileMode); err == nil {
 			originMode := srcInfo.Mode()
 			defer os.Chmod(dest, originMode)
-		} else {
-			err = opError(opnCopy, dest, err)
 		}
 	}
 	if err != nil {
@@ -210,7 +193,8 @@ func copyDir(src, dest string) (err error) {
 	// loop through entries in source directory
 	var entries []os.FileInfo
 	if entries, err = ioutil.ReadDir(src); err != nil {
-		err = opError(opnCopy, src, err)
+		// FIXME: not tested?
+		//err = opError(opnCopy, src, err)
 		return
 	}
 

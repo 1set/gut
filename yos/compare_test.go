@@ -129,7 +129,10 @@ func TestSameFileContent(t *testing.T) {
 			}
 			if gotSame != tt.wantSame {
 				t.Errorf("SameFileContent() gotSame = %v, want %v", gotSame, tt.wantSame)
+				return
 			}
+
+			expectedErrorCheck(t, err)
 		})
 	}
 }
@@ -199,7 +202,10 @@ func TestSameSymlinkContent(t *testing.T) {
 			}
 			if gotSame != tt.wantSame {
 				t.Errorf("SameSymlinkContent() gotSame = %v, want %v", gotSame, tt.wantSame)
+				return
 			}
+
+			expectedErrorCheck(t, err)
 		})
 	}
 }
@@ -290,7 +296,10 @@ func TestSameDirEntries(t *testing.T) {
 			}
 			if gotSame != tt.wantSame {
 				t.Errorf("SameDirEntries() gotSame = %v, want %v", gotSame, tt.wantSame)
+				return
 			}
+
+			expectedErrorCheck(t, err)
 		})
 	}
 }

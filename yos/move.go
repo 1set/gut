@@ -58,12 +58,8 @@ func moveEntry(src, dest string, check funcCheckFileInfo, errMode error, remove 
 
 	// check if source exists and its file mode
 	var srcInfo os.FileInfo
-	if srcInfo, err = os.Lstat(src); err == nil {
-		if !check(&srcInfo) {
-			err = opError(opnMove, src, errMode)
-		}
-	} else {
-		err = opError(opnMove, src, err)
+	if srcInfo, err = os.Lstat(src); err == nil && !check(&srcInfo) {
+		err = opError(opnMove, src, errMode)
 	}
 	if err != nil {
 		return
@@ -96,9 +92,7 @@ func moveEntry(src, dest string, check funcCheckFileInfo, errMode error, remove 
 			return
 		}
 		if err = copy(src, dest); err == nil {
-			if err = remove(src); err != nil {
-				err = opError(opnMove, src, err)
-			}
+			err = remove(src)
 		}
 	}
 	return

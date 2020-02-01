@@ -56,16 +56,15 @@ func refineOpPaths(opName, srcRaw, destRaw string, followLink bool) (src, dest s
 	// clean up paths
 	srcRaw, destRaw = filepath.Clean(srcRaw), filepath.Clean(destRaw)
 
-	// use os.Lstat instead if not following symbolic links
-	statFunc := os.Stat
-	if !followLink {
-		statFunc = os.Lstat
+	// use os.Stat to follow symbolic links
+	statFunc := os.Lstat
+	if followLink {
+		statFunc = os.Stat
 	}
 
 	// check if source exists
 	var srcInfo, destInfo os.FileInfo
 	if srcInfo, err = statFunc(srcRaw); err != nil {
-		err = opError(opName, srcRaw, err)
 		return
 	}
 
@@ -73,11 +72,7 @@ func refineOpPaths(opName, srcRaw, destRaw string, followLink bool) (src, dest s
 	if destInfo, err = statFunc(destRaw); err != nil {
 		// check existence of parent of the missing destination
 		if os.IsNotExist(err) {
-			if _, err = os.Stat(filepath.Dir(destRaw)); err != nil {
-				err = opError(opName, destRaw, err)
-			}
-		} else {
-			err = opError(opName, destRaw, err)
+			_, err = os.Stat(filepath.Dir(destRaw))
 		}
 	} else {
 		if os.SameFile(srcInfo, destInfo) {
@@ -118,7 +113,6 @@ func isFileFi(fi *os.FileInfo) bool {
 // isDirFi indicates whether the FileInfo is for a directory.
 func isDirFi(fi *os.FileInfo) bool {
 	return fi != nil && (*fi).Mode().IsDir()
-	//return fi != nil && ((*fi).Mode()&os.ModeType == os.ModeDir)
 }
 
 // isSymlinkFi indicates whether the FileInfo is for a symbolic link.
