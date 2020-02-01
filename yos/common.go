@@ -25,6 +25,20 @@ var (
 	ErrIsNotSymlink = errors.New("target is not a symbolic link")
 )
 
+var (
+	errInvalidPath    = errors.New("invalid path")
+	errSameFile       = errors.New("files are identical")
+	errShortRead      = errors.New("short read")
+	errNotDirectory   = errors.New("not a directory")
+	errNotRegularFile = errors.New("not a regular file")
+	errNotSymlink     = errors.New("not a symbolic link")
+)
+
+// Operation names for the Op field of os.PathError.
+var (
+	opnCompare = "compare"
+)
+
 // refineOpPaths validates, cleans up and adjusts the source and destination paths for operations like copy or move.
 func refineOpPaths(srcRaw, destRaw string, followLink bool) (src, dest string, err error) {
 	if ystring.IsBlank(srcRaw) || ystring.IsBlank(destRaw) {

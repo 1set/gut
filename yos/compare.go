@@ -2,7 +2,6 @@ package yos
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -25,18 +24,20 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 
 	var fi1, fi2 os.FileInfo
 	if fi1, err = os.Stat(path1); err != nil {
+		err = &os.PathError{opnCompare, path1, err}
 		return
 	}
 	if fi2, err = os.Stat(path2); err != nil {
+		err = &os.PathError{opnCompare, path2, err}
 		return
 	}
 
 	if !fi1.Mode().IsRegular() {
-		err = fmt.Errorf("%v: path1 is not a regular file", path1)
+		err = &os.PathError{opnCompare, path1, errNotRegularFile}
 		return
 	}
 	if !fi2.Mode().IsRegular() {
-		err = fmt.Errorf("%v: path2 is not a regular file", path2)
+		err = &os.PathError{opnCompare, path2, errNotRegularFile}
 		return
 	}
 
@@ -51,11 +52,13 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 
 	var file1, file2 *os.File
 	if file1, err = os.Open(path1); err != nil {
+		err = &os.PathError{opnCompare, path1, err}
 		return
 	}
 	defer file1.Close()
 
 	if file2, err = os.Open(path2); err != nil {
+		err = &os.PathError{opnCompare, path2, err}
 		return
 	}
 	defer file2.Close()
@@ -71,13 +74,21 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 				same = true
 				break
 			}
-			err = io.ErrUnexpectedEOF
+			if nr1 > 0 {
+				err = &os.PathError{opnCompare, path1, io.ErrUnexpectedEOF}
+			} else {
+				err = &os.PathError{opnCompare, path2, io.ErrUnexpectedEOF}
+			}
 		} else if err1 != nil {
-			err = err1
+			err = &os.PathError{opnCompare, path1, err1}
 		} else if err2 != nil {
-			err = err2
+			err = &os.PathError{opnCompare, path2, err2}
 		} else if nr1 != nr2 {
-			err = ErrShortRead
+			if nr1 < nr2 {
+				err = &os.PathError{opnCompare, path1, errShortRead}
+			} else {
+				err = &os.PathError{opnCompare, path2, errShortRead}
+			}
 		}
 
 		if err != nil {
@@ -100,9 +111,11 @@ func SameSymlinkContent(path1, path2 string) (same bool, err error) {
 
 	var link1, link2 string
 	if link1, err = os.Readlink(path1); err != nil {
+		err = &os.PathError{opnCompare, path1, err}
 		return
 	}
 	if link2, err = os.Readlink(path2); err != nil {
+		err = &os.PathError{opnCompare, path2, err}
 		return
 	}
 
@@ -118,18 +131,20 @@ func SameDirEntries(path1, path2 string) (same bool, err error) {
 
 	var fi1, fi2 os.FileInfo
 	if fi1, err = os.Stat(path1); err != nil {
+		err = &os.PathError{opnCompare, path1, err}
 		return
 	}
 	if fi2, err = os.Stat(path2); err != nil {
+		err = &os.PathError{opnCompare, path2, err}
 		return
 	}
 
 	if !fi1.IsDir() {
-		err = fmt.Errorf("%v: path1 is not a directory", path1)
+		err = &os.PathError{opnCompare, path1, errNotDirectory}
 		return
 	}
 	if !fi2.IsDir() {
-		err = fmt.Errorf("%v: path2 is not a directory", path2)
+		err = &os.PathError{opnCompare, path2, errNotDirectory}
 		return
 	}
 
@@ -140,9 +155,11 @@ func SameDirEntries(path1, path2 string) (same bool, err error) {
 
 	var items1, items2 []*FilePathInfo
 	if items1, err = ListAll(path1); err != nil {
+		err = &os.PathError{opnCompare, path1, err}
 		return
 	}
 	if items2, err = ListAll(path2); err != nil {
+		err = &os.PathError{opnCompare, path2, err}
 		return
 	}
 
@@ -183,8 +200,12 @@ IterateItems:
 
 // refineComparePaths validates, cleans up for file comparison.
 func refineComparePaths(pathRaw1, pathRaw2 string) (path1, path2 string, err error) {
-	if ystring.IsBlank(pathRaw1) || ystring.IsBlank(pathRaw2) {
-		err = ErrEmptyPath
+	if ystring.IsBlank(pathRaw1) {
+		err = &os.PathError{opnCompare, pathRaw1, errInvalidPath}
+		return
+	}
+	if ystring.IsBlank(pathRaw2) {
+		err = &os.PathError{opnCompare, pathRaw2, errInvalidPath}
 		return
 	}
 
