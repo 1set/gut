@@ -1,7 +1,6 @@
 package yos
 
 import (
-	"fmt"
 	"os"
 	"syscall"
 )
@@ -16,39 +15,23 @@ import (
 //
 // ErrSameFile is returned if it detects an attempt to copy a file to itself.
 func MoveFile(src, dest string) (err error) {
-	if src, dest, err = refineOpPaths(opnMove, src, dest, false); err == nil {
-		// check if source exists and is a file
-		var srcInfo os.FileInfo
-		if srcInfo, err = os.Lstat(src); err == nil && !srcInfo.Mode().IsRegular() {
-			err = ErrNotRegular
-		}
-
-		if err == nil {
-			err = moveEntry(src, dest, os.Remove, func(src, dest string) error {
-				return bufferCopyFile(src, dest, defaultBufferSize)
-			})
-		}
-	}
-	return
+	return moveEntry(
+		src, dest,
+		func(m os.FileMode) bool { return m.IsRegular() },
+		errNotRegularFile,
+		os.Remove,
+		func(src, dest string) error { return bufferCopyFile(src, dest, defaultBufferSize) })
 }
 
 // MoveSymlink moves a symbolic link to a target file.
 // It makes no attempt to read the referenced file.
 func MoveSymlink(src, dest string) (err error) {
-	if src, dest, err = refineOpPaths(opnMove, src, dest, false); err == nil {
-		// check if source exists and is a symbolic link
-		var srcInfo os.FileInfo
-		if srcInfo, err = os.Lstat(src); err == nil && srcInfo.Mode()&os.ModeType != os.ModeSymlink {
-			err = fmt.Errorf("%v: source is not a symbolic link", src)
-		}
-
-		if err == nil {
-			err = moveEntry(src, dest, os.Remove, func(src, dest string) error {
-				return copySymlink(src, dest)
-			})
-		}
-	}
-	return
+	return moveEntry(
+		src, dest,
+		func(m os.FileMode) bool { return m&os.ModeType == os.ModeSymlink },
+		errNotSymlink,
+		os.Remove,
+		func(src, dest string) error { return copySymlink(src, dest) })
 }
 
 // MoveDir moves a directory to a target directory recursively. Symbolic links inside the directories will not be followed.
@@ -61,28 +44,40 @@ func MoveSymlink(src, dest string) (err error) {
 //
 // It stops and returns immediately if any error occurs. ErrSameFile is returned if it detects an attempt to move a file to itself.
 func MoveDir(src, dest string) (err error) {
-	if src, dest, err = refineOpPaths(opnMove, src, dest, false); err == nil {
-		// check if source exists and is a directory
-		var srcInfo os.FileInfo
-		if srcInfo, err = os.Lstat(src); err == nil && srcInfo.Mode()&os.ModeType != os.ModeDir {
-			err = fmt.Errorf("%v: source is not a directory", src)
-		}
-
-		if err == nil {
-			err = moveEntry(src, dest, os.RemoveAll, func(src, dest string) error {
-				return copyDir(src, dest)
-			})
-		}
-	}
-	return
+	return moveEntry(
+		src, dest,
+		func(m os.FileMode) bool { return m&os.ModeType == os.ModeDir },
+		errNotDirectory,
+		os.RemoveAll,
+		func(src, dest string) error { return copyDir(src, dest) })
 }
 
+type (
+	funcCheckMode   func(os.FileMode) bool
+	funcRemoveEntry func(path string) error
+	funcCopyEntry   func(src, dest string) error
+)
+
 // moveEntry moves source to target by renaming or copying.
-func moveEntry(src, dest string, removeFunc func(path string) error, copyFunc func(src, dest string) error) (err error) {
+func moveEntry(src, dest string, check funcCheckMode, errMode error, remove funcRemoveEntry, copy funcCopyEntry) (err error) {
+	// validate and refine paths
+	if src, dest, err = refineOpPaths(opnMove, src, dest, false); err != nil {
+		return
+	}
+
+	// check if source exists and its file mode
+	var srcInfo os.FileInfo
+	if srcInfo, err = os.Lstat(src); err == nil && !check(srcInfo.Mode()) {
+		err = errMode
+	}
+	if err != nil {
+		return
+	}
+
 	// attempts to move file by renaming links
-	if err = os.Rename(src, dest); os.IsExist(err) || isLinkErrorNotDirectory(err) {
+	if err = os.Rename(src, dest); os.IsExist(err) || isLinkErrNotDirectory(err) {
 		// remove destination if fails for its existence or not directory
-		_ = removeFunc(dest)
+		_ = remove(dest)
 		err = os.Rename(src, dest)
 	}
 
@@ -92,25 +87,24 @@ func moveEntry(src, dest string, removeFunc func(path string) error, copyFunc fu
 	}
 
 	// cross device: move == remove dest + copy to dest + remove src
-	if isLinkErrorCrossDevice(err) {
+	if isLinkErrCrossDevice(err) {
 		// remove destination file, and ignore the non-existence error
-		if err = removeFunc(dest); err != nil && !os.IsNotExist(err) {
+		if err = remove(dest); err != nil && !os.IsNotExist(err) {
 			return
 		}
-		if err = copyFunc(src, dest); err == nil {
-			err = removeFunc(src)
+		if err = copy(src, dest); err == nil {
+			err = remove(src)
 		}
 	}
-
 	return
 }
 
-func isLinkErrorCrossDevice(err error) bool {
+func isLinkErrCrossDevice(err error) bool {
 	lerr, ok := err.(*os.LinkError)
 	return ok && lerr.Err == syscall.EXDEV
 }
 
-func isLinkErrorNotDirectory(err error) bool {
+func isLinkErrNotDirectory(err error) bool {
 	lerr, ok := err.(*os.LinkError)
 	return ok && lerr.Err == syscall.ENOTDIR
 }
