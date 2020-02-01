@@ -34,10 +34,19 @@ var (
 	errNotSymlink     = errors.New("not a symbolic link")
 )
 
-// Operation names for the Op field of os.PathError.
+// operation names for the Op field of os.PathError.
 var (
 	opnCompare = "compare"
 )
+
+// opError returns error struct with given details.
+func opError(op, path string, err error) *os.PathError {
+	return &os.PathError{
+		Op:   op,
+		Path: path,
+		Err:  err,
+	}
+}
 
 // refineOpPaths validates, cleans up and adjusts the source and destination paths for operations like copy or move.
 func refineOpPaths(srcRaw, destRaw string, followLink bool) (src, dest string, err error) {
