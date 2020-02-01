@@ -1,7 +1,6 @@
 package yos
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"math/bits"
@@ -58,13 +57,18 @@ func CopySymlink(src, dest string) (err error) {
 func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	var srcFile, destFile *os.File
 	if srcFile, err = os.Open(src); err != nil {
+		err = opError(opnCopy, src, err)
 		return
 	}
 	defer srcFile.Close()
 
 	var srcInfo, destInfo os.FileInfo
-	if srcInfo, err = os.Stat(src); err == nil && !srcInfo.Mode().IsRegular() {
-		err = ErrNotRegular
+	if srcInfo, err = os.Stat(src); err == nil {
+		if !srcInfo.Mode().IsRegular() {
+			err = opError(opnCopy, src, errNotRegularFile)
+		}
+	} else {
+		err = opError(opnCopy, src, err)
 	}
 	if err != nil {
 		return
@@ -73,13 +77,15 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	// check if source and destination files are identical
 	if destInfo, err = os.Stat(dest); err == nil {
 		if !destInfo.Mode().IsRegular() {
-			err = ErrNotRegular
+			err = opError(opnCopy, dest, errNotRegularFile)
 		} else if os.SameFile(srcInfo, destInfo) {
-			err = ErrSameFile
+			err = opError(opnCopy, dest, errSameFile)
 		}
 	} else if os.IsNotExist(err) {
 		// it's okay if destination file doesn't exist
 		err = nil
+	} else {
+		err = opError(opnCopy, dest, err)
 	}
 
 	if err != nil {
@@ -93,11 +99,12 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	}
 
 	if destFile, err = os.OpenFile(dest, os.O_RDWR|os.O_CREATE|os.O_TRUNC, srcInfo.Mode()); err != nil {
+		err = opError(opnCopy, dest, err)
 		return
 	}
 	defer func() {
 		if fe := destFile.Close(); fe != nil {
-			err = fe
+			err = opError(opnCopy, dest, fe)
 		}
 	}()
 
@@ -106,7 +113,7 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	for {
 		if nr, err = srcFile.Read(buf); err != nil {
 			if err == io.EOF && nr > 0 {
-				err = io.ErrUnexpectedEOF
+				err = opError(opnCopy, src, io.ErrUnexpectedEOF)
 			}
 			break
 		} else if nr == 0 {
@@ -114,9 +121,10 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 		}
 
 		if nw, err = destFile.Write(buf[:nr]); err != nil {
+			err = opError(opnCopy, dest, err)
 			break
 		} else if nw != nr {
-			err = io.ErrShortWrite
+			err = opError(opnCopy, dest, io.ErrShortWrite)
 			break
 		}
 	}
@@ -135,12 +143,17 @@ func copySymlink(src, dest string) (err error) {
 	if destInfo, err = os.Lstat(dest); err != nil {
 		if os.IsNotExist(err) {
 			err = nil
+		} else {
+			err = opError(opnCopy, dest, err)
 		}
 	} else {
+		// FIXME: should check if it's symlink directly
 		if destInfo.IsDir() {
-			err = fmt.Errorf("%v: destination is a directory", src)
+			err = opError(opnCopy, dest, errNotSymlink)
 		} else {
-			err = os.Remove(dest)
+			if err = os.Remove(dest); err != nil {
+				err = opError(opnCopy, dest, err)
+			}
 		}
 	}
 	if err != nil {
@@ -149,7 +162,11 @@ func copySymlink(src, dest string) (err error) {
 
 	var link string
 	if link, err = os.Readlink(src); err == nil {
-		err = os.Symlink(link, dest)
+		if err = os.Symlink(link, dest); err != nil {
+			err = opError(opnCopy, dest, err)
+		}
+	} else {
+		err = opError(opnCopy, src, err)
 	}
 	return
 }
@@ -159,8 +176,12 @@ func copyDir(src, dest string) (err error) {
 	var srcInfo, destInfo os.FileInfo
 
 	// check if source exists and is a directory
-	if srcInfo, err = os.Stat(src); err == nil && !srcInfo.IsDir() {
-		err = fmt.Errorf("%v: source is not a directory", src)
+	if srcInfo, err = os.Stat(src); err == nil {
+		if !srcInfo.IsDir() {
+			err = opError(opnCopy, src, errNotDirectory)
+		}
+	} else {
+		err = opError(opnCopy, src, err)
 	}
 	if err != nil {
 		return
@@ -169,15 +190,17 @@ func copyDir(src, dest string) (err error) {
 	// check if destination doesn't exist or is not a file or source itself
 	if destInfo, err = os.Stat(dest); err == nil {
 		if !destInfo.IsDir() {
-			err = fmt.Errorf("%v: destination is not a directory", src)
+			err = opError(opnCopy, dest, errNotDirectory)
 		} else if os.SameFile(srcInfo, destInfo) {
-			err = ErrSameFile
+			err = opError(opnCopy, dest, errSameFile)
 		}
 	} else if os.IsNotExist(err) {
 		err = nil
 		if err = os.MkdirAll(dest, defaultDirectoryFileMode); err == nil {
 			originMode := srcInfo.Mode()
 			defer os.Chmod(dest, originMode)
+		} else {
+			err = opError(opnCopy, dest, err)
 		}
 	}
 	if err != nil {
@@ -187,6 +210,7 @@ func copyDir(src, dest string) (err error) {
 	// loop through entries in source directory
 	var entries []os.FileInfo
 	if entries, err = ioutil.ReadDir(src); err != nil {
+		err = opError(opnCopy, src, err)
 		return
 	}
 
