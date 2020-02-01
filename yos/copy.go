@@ -64,7 +64,7 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 
 	var srcInfo, destInfo os.FileInfo
 	if srcInfo, err = os.Stat(src); err == nil {
-		if !srcInfo.Mode().IsRegular() {
+		if !isFileFi(&srcInfo) {
 			err = opError(opnCopy, src, errNotRegularFile)
 		}
 	} else {
@@ -76,7 +76,7 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 
 	// check if source and destination files are identical
 	if destInfo, err = os.Stat(dest); err == nil {
-		if !destInfo.Mode().IsRegular() {
+		if !isFileFi(&destInfo) {
 			err = opError(opnCopy, dest, errNotRegularFile)
 		} else if os.SameFile(srcInfo, destInfo) {
 			err = opError(opnCopy, dest, errSameFile)
@@ -147,9 +147,9 @@ func copySymlink(src, dest string) (err error) {
 			err = opError(opnCopy, dest, err)
 		}
 	} else {
-		// FIXME: should check if it's symlink directly
-		if destInfo.IsDir() {
-			err = opError(opnCopy, dest, errNotSymlink)
+		if isDirFi(&destInfo) {
+			// avoid overwriting directory
+			err = opError(opnCopy, dest, errIsDirectory)
 		} else {
 			if err = os.Remove(dest); err != nil {
 				err = opError(opnCopy, dest, err)
@@ -177,7 +177,7 @@ func copyDir(src, dest string) (err error) {
 
 	// check if source exists and is a directory
 	if srcInfo, err = os.Stat(src); err == nil {
-		if !srcInfo.IsDir() {
+		if !isDirFi(&srcInfo) {
 			err = opError(opnCopy, src, errNotDirectory)
 		}
 	} else {
@@ -189,7 +189,7 @@ func copyDir(src, dest string) (err error) {
 
 	// check if destination doesn't exist or is not a file or source itself
 	if destInfo, err = os.Stat(dest); err == nil {
-		if !destInfo.IsDir() {
+		if !isDirFi(&destInfo) {
 			err = opError(opnCopy, dest, errNotDirectory)
 		} else if os.SameFile(srcInfo, destInfo) {
 			err = opError(opnCopy, dest, errSameFile)
@@ -227,7 +227,7 @@ IterateEntry:
 			if err = copySymlink(srcPath, destPath); err != nil {
 				break IterateEntry
 			}
-		default:
+		case 0:
 			if err = bufferCopyFile(srcPath, destPath, defaultBufferSize); err != nil {
 				break IterateEntry
 			}

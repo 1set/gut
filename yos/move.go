@@ -17,8 +17,7 @@ import (
 func MoveFile(src, dest string) (err error) {
 	return moveEntry(
 		src, dest,
-		func(m os.FileMode) bool { return m.IsRegular() },
-		errNotRegularFile,
+		isFileFi, errNotRegularFile,
 		os.Remove,
 		func(src, dest string) error { return bufferCopyFile(src, dest, defaultBufferSize) })
 }
@@ -28,8 +27,7 @@ func MoveFile(src, dest string) (err error) {
 func MoveSymlink(src, dest string) (err error) {
 	return moveEntry(
 		src, dest,
-		func(m os.FileMode) bool { return m&os.ModeType == os.ModeSymlink },
-		errNotSymlink,
+		isSymlinkFi, errNotSymlink,
 		os.Remove,
 		func(src, dest string) error { return copySymlink(src, dest) })
 }
@@ -46,20 +44,13 @@ func MoveSymlink(src, dest string) (err error) {
 func MoveDir(src, dest string) (err error) {
 	return moveEntry(
 		src, dest,
-		func(m os.FileMode) bool { return m&os.ModeType == os.ModeDir },
-		errNotDirectory,
+		isDirFi, errNotDirectory,
 		os.RemoveAll,
 		func(src, dest string) error { return copyDir(src, dest) })
 }
 
-type (
-	funcCheckMode   func(os.FileMode) bool
-	funcRemoveEntry func(path string) error
-	funcCopyEntry   func(src, dest string) error
-)
-
 // moveEntry moves source to target by renaming or copying.
-func moveEntry(src, dest string, check funcCheckMode, errMode error, remove funcRemoveEntry, copy funcCopyEntry) (err error) {
+func moveEntry(src, dest string, check funcCheckFileInfo, errMode error, remove funcRemoveEntry, copy funcCopyEntry) (err error) {
 	// validate and refine paths
 	if src, dest, err = refineOpPaths(opnMove, src, dest, false); err != nil {
 		return
@@ -68,7 +59,7 @@ func moveEntry(src, dest string, check funcCheckMode, errMode error, remove func
 	// check if source exists and its file mode
 	var srcInfo os.FileInfo
 	if srcInfo, err = os.Lstat(src); err == nil {
-		if !check(srcInfo.Mode()) {
+		if !check(&srcInfo) {
 			err = opError(opnMove, src, errMode)
 		}
 	} else {

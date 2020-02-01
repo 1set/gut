@@ -24,17 +24,15 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 	if fi1, err = os.Stat(path1); err != nil {
 		err = opError(opnCompare, path1, err)
 		return
-	}
-	if fi2, err = os.Stat(path2); err != nil {
-		err = opError(opnCompare, path2, err)
-		return
-	}
-
-	if !fi1.Mode().IsRegular() {
+	} else if !isFileFi(&fi1) {
 		err = opError(opnCompare, path1, errNotRegularFile)
 		return
 	}
-	if !fi2.Mode().IsRegular() {
+
+	if fi2, err = os.Stat(path2); err != nil {
+		err = opError(opnCompare, path2, err)
+		return
+	} else if !isFileFi(&fi2) {
 		err = opError(opnCompare, path2, errNotRegularFile)
 		return
 	}
@@ -130,17 +128,15 @@ func SameDirEntries(path1, path2 string) (same bool, err error) {
 	if fi1, err = os.Stat(path1); err != nil {
 		err = opError(opnCompare, path1, err)
 		return
-	}
-	if fi2, err = os.Stat(path2); err != nil {
-		err = opError(opnCompare, path2, err)
-		return
-	}
-
-	if !fi1.IsDir() {
+	} else if !isDirFi(&fi1) {
 		err = opError(opnCompare, path1, errNotDirectory)
 		return
 	}
-	if !fi2.IsDir() {
+
+	if fi2, err = os.Stat(path2); err != nil {
+		err = opError(opnCompare, path2, err)
+		return
+	} else if !isDirFi(&fi2) {
 		err = opError(opnCompare, path2, errNotDirectory)
 		return
 	}
@@ -185,7 +181,7 @@ IterateItems:
 				break IterateItems
 			}
 		case os.ModeDir:
-		default:
+		case 0:
 			if same, err = SameFileContent(entry1.Path, entry2.Path); err != nil || !same {
 				break IterateItems
 			}

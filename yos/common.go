@@ -12,6 +12,7 @@ var (
 	errInvalidPath    = errors.New("invalid path")
 	errSameFile       = errors.New("files are identical")
 	errShortRead      = errors.New("short read")
+	errIsDirectory    = errors.New("is a directory")
 	errNotDirectory   = errors.New("not a directory")
 	errNotRegularFile = errors.New("not a regular file")
 	errNotSymlink     = errors.New("not a symbolic link")
@@ -23,6 +24,13 @@ var (
 	opnCopy    = "copy"
 	opnMove    = "move"
 	opnList    = "list"
+)
+
+type (
+	funcStatFileInfo  func(name string) (os.FileInfo, error)
+	funcCheckFileInfo func(fi *os.FileInfo) bool
+	funcRemoveEntry   func(path string) error
+	funcCopyEntry     func(src, dest string) error
 )
 
 // opError returns error struct with given details.
@@ -100,4 +108,20 @@ func refineComparePaths(pathRaw1, pathRaw2 string) (path1, path2 string, err err
 	// clean up paths
 	path1, path2 = filepath.Clean(pathRaw1), filepath.Clean(pathRaw2)
 	return
+}
+
+// isFileFi indicates whether the FileInfo is for a regular file.
+func isFileFi(fi *os.FileInfo) bool {
+	return fi != nil && (*fi).Mode().IsRegular()
+}
+
+// isDirFi indicates whether the FileInfo is for a directory.
+func isDirFi(fi *os.FileInfo) bool {
+	return fi != nil && (*fi).Mode().IsDir()
+	//return fi != nil && ((*fi).Mode()&os.ModeType == os.ModeDir)
+}
+
+// isSymlinkFi indicates whether the FileInfo is for a symbolic link.
+func isSymlinkFi(fi *os.FileInfo) bool {
+	return fi != nil && ((*fi).Mode()&os.ModeType == os.ModeSymlink)
 }
