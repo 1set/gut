@@ -67,8 +67,12 @@ func moveEntry(src, dest string, check funcCheckMode, errMode error, remove func
 
 	// check if source exists and its file mode
 	var srcInfo os.FileInfo
-	if srcInfo, err = os.Lstat(src); err == nil && !check(srcInfo.Mode()) {
-		err = errMode
+	if srcInfo, err = os.Lstat(src); err == nil {
+		if !check(srcInfo.Mode()) {
+			err = opError(opnMove, src, errMode)
+		}
+	} else {
+		err = opError(opnMove, src, err)
 	}
 	if err != nil {
 		return
@@ -81,8 +85,15 @@ func moveEntry(src, dest string, check funcCheckMode, errMode error, remove func
 		err = os.Rename(src, dest)
 	}
 
-	if err == nil || os.IsExist(err) || os.IsNotExist(err) {
-		// if rename succeeds, or got unexpected errors
+	// if rename succeeds
+	if err == nil {
+		return
+	}
+
+	// if rename got unexpected errors
+	if os.IsExist(err) || os.IsNotExist(err) {
+		// FIXME: src is not accurate
+		err = opError(opnMove, src, err)
 		return
 	}
 
@@ -90,10 +101,13 @@ func moveEntry(src, dest string, check funcCheckMode, errMode error, remove func
 	if isLinkErrCrossDevice(err) {
 		// remove destination file, and ignore the non-existence error
 		if err = remove(dest); err != nil && !os.IsNotExist(err) {
+			err = opError(opnMove, dest, err)
 			return
 		}
 		if err = copy(src, dest); err == nil {
-			err = remove(src)
+			if err = remove(src); err != nil {
+				err = opError(opnMove, src, err)
+			}
 		}
 	}
 	return
