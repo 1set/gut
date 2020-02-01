@@ -86,7 +86,6 @@ func TestListDir(t *testing.T) {
 	for _, path := range []string{"", "  ", "__not_found_folder__", resourceListSymlinkToRoot, resourceListFileInRoot} {
 		if _, err := ListFile(path); err == nil {
 			t.Errorf("ListFile(%q) got no error, diff from expected", path)
-			return
 		} else {
 			expectedErrorCheck(t, err)
 		}
