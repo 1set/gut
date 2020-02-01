@@ -4,10 +4,7 @@ import (
 	"bytes"
 	"io"
 	"os"
-	"path/filepath"
 	"strings"
-
-	"github.com/1set/gut/ystring"
 )
 
 const (
@@ -195,24 +192,5 @@ IterateItems:
 		}
 	}
 
-	return
-}
-
-// refineComparePaths validates, cleans up for file comparison.
-func refineComparePaths(pathRaw1, pathRaw2 string) (path1, path2 string, err error) {
-	var pathErr *string
-	if ystring.IsBlank(pathRaw1) {
-		pathErr = &pathRaw1
-	} else if ystring.IsBlank(pathRaw2) {
-		pathErr = &pathRaw2
-	}
-
-	if pathErr != nil {
-		err = opError(opnCompare, *pathErr, errInvalidPath)
-		return
-	}
-
-	// clean up paths
-	path1, path2 = filepath.Clean(pathRaw1), filepath.Clean(pathRaw2)
 	return
 }

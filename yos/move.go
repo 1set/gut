@@ -16,7 +16,7 @@ import (
 //
 // ErrSameFile is returned if it detects an attempt to copy a file to itself.
 func MoveFile(src, dest string) (err error) {
-	if src, dest, err = refineOpPaths(src, dest, false); err == nil {
+	if src, dest, err = refineOpPaths(opnMove, src, dest, false); err == nil {
 		// check if source exists and is a file
 		var srcInfo os.FileInfo
 		if srcInfo, err = os.Lstat(src); err == nil && !srcInfo.Mode().IsRegular() {
@@ -35,7 +35,7 @@ func MoveFile(src, dest string) (err error) {
 // MoveSymlink moves a symbolic link to a target file.
 // It makes no attempt to read the referenced file.
 func MoveSymlink(src, dest string) (err error) {
-	if src, dest, err = refineOpPaths(src, dest, false); err == nil {
+	if src, dest, err = refineOpPaths(opnMove, src, dest, false); err == nil {
 		// check if source exists and is a symbolic link
 		var srcInfo os.FileInfo
 		if srcInfo, err = os.Lstat(src); err == nil && srcInfo.Mode()&os.ModeType != os.ModeSymlink {
@@ -61,7 +61,7 @@ func MoveSymlink(src, dest string) (err error) {
 //
 // It stops and returns immediately if any error occurs. ErrSameFile is returned if it detects an attempt to move a file to itself.
 func MoveDir(src, dest string) (err error) {
-	if src, dest, err = refineOpPaths(src, dest, false); err == nil {
+	if src, dest, err = refineOpPaths(opnMove, src, dest, false); err == nil {
 		// check if source exists and is a directory
 		var srcInfo os.FileInfo
 		if srcInfo, err = os.Lstat(src); err == nil && srcInfo.Mode()&os.ModeType != os.ModeDir {

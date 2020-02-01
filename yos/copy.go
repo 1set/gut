@@ -23,7 +23,7 @@ const (
 //
 // ErrSameFile is returned if it detects an attempt to copy a file to itself.
 func CopyFile(src, dest string) (err error) {
-	if src, dest, err = refineOpPaths(src, dest, true); err == nil {
+	if src, dest, err = refineOpPaths(opnCopy, src, dest, true); err == nil {
 		err = bufferCopyFile(src, dest, defaultBufferSize)
 	}
 	return
@@ -39,7 +39,7 @@ func CopyFile(src, dest string) (err error) {
 //
 // It stops and returns immediately if any error occurs. ErrSameFile is returned if it detects an attempt to copy a file to itself.
 func CopyDir(src, dest string) (err error) {
-	if src, dest, err = refineOpPaths(src, dest, true); err == nil {
+	if src, dest, err = refineOpPaths(opnCopy, src, dest, true); err == nil {
 		err = copyDir(src, dest)
 	}
 	return
@@ -48,7 +48,7 @@ func CopyDir(src, dest string) (err error) {
 // CopySymlink copies a symbolic link to a target file.
 // It only copies the contents and makes no attempt to read the referenced file.
 func CopySymlink(src, dest string) (err error) {
-	if src, dest, err = refineOpPaths(src, dest, false); err == nil {
+	if src, dest, err = refineOpPaths(opnCopy, src, dest, false); err == nil {
 		err = copySymlink(src, dest)
 	}
 	return

@@ -37,6 +37,8 @@ var (
 // operation names for the Op field of os.PathError.
 var (
 	opnCompare = "compare"
+	opnCopy    = "copy"
+	opnMove    = "move"
 )
 
 // opError returns error struct with given details.
@@ -49,9 +51,13 @@ func opError(op, path string, err error) *os.PathError {
 }
 
 // refineOpPaths validates, cleans up and adjusts the source and destination paths for operations like copy or move.
-func refineOpPaths(srcRaw, destRaw string, followLink bool) (src, dest string, err error) {
-	if ystring.IsBlank(srcRaw) || ystring.IsBlank(destRaw) {
-		err = ErrEmptyPath
+func refineOpPaths(opName, srcRaw, destRaw string, followLink bool) (src, dest string, err error) {
+	if ystring.IsBlank(srcRaw) {
+		err = opError(opName, srcRaw, errInvalidPath)
+		return
+	}
+	if ystring.IsBlank(destRaw) {
+		err = opError(opName, destRaw, errInvalidPath)
 		return
 	}
 
@@ -67,6 +73,7 @@ func refineOpPaths(srcRaw, destRaw string, followLink bool) (src, dest string, e
 	// check if source exists
 	var srcInfo, destInfo os.FileInfo
 	if srcInfo, err = statFunc(srcRaw); err != nil {
+		err = opError(opName, srcRaw, err)
 		return
 	}
 
@@ -74,11 +81,15 @@ func refineOpPaths(srcRaw, destRaw string, followLink bool) (src, dest string, e
 	if destInfo, err = statFunc(destRaw); err != nil {
 		// check existence of parent of the missing destination
 		if os.IsNotExist(err) {
-			_, err = os.Stat(filepath.Dir(destRaw))
+			if _, err = os.Stat(filepath.Dir(destRaw)); err != nil {
+				err = opError(opName, destRaw, err)
+			}
+		} else {
+			err = opError(opName, destRaw, err)
 		}
 	} else {
 		if os.SameFile(srcInfo, destInfo) {
-			err = ErrSameFile
+			err = opError(opName, destRaw, errSameFile)
 		} else if destInfo.IsDir() {
 			// append file name of source to path of the existing destination
 			destRaw = JoinPath(destRaw, srcInfo.Name())
@@ -88,5 +99,21 @@ func refineOpPaths(srcRaw, destRaw string, followLink bool) (src, dest string, e
 	if err == nil {
 		src, dest = srcRaw, destRaw
 	}
+	return
+}
+
+// refineComparePaths validates, cleans up for file comparison.
+func refineComparePaths(pathRaw1, pathRaw2 string) (path1, path2 string, err error) {
+	if ystring.IsBlank(pathRaw1) {
+		err = opError(opnCompare, pathRaw1, errInvalidPath)
+		return
+	}
+	if ystring.IsBlank(pathRaw2) {
+		err = opError(opnCompare, pathRaw2, errInvalidPath)
+		return
+	}
+
+	// clean up paths
+	path1, path2 = filepath.Clean(pathRaw1), filepath.Clean(pathRaw2)
 	return
 }
