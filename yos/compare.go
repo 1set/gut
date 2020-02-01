@@ -10,9 +10,10 @@ import (
 	"github.com/1set/gut/ystring"
 )
 
-var (
+const (
 	// CompareFileModeMask is a mask for file mode bits to compare in SameDirEntries.
-	CompareFileModeMask = os.ModeDir | os.ModeSymlink
+	CompareFileModeMask  = os.ModeDir | os.ModeSymlink
+	fileCompareChunkSize = 64 * 1024
 )
 
 // SameFileContent checks if the two given files have the same content or are the same file. Symbolic links are followed.
@@ -24,20 +25,20 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 
 	var fi1, fi2 os.FileInfo
 	if fi1, err = os.Stat(path1); err != nil {
-		err = &os.PathError{opnCompare, path1, err}
+		err = &os.PathError{Op: opnCompare, Path: path1, Err: err}
 		return
 	}
 	if fi2, err = os.Stat(path2); err != nil {
-		err = &os.PathError{opnCompare, path2, err}
+		err = &os.PathError{Op: opnCompare, Path: path2, Err: err}
 		return
 	}
 
 	if !fi1.Mode().IsRegular() {
-		err = &os.PathError{opnCompare, path1, errNotRegularFile}
+		err = &os.PathError{Op: opnCompare, Path: path1, Err: errNotRegularFile}
 		return
 	}
 	if !fi2.Mode().IsRegular() {
-		err = &os.PathError{opnCompare, path2, errNotRegularFile}
+		err = &os.PathError{Op: opnCompare, Path: path2, Err: errNotRegularFile}
 		return
 	}
 
@@ -52,19 +53,19 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 
 	var file1, file2 *os.File
 	if file1, err = os.Open(path1); err != nil {
-		err = &os.PathError{opnCompare, path1, err}
+		err = &os.PathError{Op: opnCompare, Path: path1, Err: err}
 		return
 	}
 	defer file1.Close()
 
 	if file2, err = os.Open(path2); err != nil {
-		err = &os.PathError{opnCompare, path2, err}
+		err = &os.PathError{Op: opnCompare, Path: path2, Err: err}
 		return
 	}
 	defer file2.Close()
 
-	const chunkSize = 64 * 1024
-	buf1, buf2 := make([]byte, chunkSize), make([]byte, chunkSize)
+	var pathErr string
+	buf1, buf2 := make([]byte, fileCompareChunkSize), make([]byte, fileCompareChunkSize)
 	for {
 		nr1, err1 := file1.Read(buf1)
 		nr2, err2 := file2.Read(buf2)
@@ -74,21 +75,20 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 				same = true
 				break
 			}
-			if nr1 > 0 {
-				err = &os.PathError{opnCompare, path1, io.ErrUnexpectedEOF}
-			} else {
-				err = &os.PathError{opnCompare, path2, io.ErrUnexpectedEOF}
+
+			if pathErr = path1; nr2 > 0 {
+				pathErr = path2
 			}
+			err = &os.PathError{Op: opnCompare, Path: pathErr, Err: io.ErrUnexpectedEOF}
 		} else if err1 != nil {
-			err = &os.PathError{opnCompare, path1, err1}
+			err = &os.PathError{Op: opnCompare, Path: path1, Err: err1}
 		} else if err2 != nil {
-			err = &os.PathError{opnCompare, path2, err2}
+			err = &os.PathError{Op: opnCompare, Path: path2, Err: err2}
 		} else if nr1 != nr2 {
-			if nr1 < nr2 {
-				err = &os.PathError{opnCompare, path1, errShortRead}
-			} else {
-				err = &os.PathError{opnCompare, path2, errShortRead}
+			if pathErr = path1; nr1 > nr2 {
+				pathErr = path2
 			}
+			err = &os.PathError{Op: opnCompare, Path: pathErr, Err: errShortRead}
 		}
 
 		if err != nil {
@@ -111,11 +111,11 @@ func SameSymlinkContent(path1, path2 string) (same bool, err error) {
 
 	var link1, link2 string
 	if link1, err = os.Readlink(path1); err != nil {
-		err = &os.PathError{opnCompare, path1, err}
+		err = &os.PathError{Op: opnCompare, Path: path1, Err: err}
 		return
 	}
 	if link2, err = os.Readlink(path2); err != nil {
-		err = &os.PathError{opnCompare, path2, err}
+		err = &os.PathError{Op: opnCompare, Path: path2, Err: err}
 		return
 	}
 
@@ -131,20 +131,20 @@ func SameDirEntries(path1, path2 string) (same bool, err error) {
 
 	var fi1, fi2 os.FileInfo
 	if fi1, err = os.Stat(path1); err != nil {
-		err = &os.PathError{opnCompare, path1, err}
+		err = &os.PathError{Op: opnCompare, Path: path1, Err: err}
 		return
 	}
 	if fi2, err = os.Stat(path2); err != nil {
-		err = &os.PathError{opnCompare, path2, err}
+		err = &os.PathError{Op: opnCompare, Path: path2, Err: err}
 		return
 	}
 
 	if !fi1.IsDir() {
-		err = &os.PathError{opnCompare, path1, errNotDirectory}
+		err = &os.PathError{Op: opnCompare, Path: path1, Err: errNotDirectory}
 		return
 	}
 	if !fi2.IsDir() {
-		err = &os.PathError{opnCompare, path2, errNotDirectory}
+		err = &os.PathError{Op: opnCompare, Path: path2, Err: errNotDirectory}
 		return
 	}
 
@@ -155,11 +155,11 @@ func SameDirEntries(path1, path2 string) (same bool, err error) {
 
 	var items1, items2 []*FilePathInfo
 	if items1, err = ListAll(path1); err != nil {
-		err = &os.PathError{opnCompare, path1, err}
+		err = &os.PathError{Op: opnCompare, Path: path1, Err: err}
 		return
 	}
 	if items2, err = ListAll(path2); err != nil {
-		err = &os.PathError{opnCompare, path2, err}
+		err = &os.PathError{Op: opnCompare, Path: path2, Err: err}
 		return
 	}
 
@@ -200,12 +200,15 @@ IterateItems:
 
 // refineComparePaths validates, cleans up for file comparison.
 func refineComparePaths(pathRaw1, pathRaw2 string) (path1, path2 string, err error) {
+	var pathErr *string
 	if ystring.IsBlank(pathRaw1) {
-		err = &os.PathError{opnCompare, pathRaw1, errInvalidPath}
-		return
+		pathErr = &pathRaw1
+	} else if ystring.IsBlank(pathRaw2) {
+		pathErr = &pathRaw2
 	}
-	if ystring.IsBlank(pathRaw2) {
-		err = &os.PathError{opnCompare, pathRaw2, errInvalidPath}
+
+	if pathErr != nil {
+		err = &os.PathError{Op: opnCompare, Path: *pathErr, Err: errInvalidPath}
 		return
 	}
 
