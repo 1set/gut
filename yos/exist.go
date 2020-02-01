@@ -1,18 +1,8 @@
 package yos
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
-)
-
-var (
-	// ErrIsDir indicates the given path is actually a directory
-	ErrIsDir = errors.New("target is a directory")
-	// ErrIsFile indicates the given path is actually a file
-	ErrIsFile = errors.New("target is a file")
-	// ErrIsNotSymlink indicates the given path is not a symbolic link
-	ErrIsNotSymlink = errors.New("target is not a symbolic link")
 )
 
 // IsExist checks if the file, directory exists.

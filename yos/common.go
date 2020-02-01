@@ -1,10 +1,28 @@
 package yos
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 
 	"github.com/1set/gut/ystring"
+)
+
+var (
+	// ErrShortRead means a read accepted fewer bytes than expected.
+	ErrShortRead = errors.New("short read")
+	// ErrEmptyPath means the given path is empty or blank.
+	ErrEmptyPath = errors.New("path is empty or blank")
+	// ErrSameFile means the given two files are actually the same one.
+	ErrSameFile = errors.New("files are identical")
+	// ErrNotRegular means the file is not a regular file.
+	ErrNotRegular = errors.New("file is not regular")
+	// ErrIsDir indicates the given path is actually a directory
+	ErrIsDir = errors.New("target is a directory")
+	// ErrIsFile indicates the given path is actually a file
+	ErrIsFile = errors.New("target is a file")
+	// ErrIsNotSymlink indicates the given path is not a symbolic link
+	ErrIsNotSymlink = errors.New("target is not a symbolic link")
 )
 
 // refineOpPaths validates, cleans up and adjusts the source and destination paths for operations like copy or move.

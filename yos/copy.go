@@ -1,23 +1,11 @@
 package yos
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"math/bits"
 	"os"
-)
-
-var (
-	// ErrShortRead means a read accepted fewer bytes than expected.
-	ErrShortRead = errors.New("short read")
-	// ErrEmptyPath means the given path is empty or blank.
-	ErrEmptyPath = errors.New("path is empty or blank")
-	// ErrSameFile means the given two files are actually the same one.
-	ErrSameFile = errors.New("files are identical")
-	// ErrNotRegular means the file is not a regular file.
-	ErrNotRegular = errors.New("file is not regular")
 )
 
 const (
