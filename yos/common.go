@@ -39,6 +39,7 @@ var (
 	opnCompare = "compare"
 	opnCopy    = "copy"
 	opnMove    = "move"
+	opnList    = "list"
 )
 
 // opError returns error struct with given details.

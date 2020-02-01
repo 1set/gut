@@ -1,7 +1,6 @@
 package yos
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -49,7 +48,7 @@ const (
 // ListMatch returns a list of directory entries that matches any given pattern in the directory in lexical order.
 // ListMatch requires the pattern to match all of the filename, not just a substring.
 // Symbolic links will be not be followed. The given directory is not included in the list.
-// ErrBadPattern is returned if any pattern is malformed.
+// filepath.ErrBadPattern is returned if any pattern is malformed.
 func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathInfo, err error) {
 	return listCondEntries(root, func(info os.FileInfo) (ok bool, err error) {
 		fileName := info.Name()
@@ -76,7 +75,7 @@ func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathIn
 func listCondEntries(root string, cond func(os.FileInfo) (bool, error)) (entries []*FilePathInfo, err error) {
 	var info os.FileInfo
 	if info, err = os.Lstat(root); err == nil && !info.IsDir() {
-		err = fmt.Errorf("%v: root is not a directory", root)
+		err = opError(opnList, root, errNotDirectory)
 	}
 	if err != nil {
 		return
