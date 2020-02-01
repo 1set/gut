@@ -135,7 +135,6 @@ func TestCopyFile(t *testing.T) {
 
 			if err := CopyFile(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("CopyFile() error = %v, wantErr %v", err, tt.wantErr)
-				return
 			} else {
 				expectedErrorCheck(t, err)
 			}
@@ -228,7 +227,6 @@ func TestCopyDir(t *testing.T) {
 
 			if err := CopyDir(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("CopyDir() error = %v, wantErr %v", err, tt.wantErr)
-				return
 			} else {
 				expectedErrorCheck(t, err)
 			}
@@ -308,7 +306,6 @@ func TestCopySymlink(t *testing.T) {
 
 			if err := CopySymlink(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("CopySymlink() error = %v, wantErr %v", err, tt.wantErr)
-				return
 			} else {
 				expectedErrorCheck(t, err)
 			}

@@ -46,7 +46,6 @@ func TestListAll(t *testing.T) {
 	for _, path := range []string{"", "  ", "__not_found_folder__", resourceListSymlinkToRoot, resourceListFileInRoot} {
 		if _, err := ListAll(path); err == nil {
 			t.Errorf("ListAll(%q) got no error, diff from expected", path)
-			return
 		} else {
 			expectedErrorCheck(t, err)
 		}
@@ -66,7 +65,6 @@ func TestListFile(t *testing.T) {
 	for _, path := range []string{"", "  ", "__not_found_folder__", resourceListSymlinkToRoot, resourceListFileInRoot} {
 		if _, err := ListFile(path); err == nil {
 			t.Errorf("ListFile(%q) got no error, diff from expected", path)
-			return
 		} else {
 			expectedErrorCheck(t, err)
 		}
@@ -151,7 +149,6 @@ func TestListMatch(t *testing.T) {
 			actual, err := ListMatch(tt.args.root, tt.args.flag, tt.args.patterns...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ListMatch() error = %v, wantErr %v", err, tt.wantErr)
-				return
 			}
 
 			if !tt.wantErr {
