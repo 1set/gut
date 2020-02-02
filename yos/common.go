@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"syscall"
 
 	"github.com/1set/gut/ystring"
 )
@@ -68,6 +69,16 @@ func isDirFi(fi *os.FileInfo) bool {
 // isSymlinkFi indicates whether the FileInfo is for a symbolic link.
 func isSymlinkFi(fi *os.FileInfo) bool {
 	return fi != nil && ((*fi).Mode()&os.ModeType == os.ModeSymlink)
+}
+
+func isLinkErrorCrossDevice(err error) bool {
+	lerr, ok := err.(*os.LinkError)
+	return ok && lerr.Err == syscall.EXDEV
+}
+
+func isLinkErrorNotDirectory(err error) bool {
+	lerr, ok := err.(*os.LinkError)
+	return ok && lerr.Err == syscall.ENOTDIR
 }
 
 // refineOpPaths validates, cleans up and adjusts the source and destination paths for operations like copy or move.

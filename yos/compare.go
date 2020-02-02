@@ -7,9 +7,10 @@ import (
 	"strings"
 )
 
-const (
-	// CompareFileModeMask is a mask for file mode bits to compare in SameDirEntries.
-	CompareFileModeMask  = os.ModeDir | os.ModeSymlink
+var (
+	// compareFileModeMask is a mask for file mode bits to compare in SameDirEntries.
+	compareFileModeMask = os.ModeDir | os.ModeSymlink
+	// fileCompareChunkSize represents the buffer size for readers of SameFileContent.
 	fileCompareChunkSize = 64 * 1024
 )
 
@@ -161,7 +162,7 @@ IterateItems:
 		}
 
 		entryMode1, entryMode2 := entry1.Info.Mode(), entry2.Info.Mode()
-		if same = entryMode1&CompareFileModeMask == entryMode2&CompareFileModeMask; !same {
+		if same = entryMode1&compareFileModeMask == entryMode2&compareFileModeMask; !same {
 			break
 		}
 

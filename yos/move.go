@@ -2,7 +2,6 @@ package yos
 
 import (
 	"os"
-	"syscall"
 )
 
 // MoveFile moves a file to a target file or directory. Symbolic links will be not be followed.
@@ -66,7 +65,7 @@ func moveEntry(src, dest string, check funcCheckFileInfo, errMode error, remove 
 	}
 
 	// attempts to move file by renaming links
-	if err = os.Rename(src, dest); os.IsExist(err) || isLinkErrNotDirectory(err) {
+	if err = os.Rename(src, dest); os.IsExist(err) || isLinkErrorNotDirectory(err) {
 		// remove destination if fails for its existence or not directory
 		_ = remove(dest)
 		err = os.Rename(src, dest)
@@ -85,7 +84,7 @@ func moveEntry(src, dest string, check funcCheckFileInfo, errMode error, remove 
 	}
 
 	// cross device: move == remove dest + copy to dest + remove src
-	if isLinkErrCrossDevice(err) {
+	if isLinkErrorCrossDevice(err) {
 		// remove destination file, and ignore the non-existence error
 		if err = remove(dest); err != nil && !os.IsNotExist(err) {
 			err = opError(opnMove, dest, err)
@@ -96,14 +95,4 @@ func moveEntry(src, dest string, check funcCheckFileInfo, errMode error, remove 
 		}
 	}
 	return
-}
-
-func isLinkErrCrossDevice(err error) bool {
-	lerr, ok := err.(*os.LinkError)
-	return ok && lerr.Err == syscall.EXDEV
-}
-
-func isLinkErrNotDirectory(err error) bool {
-	lerr, ok := err.(*os.LinkError)
-	return ok && lerr.Err == syscall.ENOTDIR
 }
