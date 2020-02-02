@@ -10,6 +10,7 @@ function display_help() {
 Usage:
   ./ramdisk.sh create name [size] [access]
   ./ramdisk.sh destroy name
+  ./ramdisk.sh reload name
 
 Options:
   name: disk name.
@@ -43,6 +44,9 @@ create)
     ;;
 destroy)
     ACTION="DESTROY"
+    ;;
+reload)
+    ACTION="RELOAD"
     ;;
 *)
     printf "got unknown verb: '$1'\n"
@@ -114,19 +118,35 @@ function macos_create_ramdisk() {
     fi
 }
 
+function macos_reload_ramdisk() {
+    if macos_exist_ramdisk; then
+        diskutil umount ${DISK_ID}
+        diskutil mount readOnly ${DISK_ID}
+        if ! macos_exist_ramdisk; then
+            printf "failed to reload ramdisk '${DISK_NAME}'\n"
+            exit 21
+        fi
+
+        printf "reloaded ramdisk '${DISK_NAME}' for read-only: ${DISK_ID}\n"
+    else
+        printf "ramdisk '${DISK_NAME}' doesn't exist\n"
+        exit 20
+    fi
+}
+
 function macos_destroy_ramdisk() {
     if macos_exist_ramdisk; then
         diskutil umount ${DISK_ID}
         hdiutil detach ${DISK_ID}
         if macos_exist_ramdisk; then
             printf "failed to detach ramdisk '${DISK_NAME}'\n"
-            exit 21
+            exit 31
         fi
 
         printf "ramdisk '${DISK_NAME}' just detached\n"
     else
         printf "ramdisk '${DISK_NAME}' doesn't exist\n"
-        exit 20
+        exit 30
     fi
 }
 
@@ -146,7 +166,7 @@ function linux_exist_ramdisk() {
 function linux_create_ramdisk() {
     if linux_exist_ramdisk; then
         printf "ramdisk '${DISK_NAME}' already exists: ${DISK_ID}\n"
-        exit 30
+        exit 10
     else
         DISK_ID=/mnt/${DISK_NAME}
         if [[ ! -d "$DISK_ID" ]]; then
@@ -163,19 +183,34 @@ function linux_create_ramdisk() {
     fi
 }
 
+function linux_reload_ramdisk() {
+    if linux_exist_ramdisk; then
+        mount -o remount,ro ${DISK_ID} ${DISK_ID}
+        if ! linux_exist_ramdisk; then
+            printf "failed to reload ramdisk '${DISK_NAME}'\n"
+            exit 21
+        fi
+
+        printf "reloaded ramdisk '${DISK_NAME}' for read-only: ${DISK_ID}\n"
+    else
+        printf "ramdisk '${DISK_NAME}' doesn't exist\n"
+        exit 20
+    fi
+}
+
 function linux_destroy_ramdisk() {
     if linux_exist_ramdisk; then
         umount ${DISK_ID}
         rmdir ${DISK_ID}
         if linux_exist_ramdisk; then
             printf "failed to detach ramdisk '${DISK_NAME}'\n"
-            exit 41
+            exit 31
         fi
 
         printf "ramdisk '${DISK_NAME}' just detached\n"
     else
         printf "ramdisk '${DISK_NAME}' doesn't exist\n"
-        exit 40
+        exit 30
     fi
 }
 
@@ -183,7 +218,7 @@ function linux_destroy_ramdisk() {
 printf "Task: [${OS_NAME}] ${ACTION} "
 if [[ $ACTION == "CREATE" ]]; then
     printf "${ACCESS_TYPE} ramdisk '${DISK_NAME}' of ${DISK_SIZE_MB} MiB\n\n"
-elif [[ $ACTION == "DESTROY" ]]; then
+elif [[ $ACTION == "DESTROY" ]] || [[ $ACTION == "RELOAD" ]]; then
     printf "ramdisk '${DISK_NAME}'\n\n"
 fi
 
@@ -195,6 +230,9 @@ if [[ $OS_NAME == "MACOS" ]]; then
     DESTROY)
         macos_destroy_ramdisk
         ;;
+    RELOAD)
+        macos_reload_ramdisk
+        ;;
     esac
 elif [[ $OS_NAME == "LINUX" ]]; then
     case "$ACTION" in
@@ -203,6 +241,9 @@ elif [[ $OS_NAME == "LINUX" ]]; then
         ;;
     DESTROY)
         linux_destroy_ramdisk
+        ;;
+    RELOAD)
+        linux_reload_ramdisk
         ;;
     esac
 fi

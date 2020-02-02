@@ -135,7 +135,8 @@ func TestCopyFile(t *testing.T) {
 
 			if err := CopyFile(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("CopyFile() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			} else {
+				expectedErrorCheck(t, err)
 			}
 
 			if !tt.wantErr {
@@ -213,6 +214,7 @@ func TestCopyDir(t *testing.T) {
 		{"Destination directory exists and contains a file with the same name and no permissions", resourceCopyDirSourceMap["OneFileDir"], JoinPath(outputRoot, "exist-no-perm-file"), emptyStr, emptyStr, true},
 		{"Destination directory exists and contains a directory with the same name and no permissions", resourceCopyDirSourceMap["MiscDir"], JoinPath(outputRoot, "exist-no-perm-dir"), emptyStr, emptyStr, true},
 		{"Destination directory exists and contains a symlink with the same name", resourceCopyDirSourceMap["OnlySymlinks"], JoinPath(outputRoot, "exist-symlink"), resourceCopyDirSourceMap["OnlySymlinks"], JoinPath(outputRoot, "exist-symlink", "only-symlinks"), false},
+		{"Destination directory exists and contains a directory using the same symlink name", resourceCopyDirSourceMap["OnlySymlinks"], JoinPath(outputRoot, "exist-conflict"), emptyStr, emptyStr, true},
 
 		{"Source and destination are exactly the same", resourceCopyDirSourceMap["OneFileDir"], resourceCopyDirSourceMap["OneFileDir"], emptyStr, emptyStr, true},
 		{"Source and destination are actually the same", resourceCopyDirSourceMap["OneFileDir"], resourceCopyDirSourceRoot, emptyStr, emptyStr, true},
@@ -226,7 +228,8 @@ func TestCopyDir(t *testing.T) {
 
 			if err := CopyDir(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("CopyDir() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			} else {
+				expectedErrorCheck(t, err)
 			}
 
 			if !tt.wantErr {
@@ -296,6 +299,11 @@ func TestCopySymlink(t *testing.T) {
 		{"Destination exists and it's a circular symlink", JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "link-circular"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(existRoot, "link-circular"), false},
 		{"Destination doesn't exist but its parent does", JoinPath(sourceRoot, "link-file.txt"), JoinPath(outputRoot, "target.lnk"), JoinPath(sourceRoot, "link-file.txt"), JoinPath(outputRoot, "target.lnk"), false},
 		{"Destination and its parent don't exist", JoinPath(sourceRoot, "link-file.txt"), JoinPath(resourceCopySymlinkRoot, "missing1", "missing2"), emptyStr, emptyStr, true},
+
+		{"Inferred destination path is a file", JoinPath(sourceRoot, "link.txt"), JoinPath(outputRoot, "exist-file"), JoinPath(sourceRoot, "link.txt"), JoinPath(outputRoot, "exist-file", "link.txt"), false},
+		{"Inferred destination path is a symlink", JoinPath(sourceRoot, "link.txt"), JoinPath(outputRoot, "exist-link"), JoinPath(sourceRoot, "link.txt"), JoinPath(outputRoot, "exist-link", "link.txt"), false},
+		{"Inferred destination path is a directory", JoinPath(sourceRoot, "link.txt"), JoinPath(outputRoot, "exist-dir"), emptyStr, emptyStr, true},
+		{"Cross-device: destination is on a read-only device", JoinPath(sourceRoot, "link-file.txt"), JoinPath(resourceReadOnlyDevice, "copy-link.txt"), emptyStr, emptyStr, true},
 	}
 
 	for _, tt := range tests {
@@ -304,7 +312,8 @@ func TestCopySymlink(t *testing.T) {
 
 			if err := CopySymlink(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("CopySymlink() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			} else {
+				expectedErrorCheck(t, err)
 			}
 
 			if !tt.wantErr {

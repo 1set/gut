@@ -2,99 +2,21 @@ package yos
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"strings"
-
-	"github.com/1set/gut/ystring"
 )
 
 var (
-	// CompareFileModeMask is a mask for file mode bits to compare in SameDirEntries.
-	CompareFileModeMask = os.ModeDir | os.ModeSymlink
+	// compareFileModeMask is a mask for file mode bits to compare in SameDirEntries.
+	compareFileModeMask = os.ModeDir | os.ModeSymlink
+	// fileCompareChunkSize represents the buffer size for readers of SameFileContent.
+	fileCompareChunkSize = 64 * 1024
 )
-
-// SameFileContent checks if the two given files have the same content or are the same file. Symbolic links are followed.
-// Errors are returned if any files doesn't exist or is broken.
-func SameFileContent(path1, path2 string) (same bool, err error) {
-	if path1, path2, err = refineComparePaths(path1, path2); err != nil {
-		return
-	}
-
-	var fi1, fi2 os.FileInfo
-	if fi1, err = os.Stat(path1); err != nil {
-		return
-	}
-	if fi2, err = os.Stat(path2); err != nil {
-		return
-	}
-
-	if !fi1.Mode().IsRegular() {
-		err = fmt.Errorf("%v: path1 is not a regular file", path1)
-		return
-	}
-	if !fi2.Mode().IsRegular() {
-		err = fmt.Errorf("%v: path2 is not a regular file", path2)
-		return
-	}
-
-	if os.SameFile(fi1, fi2) {
-		same = true
-		return
-	}
-
-	if fi1.Size() != fi2.Size() {
-		return
-	}
-
-	var file1, file2 *os.File
-	if file1, err = os.Open(path1); err != nil {
-		return
-	}
-	defer file1.Close()
-
-	if file2, err = os.Open(path2); err != nil {
-		return
-	}
-	defer file2.Close()
-
-	const chunkSize = 64 * 1024
-	buf1, buf2 := make([]byte, chunkSize), make([]byte, chunkSize)
-	for {
-		nr1, err1 := file1.Read(buf1)
-		nr2, err2 := file2.Read(buf2)
-
-		if err1 == io.EOF && err2 == io.EOF {
-			if nr1 == 0 && nr2 == 0 {
-				same = true
-				break
-			}
-			err = io.ErrUnexpectedEOF
-		} else if err1 != nil {
-			err = err1
-		} else if err2 != nil {
-			err = err2
-		} else if nr1 != nr2 {
-			err = ErrShortRead
-		}
-
-		if err != nil {
-			break
-		}
-
-		if same = bytes.Equal(buf1[:nr1], buf2[:nr2]); !same {
-			break
-		}
-	}
-
-	return
-}
 
 // SameSymlinkContent checks if the two symbolic links have the same destination.
 func SameSymlinkContent(path1, path2 string) (same bool, err error) {
-	if path1, path2, err = refineComparePaths(path1, path2); err != nil {
+	if path1, path2, err = refineComparePaths(path1, path2, nil, nil); err != nil {
 		return
 	}
 
@@ -110,31 +32,77 @@ func SameSymlinkContent(path1, path2 string) (same bool, err error) {
 	return
 }
 
+// SameFileContent checks if the two given files have the same content or are the same file. Symbolic links are followed.
+// Errors are returned if any files doesn't exist or is broken.
+func SameFileContent(path1, path2 string) (same bool, err error) {
+	switch path1, path2, err = refineComparePaths(path1, path2, isFileFi, errNotRegularFile); {
+	case err == errSameFile:
+		same, err = true, nil
+		return
+	case err == errDiffFileSize:
+		same, err = false, nil
+		return
+	case err != nil:
+		return
+	}
+
+	var file1, file2 *os.File
+	if file1, err = os.Open(path1); err != nil {
+		return
+	}
+	defer file1.Close()
+
+	if file2, err = os.Open(path2); err != nil {
+		return
+	}
+	defer file2.Close()
+
+	var pathErr string
+	buf1, buf2 := make([]byte, fileCompareChunkSize), make([]byte, fileCompareChunkSize)
+	for {
+		nr1, err1 := file1.Read(buf1)
+		nr2, err2 := file2.Read(buf2)
+
+		if err1 == io.EOF && err2 == io.EOF {
+			if nr1 == 0 && nr2 == 0 {
+				same = true
+				break
+			}
+
+			if pathErr = path1; nr2 > 0 {
+				pathErr = path2
+			}
+			err = opError(opnCompare, pathErr, io.ErrUnexpectedEOF)
+		} else if err1 != nil {
+			err = opError(opnCompare, path1, err1)
+		} else if err2 != nil {
+			err = opError(opnCompare, path2, err2)
+		} else if nr1 != nr2 {
+			if pathErr = path1; nr1 > nr2 {
+				pathErr = path2
+			}
+			err = opError(opnCompare, pathErr, errShortRead)
+		}
+
+		if err != nil {
+			break
+		}
+
+		if same = bytes.Equal(buf1[:nr1], buf2[:nr2]); !same {
+			break
+		}
+	}
+
+	return
+}
+
 // SameDirEntries checks if the two directories have the same entries. Symbolic links will be not be followed, and only compares the contents.
 func SameDirEntries(path1, path2 string) (same bool, err error) {
-	if path1, path2, err = refineComparePaths(path1, path2); err != nil {
+	switch path1, path2, err = refineComparePaths(path1, path2, isDirFi, errNotDirectory); {
+	case err == errSameFile:
+		same, err = true, nil
 		return
-	}
-
-	var fi1, fi2 os.FileInfo
-	if fi1, err = os.Stat(path1); err != nil {
-		return
-	}
-	if fi2, err = os.Stat(path2); err != nil {
-		return
-	}
-
-	if !fi1.IsDir() {
-		err = fmt.Errorf("%v: path1 is not a directory", path1)
-		return
-	}
-	if !fi2.IsDir() {
-		err = fmt.Errorf("%v: path2 is not a directory", path2)
-		return
-	}
-
-	if os.SameFile(fi1, fi2) {
-		same = true
+	case err != nil:
 		return
 	}
 
@@ -161,7 +129,7 @@ IterateItems:
 		}
 
 		entryMode1, entryMode2 := entry1.Info.Mode(), entry2.Info.Mode()
-		if same = entryMode1&CompareFileModeMask == entryMode2&CompareFileModeMask; !same {
+		if same = entryMode1&compareFileModeMask == entryMode2&compareFileModeMask; !same {
 			break
 		}
 
@@ -171,24 +139,12 @@ IterateItems:
 				break IterateItems
 			}
 		case os.ModeDir:
-		default:
+		case 0:
 			if same, err = SameFileContent(entry1.Path, entry2.Path); err != nil || !same {
 				break IterateItems
 			}
 		}
 	}
 
-	return
-}
-
-// refineComparePaths validates, cleans up for file comparison.
-func refineComparePaths(pathRaw1, pathRaw2 string) (path1, path2 string, err error) {
-	if ystring.IsBlank(pathRaw1) || ystring.IsBlank(pathRaw2) {
-		err = ErrEmptyPath
-		return
-	}
-
-	// clean up paths
-	path1, path2 = filepath.Clean(pathRaw1), filepath.Clean(pathRaw2)
 	return
 }

@@ -1,18 +1,8 @@
 package yos
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
-)
-
-var (
-	// ErrIsDir indicates the given path is actually a directory
-	ErrIsDir = errors.New("target is a directory")
-	// ErrIsFile indicates the given path is actually a file
-	ErrIsFile = errors.New("target is a file")
-	// ErrIsNotSymlink indicates the given path is not a symbolic link
-	ErrIsNotSymlink = errors.New("target is not a symbolic link")
 )
 
 // IsExist checks if the file, directory exists.
@@ -31,42 +21,25 @@ func IsNotExist(path string) bool {
 
 // IsFileExist checks if the specified path exists and is a file.
 // If the path is a symbolic link, it will attempt to follow the link and check.
-func IsFileExist(path string) (exist bool, err error) {
-	return checkPathExist(path, false, ErrIsDir)
+func IsFileExist(path string) bool {
+	return checkPathExist(path, os.Stat, isFileFi)
 }
 
 // IsDirExist checks if the specified path exists and is a directory.
 // If the path is a symbolic link, it will attempt to follow the link and check.
-func IsDirExist(path string) (exist bool, err error) {
-	return checkPathExist(path, true, ErrIsFile)
-}
-
-func checkPathExist(path string, expectDir bool, fallbackErr error) (exist bool, err error) {
-	exist, err = false, nil
-	var info os.FileInfo
-	if info, err = os.Stat(path); err == nil {
-		if info.IsDir() == expectDir {
-			exist = true
-		} else {
-			err = fallbackErr
-		}
-	}
-	return
+func IsDirExist(path string) bool {
+	return checkPathExist(path, os.Stat, isDirFi)
 }
 
 // IsSymlinkExist checks if the specified path exists and is a symbolic link.
 // It only checks the path itself and makes no attempt to follow the link.
-func IsSymlinkExist(path string) (exist bool, err error) {
-	exist, err = false, nil
-	var info os.FileInfo
-	if info, err = os.Lstat(path); err == nil {
-		if (info.Mode() & os.ModeSymlink) != 0 {
-			exist = true
-		} else {
-			err = ErrIsNotSymlink
-		}
-	}
-	return
+func IsSymlinkExist(path string) bool {
+	return checkPathExist(path, os.Lstat, isSymlinkFi)
+}
+
+func checkPathExist(path string, stat funcStatFileInfo, check funcCheckFileInfo) bool {
+	fi, err := stat(path)
+	return err == nil && check(&fi)
 }
 
 // JoinPath joins any number of path elements into a single path, adding a separator if necessary.

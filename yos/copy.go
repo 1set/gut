@@ -1,23 +1,10 @@
 package yos
 
 import (
-	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"math/bits"
 	"os"
-)
-
-var (
-	// ErrShortRead means a read accepted fewer bytes than expected.
-	ErrShortRead = errors.New("short read")
-	// ErrEmptyPath means the given path is empty or blank.
-	ErrEmptyPath = errors.New("path is empty or blank")
-	// ErrSameFile means the given two files are actually the same one.
-	ErrSameFile = errors.New("files are identical")
-	// ErrNotRegular means the file is not a regular file.
-	ErrNotRegular = errors.New("file is not regular")
 )
 
 const (
@@ -33,9 +20,9 @@ const (
 //
 // If the target doesn't exist but its parent directory does, the source file will be copied to the parent directory with the target name.
 //
-// ErrSameFile is returned if it detects an attempt to copy a file to itself.
+// If there is an error, it'll be of type *os.PathError.
 func CopyFile(src, dest string) (err error) {
-	if src, dest, err = refineOpPaths(src, dest, true); err == nil {
+	if src, dest, err = refineOpPaths(opnCopy, src, dest, true); err == nil {
 		err = bufferCopyFile(src, dest, defaultBufferSize)
 	}
 	return
@@ -49,9 +36,9 @@ func CopyFile(src, dest string) (err error) {
 //
 // If the target doesn't exist but its parent directory does, the source directory will be copied to the parent directory with the target name.
 //
-// It stops and returns immediately if any error occurs. ErrSameFile is returned if it detects an attempt to copy a file to itself.
+// It stops and returns immediately if any error occurs, and the error will be of type *os.PathError.
 func CopyDir(src, dest string) (err error) {
-	if src, dest, err = refineOpPaths(src, dest, true); err == nil {
+	if src, dest, err = refineOpPaths(opnCopy, src, dest, true); err == nil {
 		err = copyDir(src, dest)
 	}
 	return
@@ -59,8 +46,9 @@ func CopyDir(src, dest string) (err error) {
 
 // CopySymlink copies a symbolic link to a target file.
 // It only copies the contents and makes no attempt to read the referenced file.
+// If there is an error, it'll be of type *os.PathError.
 func CopySymlink(src, dest string) (err error) {
-	if src, dest, err = refineOpPaths(src, dest, false); err == nil {
+	if src, dest, err = refineOpPaths(opnCopy, src, dest, false); err == nil {
 		err = copySymlink(src, dest)
 	}
 	return
@@ -75,8 +63,10 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	defer srcFile.Close()
 
 	var srcInfo, destInfo os.FileInfo
-	if srcInfo, err = os.Stat(src); err == nil && !srcInfo.Mode().IsRegular() {
-		err = ErrNotRegular
+	if srcInfo, err = os.Stat(src); err == nil {
+		if !isFileFi(&srcInfo) {
+			err = opError(opnCopy, src, errNotRegularFile)
+		}
 	}
 	if err != nil {
 		return
@@ -84,16 +74,15 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 
 	// check if source and destination files are identical
 	if destInfo, err = os.Stat(dest); err == nil {
-		if !destInfo.Mode().IsRegular() {
-			err = ErrNotRegular
+		if !isFileFi(&destInfo) {
+			err = opError(opnCopy, dest, errNotRegularFile)
 		} else if os.SameFile(srcInfo, destInfo) {
-			err = ErrSameFile
+			err = opError(opnCopy, dest, errSameFile)
 		}
 	} else if os.IsNotExist(err) {
 		// it's okay if destination file doesn't exist
 		err = nil
 	}
-
 	if err != nil {
 		return
 	}
@@ -118,7 +107,7 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	for {
 		if nr, err = srcFile.Read(buf); err != nil {
 			if err == io.EOF && nr > 0 {
-				err = io.ErrUnexpectedEOF
+				err = opError(opnCopy, src, io.ErrUnexpectedEOF)
 			}
 			break
 		} else if nr == 0 {
@@ -128,7 +117,7 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 		if nw, err = destFile.Write(buf[:nr]); err != nil {
 			break
 		} else if nw != nr {
-			err = io.ErrShortWrite
+			err = opError(opnCopy, dest, io.ErrShortWrite)
 			break
 		}
 	}
@@ -149,8 +138,9 @@ func copySymlink(src, dest string) (err error) {
 			err = nil
 		}
 	} else {
-		if destInfo.IsDir() {
-			err = fmt.Errorf("%v: destination is a directory", src)
+		if isDirFi(&destInfo) {
+			// avoid overwriting directory
+			err = opError(opnCopy, dest, errIsDirectory)
 		} else {
 			err = os.Remove(dest)
 		}
@@ -160,8 +150,10 @@ func copySymlink(src, dest string) (err error) {
 	}
 
 	var link string
-	if link, err = os.Readlink(src); err == nil {
-		err = os.Symlink(link, dest)
+	if link, err = os.Readlink(src); err != nil {
+		err = opError(opnCopy, src, err)
+	} else if err = os.Symlink(link, dest); err != nil {
+		err = opError(opnCopy, dest, err)
 	}
 	return
 }
@@ -171,8 +163,10 @@ func copyDir(src, dest string) (err error) {
 	var srcInfo, destInfo os.FileInfo
 
 	// check if source exists and is a directory
-	if srcInfo, err = os.Stat(src); err == nil && !srcInfo.IsDir() {
-		err = fmt.Errorf("%v: source is not a directory", src)
+	if srcInfo, err = os.Stat(src); err == nil {
+		if !isDirFi(&srcInfo) {
+			err = opError(opnCopy, src, errNotDirectory)
+		}
 	}
 	if err != nil {
 		return
@@ -180,10 +174,10 @@ func copyDir(src, dest string) (err error) {
 
 	// check if destination doesn't exist or is not a file or source itself
 	if destInfo, err = os.Stat(dest); err == nil {
-		if !destInfo.IsDir() {
-			err = fmt.Errorf("%v: destination is not a directory", src)
+		if !isDirFi(&destInfo) {
+			err = opError(opnCopy, dest, errNotDirectory)
 		} else if os.SameFile(srcInfo, destInfo) {
-			err = ErrSameFile
+			err = opError(opnCopy, dest, errSameFile)
 		}
 	} else if os.IsNotExist(err) {
 		err = nil
@@ -215,7 +209,7 @@ IterateEntry:
 			if err = copySymlink(srcPath, destPath); err != nil {
 				break IterateEntry
 			}
-		default:
+		case 0:
 			if err = bufferCopyFile(srcPath, destPath, defaultBufferSize); err != nil {
 				break IterateEntry
 			}

@@ -19,11 +19,12 @@ func init() {
 
 func TestMoveFile(t *testing.T) {
 	var (
-		bkRoot         = JoinPath(resourceMoveFileRoot, "backup")
-		srcRoot        = JoinPath(resourceMoveFileRoot, "source")
-		destRoot       = JoinPath(resourceMoveFileRoot, "destination")
-		writeDevice    = JoinPath(resourceReadWriteDevice, "move_file")
-		readOnlyDevice = JoinPath(resourceReadOnlyDevice, "move_file")
+		bkRoot          = JoinPath(resourceMoveFileRoot, "backup")
+		srcRoot         = JoinPath(resourceMoveFileRoot, "source")
+		destRoot        = JoinPath(resourceMoveFileRoot, "destination")
+		writeDevice     = JoinPath(resourceReadWriteDevice, "move_file")
+		readOnlyDevice  = JoinPath(resourceReadOnlyDevice, "move_file")
+		protectedDevice = JoinPath(resourceProtectedDevice, "move_dir")
 	)
 
 	tests := []struct {
@@ -78,7 +79,9 @@ func TestMoveFile(t *testing.T) {
 		{"Cross-device: destination directory got no permissions", JoinPath(srcRoot, "text.txt"), JoinPath(writeDevice, "no_perm_dir"), emptyStr, emptyStr, true},
 		{"Cross-device: destination file got no permissions", JoinPath(srcRoot, "file8.txt"), JoinPath(writeDevice, "no_perm_file"), JoinPath(bkRoot, "file8.txt"), JoinPath(writeDevice, "no_perm_file"), false},
 		{"Cross-device: destination got no spaces for large file", JoinPath(srcRoot, "xlarge-text.txt"), JoinPath(writeDevice, "text.txt"), emptyStr, emptyStr, true},
-		{"Cross-device: destination is a read-only device", JoinPath(srcRoot, "text.txt"), JoinPath(readOnlyDevice, "new.txt"), emptyStr, emptyStr, true},
+		{"Cross-device: source is on a protected read-only device", JoinPath(protectedDevice, "text.txt"), JoinPath(writeDevice, "new-text-try.txt"), emptyStr, emptyStr, true},
+		{"Cross-device: destination is on a protected read-only device", JoinPath(srcRoot, "text.txt"), JoinPath(protectedDevice, "text.txt"), emptyStr, emptyStr, true},
+		{"Cross-device: destination is on an empty read-only device", JoinPath(srcRoot, "text.txt"), JoinPath(readOnlyDevice, "new.txt"), emptyStr, emptyStr, true},
 	}
 
 	for _, tt := range tests {
@@ -87,7 +90,8 @@ func TestMoveFile(t *testing.T) {
 
 			if err := MoveFile(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("MoveFile() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			} else {
+				expectedErrorCheck(t, err)
 			}
 
 			if !tt.wantErr {
@@ -182,7 +186,8 @@ func TestMoveSymlink(t *testing.T) {
 
 			if err := MoveSymlink(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("MoveSymlink() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			} else {
+				expectedErrorCheck(t, err)
 			}
 
 			if !tt.wantErr {
@@ -283,7 +288,8 @@ func TestMoveDir(t *testing.T) {
 
 			if err := MoveDir(tt.srcPath, tt.destPath); (err != nil) != tt.wantErr {
 				t.Errorf("MoveDir() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			} else {
+				expectedErrorCheck(t, err)
 			}
 
 			if !tt.wantErr {

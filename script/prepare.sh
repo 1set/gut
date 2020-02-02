@@ -24,21 +24,29 @@ export OS_NAME="$platform_name"
 
 # create ram disk
 if [[ $OS_NAME == "MACOS" ]]; then
-    "$SCRIPT_DIR"/ramdisk.sh destroy GutRamDisk || true
+    "$SCRIPT_DIR"/ramdisk.sh destroy GutWriteDisk || true
     "$SCRIPT_DIR"/ramdisk.sh destroy GutReadOnlyDisk || true
+    "$SCRIPT_DIR"/ramdisk.sh destroy GutProtectedDisk || true
 
-    "$SCRIPT_DIR"/ramdisk.sh create GutRamDisk 64
+    "$SCRIPT_DIR"/ramdisk.sh create GutWriteDisk 64
     "$SCRIPT_DIR"/ramdisk.sh create GutReadOnlyDisk 16 ReadOnly
-    export RAMDISK_WRITE=/Volumes/GutRamDisk
-    export RAMDISK_READONLY=/Volumes/GutReadOnlyDisk
-elif [[ $OS_NAME == "LINUX" ]]; then
-    sudo "$SCRIPT_DIR"/ramdisk.sh destroy GutRamDisk || true
-    sudo "$SCRIPT_DIR"/ramdisk.sh destroy GutReadOnlyDisk || true
+    "$SCRIPT_DIR"/ramdisk.sh create GutProtectedDisk 16
 
-    sudo "$SCRIPT_DIR"/ramdisk.sh create GutRamDisk 64
+    export RAMDISK_WRITE=/Volumes/GutWriteDisk
+    export RAMDISK_READONLY=/Volumes/GutReadOnlyDisk
+    export RAMDISK_PROTECT=/Volumes/GutProtectedDisk
+elif [[ $OS_NAME == "LINUX" ]]; then
+    sudo "$SCRIPT_DIR"/ramdisk.sh destroy GutWriteDisk || true
+    sudo "$SCRIPT_DIR"/ramdisk.sh destroy GutReadOnlyDisk || true
+    sudo "$SCRIPT_DIR"/ramdisk.sh destroy GutProtectedDisk || true
+
+    sudo "$SCRIPT_DIR"/ramdisk.sh create GutWriteDisk 64
     sudo "$SCRIPT_DIR"/ramdisk.sh create GutReadOnlyDisk 16 ReadOnly
-    export RAMDISK_WRITE=/mnt/GutRamDisk
+    sudo "$SCRIPT_DIR"/ramdisk.sh create GutProtectedDisk 16
+
+    export RAMDISK_WRITE=/mnt/GutWriteDisk
     export RAMDISK_READONLY=/mnt/GutReadOnlyDisk
+    export RAMDISK_PROTECT=/mnt/GutProtectedDisk
 fi
 
 # uncompress test resource to temp dir
@@ -53,6 +61,16 @@ if [[ ! -z $RAMDISK_WRITE ]]; then
     cp -R "$TESTRSSDIR"/yos/move_file/destination "$RAMDISK_WRITE"/move_file
     cp -R "$TESTRSSDIR"/yos/move_link/destination "$RAMDISK_WRITE"/move_link
     cp -R "$TESTRSSDIR"/yos/move_dir/destination "$RAMDISK_WRITE"/move_dir
+fi
+
+if [[ ! -z $RAMDISK_PROTECT ]]; then
+    cp -R "$TESTRSSDIR"/yos/move_dir/destination "$RAMDISK_PROTECT"/move_dir
+
+    if [[ $OS_NAME == "MACOS" ]]; then
+        "$SCRIPT_DIR"/ramdisk.sh reload GutProtectedDisk
+    elif [[ $OS_NAME == "LINUX" ]]; then
+        sudo "$SCRIPT_DIR"/ramdisk.sh reload GutProtectedDisk
+    fi
 fi
 
 printf "Uncompress test resource: ${TESTRSSDIR} ${RAMDISK_WRITE}\n"
