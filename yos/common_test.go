@@ -51,16 +51,13 @@ func unwrapErrorStruct(err error) (string, error) {
 	if err == nil {
 		return "null", nil
 	}
-	switch err.(type) {
+	switch e := err.(type) {
 	case *os.PathError:
-		errP, _ := err.(*os.PathError)
-		return "path", errP.Err
+		return "path", e.Err
 	case *os.LinkError:
-		errL, _ := err.(*os.LinkError)
-		return "path", errL.Err
+		return "path", e.Err
 	case *os.SyscallError:
-		errS, _ := err.(*os.SyscallError)
-		return "syscall", errS.Err
+		return "syscall", e.Err
 	default:
 		return "normal", err
 	}

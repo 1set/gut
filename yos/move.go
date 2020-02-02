@@ -72,15 +72,15 @@ func moveEntry(src, dest string, check funcCheckFileInfo, errMode error, remove 
 		err = os.Rename(src, dest)
 	}
 
-	// if rename succeeds
-	if err == nil {
+	// if rename succeeds, or got unexpected errors
+	switch {
+	case err == nil:
 		return
-	}
-
-	// if rename got unexpected errors
-	if os.IsExist(err) || os.IsNotExist(err) {
-		// FIXME: src is not accurate
+	case os.IsNotExist(err):
 		err = opError(opnMove, src, err)
+		return
+	case os.IsExist(err):
+		err = opError(opnMove, dest, err)
 		return
 	}
 

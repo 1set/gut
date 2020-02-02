@@ -33,12 +33,25 @@ type (
 	funcCopyEntry     func(src, dest string) error
 )
 
+// underlyingError returns the underlying error for known os error types. forked from: os/error.go
+func underlyingError(err error) error {
+	switch err := err.(type) {
+	case *os.LinkError:
+		return err.Err
+	case *os.PathError:
+		return err.Err
+	case *os.SyscallError:
+		return err.Err
+	}
+	return err
+}
+
 // opError returns error struct with given details.
 func opError(op, path string, err error) *os.PathError {
 	return &os.PathError{
 		Op:   op,
 		Path: path,
-		Err:  err,
+		Err:  underlyingError(err),
 	}
 }
 

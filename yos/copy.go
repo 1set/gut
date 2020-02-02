@@ -149,11 +149,10 @@ func copySymlink(src, dest string) (err error) {
 	}
 
 	var link string
-	if link, err = os.Readlink(src); err == nil {
-		if err = os.Symlink(link, dest); err != nil {
-			// FIXME: LinkError -> PathError
-			err = opError(opnCopy, dest, err)
-		}
+	if link, err = os.Readlink(src); err != nil {
+		err = opError(opnCopy, src, err)
+	} else if err = os.Symlink(link, dest); err != nil {
+		err = opError(opnCopy, dest, err)
 	}
 	return
 }
