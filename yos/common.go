@@ -26,13 +26,6 @@ var (
 	opnList    = "list"
 )
 
-type (
-	funcStatFileInfo  func(name string) (os.FileInfo, error)
-	funcCheckFileInfo func(fi *os.FileInfo) bool
-	funcRemoveEntry   func(path string) error
-	funcCopyEntry     func(src, dest string) error
-)
-
 // underlyingError returns the underlying error for known os error types. forked from: os/error.go
 func underlyingError(err error) error {
 	switch err := err.(type) {
@@ -53,6 +46,28 @@ func opError(op, path string, err error) *os.PathError {
 		Path: path,
 		Err:  underlyingError(err),
 	}
+}
+
+type (
+	funcStatFileInfo  func(name string) (os.FileInfo, error)
+	funcCheckFileInfo func(fi *os.FileInfo) bool
+	funcRemoveEntry   func(path string) error
+	funcCopyEntry     func(src, dest string) error
+)
+
+// isFileFi indicates whether the FileInfo is for a regular file.
+func isFileFi(fi *os.FileInfo) bool {
+	return fi != nil && (*fi).Mode().IsRegular()
+}
+
+// isDirFi indicates whether the FileInfo is for a directory.
+func isDirFi(fi *os.FileInfo) bool {
+	return fi != nil && (*fi).Mode().IsDir()
+}
+
+// isSymlinkFi indicates whether the FileInfo is for a symbolic link.
+func isSymlinkFi(fi *os.FileInfo) bool {
+	return fi != nil && ((*fi).Mode()&os.ModeType == os.ModeSymlink)
 }
 
 // refineOpPaths validates, cleans up and adjusts the source and destination paths for operations like copy or move.
@@ -116,19 +131,4 @@ func refineComparePaths(pathRaw1, pathRaw2 string) (path1, path2 string, err err
 	// clean up paths
 	path1, path2 = filepath.Clean(pathRaw1), filepath.Clean(pathRaw2)
 	return
-}
-
-// isFileFi indicates whether the FileInfo is for a regular file.
-func isFileFi(fi *os.FileInfo) bool {
-	return fi != nil && (*fi).Mode().IsRegular()
-}
-
-// isDirFi indicates whether the FileInfo is for a directory.
-func isDirFi(fi *os.FileInfo) bool {
-	return fi != nil && (*fi).Mode().IsDir()
-}
-
-// isSymlinkFi indicates whether the FileInfo is for a symbolic link.
-func isSymlinkFi(fi *os.FileInfo) bool {
-	return fi != nil && ((*fi).Mode()&os.ModeType == os.ModeSymlink)
 }
