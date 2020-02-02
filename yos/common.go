@@ -12,6 +12,7 @@ import (
 var (
 	errInvalidPath    = errors.New("invalid path")
 	errSameFile       = errors.New("files are identical")
+	errDiffFileSize   = errors.New("different file size")
 	errShortRead      = errors.New("short read")
 	errIsDirectory    = errors.New("is a directory")
 	errNotDirectory   = errors.New("not a directory")
@@ -128,8 +129,8 @@ func refineOpPaths(opName, srcRaw, destRaw string, followLink bool) (src, dest s
 	return
 }
 
-// refineComparePaths validates, cleans up for file comparison.
-func refineComparePaths(pathRaw1, pathRaw2 string) (path1, path2 string, err error) {
+// refineComparePaths validates, cleans up path for file comparison.
+func refineComparePaths(pathRaw1, pathRaw2 string, check funcCheckFileInfo, errMode error) (path1, path2 string, err error) {
 	if ystring.IsBlank(pathRaw1) {
 		err = opError(opnCompare, pathRaw1, errInvalidPath)
 		return
@@ -141,5 +142,34 @@ func refineComparePaths(pathRaw1, pathRaw2 string) (path1, path2 string, err err
 
 	// clean up paths
 	path1, path2 = filepath.Clean(pathRaw1), filepath.Clean(pathRaw2)
+
+	// quit if got no further check
+	if check == nil {
+		return
+	}
+
+	// check file mode of path1
+	var fi1, fi2 os.FileInfo
+	if fi1, err = os.Stat(path1); err != nil {
+		return
+	} else if !check(&fi1) {
+		err = opError(opnCompare, path1, errMode)
+		return
+	}
+
+	// check file mode of path2
+	if fi2, err = os.Stat(path2); err != nil {
+		return
+	} else if !check(&fi2) {
+		err = opError(opnCompare, path2, errMode)
+		return
+	}
+
+	// check if it's the identical file and file size
+	if os.SameFile(fi1, fi2) {
+		err = errSameFile
+	} else if isFileFi(&fi1) && fi1.Size() != fi2.Size() {
+		err = errDiffFileSize
+	}
 	return
 }
