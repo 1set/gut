@@ -8,11 +8,11 @@ import (
 //
 // If the target is an existing file, the target will be overwritten with the source file.
 //
-// If the target is an existing directory, the source file will be moved to the directory with the same file name.
+// If the target is an existing directory, the source file will be moved to the directory with the same name.
 //
 // If the target doesn't exist but its parent directory does, the source file will be moved to the parent directory with the target name.
 //
-// ErrSameFile is returned if it detects an attempt to copy a file to itself.
+// If there is an error, it'll be of type *os.PathError.
 func MoveFile(src, dest string) (err error) {
 	return moveEntry(
 		src, dest,
@@ -21,8 +21,15 @@ func MoveFile(src, dest string) (err error) {
 		func(src, dest string) error { return bufferCopyFile(src, dest, defaultBufferSize) })
 }
 
-// MoveSymlink moves a symbolic link to a target file.
-// It makes no attempt to read the referenced file.
+// MoveSymlink moves a symbolic link to a target file. It makes no attempt to read the referenced file.
+//
+// If the target is an existing file or link, the target will be overwritten with the source link.
+//
+// If the target is an existing directory, the source link will be moved to the directory with the same name.
+//
+// If the target doesn't exist but its parent directory does, the source link will be moved to the parent directory with the target name.
+//
+// If there is an error, it'll be of type *os.PathError.
 func MoveSymlink(src, dest string) (err error) {
 	return moveEntry(
 		src, dest,
@@ -33,13 +40,13 @@ func MoveSymlink(src, dest string) (err error) {
 
 // MoveDir moves a directory to a target directory recursively. Symbolic links inside the directories will not be followed.
 //
-// If the target is an existing file, it will be replaced by the source directory under the same target name.
+// If the target is an existing file, it will be replaced by the source directory.
 //
 // If the target is an existing directory, the source directory will be moved to the directory with the same name.
 //
 // If the target doesn't exist but its parent directory does, the source directory will be moved to the parent directory with the target name.
 //
-// It stops and returns immediately if any error occurs. ErrSameFile is returned if it detects an attempt to move a file to itself.
+// It stops and returns immediately if any error occurs, and the error will be of type *os.PathError.
 func MoveDir(src, dest string) (err error) {
 	return moveEntry(
 		src, dest,

@@ -20,7 +20,7 @@ const (
 //
 // If the target doesn't exist but its parent directory does, the source file will be copied to the parent directory with the target name.
 //
-// ErrSameFile is returned if it detects an attempt to copy a file to itself.
+// If there is an error, it'll be of type *os.PathError.
 func CopyFile(src, dest string) (err error) {
 	if src, dest, err = refineOpPaths(opnCopy, src, dest, true); err == nil {
 		err = bufferCopyFile(src, dest, defaultBufferSize)
@@ -36,7 +36,7 @@ func CopyFile(src, dest string) (err error) {
 //
 // If the target doesn't exist but its parent directory does, the source directory will be copied to the parent directory with the target name.
 //
-// It stops and returns immediately if any error occurs. ErrSameFile is returned if it detects an attempt to copy a file to itself.
+// It stops and returns immediately if any error occurs, and the error will be of type *os.PathError.
 func CopyDir(src, dest string) (err error) {
 	if src, dest, err = refineOpPaths(opnCopy, src, dest, true); err == nil {
 		err = copyDir(src, dest)
@@ -46,6 +46,7 @@ func CopyDir(src, dest string) (err error) {
 
 // CopySymlink copies a symbolic link to a target file.
 // It only copies the contents and makes no attempt to read the referenced file.
+// If there is an error, it'll be of type *os.PathError.
 func CopySymlink(src, dest string) (err error) {
 	if src, dest, err = refineOpPaths(opnCopy, src, dest, false); err == nil {
 		err = copySymlink(src, dest)
@@ -192,8 +193,6 @@ func copyDir(src, dest string) (err error) {
 	// loop through entries in source directory
 	var entries []os.FileInfo
 	if entries, err = ioutil.ReadDir(src); err != nil {
-		// FIXME: not tested?
-		//err = opError(opnCopy, src, err)
 		return
 	}
 
