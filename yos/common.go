@@ -84,17 +84,18 @@ func isLinkErrorNotDirectory(err error) bool {
 
 // refineOpPaths validates, cleans up and adjusts the source and destination paths for operations like copy or move.
 func refineOpPaths(opName, srcRaw, destRaw string, followLink bool) (src, dest string, err error) {
+	// validate paths, and quit if got error
 	if ystring.IsBlank(srcRaw) {
 		err = opError(opName, srcRaw, errInvalidPath)
-		return
-	}
-	if ystring.IsBlank(destRaw) {
+	} else if ystring.IsBlank(destRaw) {
 		err = opError(opName, destRaw, errInvalidPath)
+	}
+	if err != nil {
 		return
 	}
 
 	// clean up paths
-	srcRaw, destRaw = filepath.Clean(srcRaw), filepath.Clean(destRaw)
+	src, dest = filepath.Clean(srcRaw), filepath.Clean(destRaw)
 
 	// use os.Stat to follow symbolic links
 	statFunc := os.Lstat
@@ -104,64 +105,58 @@ func refineOpPaths(opName, srcRaw, destRaw string, followLink bool) (src, dest s
 
 	// check if source exists
 	var srcInfo, destInfo os.FileInfo
-	if srcInfo, err = statFunc(srcRaw); err != nil {
+	if srcInfo, err = statFunc(src); err != nil {
 		return
 	}
 
 	// check if destination exists
-	if destInfo, err = statFunc(destRaw); err != nil {
+	if destInfo, err = statFunc(dest); err != nil {
 		// check existence of parent of the missing destination
 		if os.IsNotExist(err) {
-			_, err = os.Stat(filepath.Dir(destRaw))
+			_, err = os.Stat(filepath.Dir(dest))
 		}
 	} else {
 		if os.SameFile(srcInfo, destInfo) {
-			err = opError(opName, destRaw, errSameFile)
+			err = opError(opName, dest, errSameFile)
 		} else if destInfo.IsDir() {
 			// append file name of source to path of the existing destination
-			destRaw = JoinPath(destRaw, srcInfo.Name())
+			dest = JoinPath(dest, srcInfo.Name())
 		}
-	}
-
-	if err == nil {
-		src, dest = srcRaw, destRaw
 	}
 	return
 }
 
 // refineComparePaths validates, cleans up path for file comparison.
 func refineComparePaths(pathRaw1, pathRaw2 string, check funcCheckFileInfo, errMode error) (path1, path2 string, err error) {
-	if ystring.IsBlank(pathRaw1) {
-		err = opError(opnCompare, pathRaw1, errInvalidPath)
-		return
-	}
-	if ystring.IsBlank(pathRaw2) {
-		err = opError(opnCompare, pathRaw2, errInvalidPath)
-		return
-	}
-
 	// clean up paths
 	path1, path2 = filepath.Clean(pathRaw1), filepath.Clean(pathRaw2)
 
-	// quit if got no further check
-	if check == nil {
+	// validate paths
+	if ystring.IsBlank(pathRaw1) {
+		err = opError(opnCompare, pathRaw1, errInvalidPath)
+	} else if ystring.IsBlank(pathRaw2) {
+		err = opError(opnCompare, pathRaw2, errInvalidPath)
+	}
+
+	// quit if got error, or no further check
+	if err != nil || check == nil {
 		return
 	}
 
 	// check file mode of path1
 	var fi1, fi2 os.FileInfo
-	if fi1, err = os.Stat(path1); err != nil {
-		return
-	} else if !check(&fi1) {
+	if fi1, err = os.Stat(path1); err == nil && !check(&fi1) {
 		err = opError(opnCompare, path1, errMode)
+	}
+	if err != nil {
 		return
 	}
 
 	// check file mode of path2
-	if fi2, err = os.Stat(path2); err != nil {
-		return
-	} else if !check(&fi2) {
+	if fi2, err = os.Stat(path2); err == nil && !check(&fi2) {
 		err = opError(opnCompare, path2, errMode)
+	}
+	if err != nil {
 		return
 	}
 
