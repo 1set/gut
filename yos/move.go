@@ -78,9 +78,10 @@ func moveEntry(src, dest string, check funcCheckFileInfo, errMode error, remove 
 		err = os.Rename(src, dest)
 	}
 
-	if err == nil {
+	switch {
+	case err == nil:
 		// pass if rename succeeds
-	} else if isLinkErrorCrossDevice(err) {
+	case isLinkErrorCrossDevice(err):
 		// cross device move == remove dest + copy to dest + remove src
 		// remove destination file, and ignore the non-existence error
 		if err = remove(dest); err != nil && !os.IsNotExist(err) {
@@ -90,9 +91,9 @@ func moveEntry(src, dest string, check funcCheckFileInfo, errMode error, remove 
 		if err = copy(src, dest); err == nil {
 			err = remove(src)
 		}
-	} else if os.IsNotExist(err) {
+	case os.IsNotExist(err):
 		err = opError(opnMove, src, err)
-	} else if os.IsExist(err) {
+	case os.IsExist(err):
 		err = opError(opnMove, dest, err)
 	}
 	return
