@@ -57,7 +57,6 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 	}
 	defer file2.Close()
 
-	var pathErr string
 	buf1, buf2 := make([]byte, fileCompareChunkSize), make([]byte, fileCompareChunkSize)
 	for {
 		nr1, err1 := file1.Read(buf1)
@@ -67,21 +66,19 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 			if nr1 == 0 && nr2 == 0 {
 				same = true
 				break
+			} else if nr1 > 0 {
+				err = opError(opnCompare, path1, io.ErrUnexpectedEOF)
+			} else if nr2 > 0 {
+				err = opError(opnCompare, path2, io.ErrUnexpectedEOF)
 			}
-
-			if pathErr = path1; nr2 > 0 {
-				pathErr = path2
-			}
-			err = opError(opnCompare, pathErr, io.ErrUnexpectedEOF)
 		} else if err1 != nil {
 			err = opError(opnCompare, path1, err1)
 		} else if err2 != nil {
 			err = opError(opnCompare, path2, err2)
-		} else if nr1 != nr2 {
-			if pathErr = path1; nr1 > nr2 {
-				pathErr = path2
-			}
-			err = opError(opnCompare, pathErr, errShortRead)
+		} else if nr1 < nr2 {
+			err = opError(opnCompare, path1, errShortRead)
+		} else if nr2 < nr1 {
+			err = opError(opnCompare, path2, errShortRead)
 		}
 
 		if err != nil {
@@ -92,7 +89,6 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 			break
 		}
 	}
-
 	return
 }
 
