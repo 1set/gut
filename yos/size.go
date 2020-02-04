@@ -5,7 +5,9 @@ import (
 	"path/filepath"
 )
 
-func FileSize(path string) (size int64, err error) {
+// GetFileSize returns the size in bytes for a regular file.
+// If the given path is a symbolic link, it will be followed.
+func GetFileSize(path string) (size int64, err error) {
 	var fi os.FileInfo
 	if fi, err = os.Stat(path); err == nil {
 		if isFileFi(&fi) {
@@ -17,7 +19,8 @@ func FileSize(path string) (size int64, err error) {
 	return
 }
 
-func SymlinkSize(path string) (size int64, err error) {
+// GetSymlinkSize returns the size in bytes for a symbolic link.
+func GetSymlinkSize(path string) (size int64, err error) {
 	var fi os.FileInfo
 	if fi, err = os.Lstat(path); err == nil {
 		if isSymlinkFi(&fi) {
@@ -29,7 +32,9 @@ func SymlinkSize(path string) (size int64, err error) {
 	return
 }
 
-func DirSize(path string) (size int64, err error) {
+// GetDirSize returns total size in bytes for all regular files and symbolic links in a directory.
+// If the given path is a symbolic link, it will be followed, but symbolic links inside the directory won't.
+func GetDirSize(path string) (size int64, err error) {
 	var fi os.FileInfo
 	if fi, err = os.Lstat(path); err == nil {
 		// resolve given symbolic link to real path
