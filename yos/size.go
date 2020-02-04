@@ -36,8 +36,8 @@ func GetSymlinkSize(path string) (size int64, err error) {
 // If the given path is a symbolic link, it will be followed, but symbolic links inside the directory won't.
 func GetDirSize(path string) (size int64, err error) {
 	var (
-		fi      os.FileInfo
-		pathRaw = path
+		fi  os.FileInfo
+		raw = path
 	)
 	if path, fi, err = resolveDirInfo(path); err == nil {
 		if isDirFi(&fi) {
@@ -55,7 +55,7 @@ func GetDirSize(path string) (size int64, err error) {
 			err = opError(opnSize, path, errNotDirectory)
 		}
 	} else {
-		err = opError(opnSize, pathRaw, err)
+		err = opError(opnSize, raw, err)
 	}
 
 	return

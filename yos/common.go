@@ -133,10 +133,7 @@ func refineOpPaths(opName, srcRaw, destRaw string, followLink bool) (src, dest s
 }
 
 // refineComparePaths validates, cleans up path for file comparison.
-func refineComparePaths(pathRaw1, pathRaw2 string, check funcCheckFileInfo, errMode error) (path1, path2 string, err error) {
-	// clean up paths
-	path1, path2 = filepath.Clean(pathRaw1), filepath.Clean(pathRaw2)
-
+func refineComparePaths(pathRaw1, pathRaw2 string) (path1, path2 string, err error) {
 	// validate paths
 	if ystring.IsBlank(pathRaw1) {
 		err = opError(opnCompare, pathRaw1, errInvalidPath)
@@ -144,33 +141,9 @@ func refineComparePaths(pathRaw1, pathRaw2 string, check funcCheckFileInfo, errM
 		err = opError(opnCompare, pathRaw2, errInvalidPath)
 	}
 
-	// quit if got error, or no further check
-	if err != nil || check == nil {
-		return
-	}
-
-	// check file mode of path1
-	var fi1, fi2 os.FileInfo
-	if fi1, err = os.Stat(path1); err == nil && !check(&fi1) {
-		err = opError(opnCompare, path1, errMode)
-	}
-	if err != nil {
-		return
-	}
-
-	// check file mode of path2
-	if fi2, err = os.Stat(path2); err == nil && !check(&fi2) {
-		err = opError(opnCompare, path2, errMode)
-	}
-	if err != nil {
-		return
-	}
-
-	// check if it's the identical file and file size
-	if os.SameFile(fi1, fi2) {
-		err = errSameFile
-	} else if isFileFi(&fi1) && fi1.Size() != fi2.Size() {
-		err = errDiffFileSize
+	// clean up paths
+	if err == nil {
+		path1, path2 = filepath.Clean(pathRaw1), filepath.Clean(pathRaw2)
 	}
 	return
 }
@@ -189,8 +162,8 @@ func resolveDirInfo(pathRaw string) (path string, fi os.FileInfo, err error) {
 				return
 			}
 		} else {
-			// simply assign if the raw path isn't a symbolic link to resolve
-			path = pathRaw
+			// simply clean the path if the raw path isn't a symbolic link to resolve
+			path = filepath.Clean(pathRaw)
 		}
 
 		// check if the final path is a directory
