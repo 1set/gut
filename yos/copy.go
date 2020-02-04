@@ -108,12 +108,10 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	var nr, nw int
 	buf := make([]byte, bufferSize)
 	for {
-		if nr, err = srcFile.Read(buf); err != nil {
+		if nr, err = srcFile.Read(buf); err != nil || nr == 0 {
 			if err == io.EOF && nr > 0 {
 				err = opError(opnCopy, src, io.ErrUnexpectedEOF)
 			}
-			break
-		} else if nr == 0 {
 			break
 		}
 
