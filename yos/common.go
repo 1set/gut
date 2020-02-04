@@ -26,6 +26,7 @@ var (
 	opnCopy    = "copy"
 	opnMove    = "move"
 	opnList    = "list"
+	opnSize    = "size"
 )
 
 // underlyingError returns the underlying error for known os error types. forked from: os/error.go
