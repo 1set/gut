@@ -118,7 +118,27 @@ func TestDirSize(t *testing.T) {
 		path     string
 		wantSize int64
 		wantErr  bool
-	}{}
+	}{
+		{"Path is empty", emptyStr, 0, true},
+		{"Source is missing", "__not_exist_link__", 0, true},
+		{"Source is an empty file", resourceSizeSourceMap["EmptyFile"], 0, true},
+		{"Source is a small text file", resourceSizeSourceMap["TextFile"], 0, true},
+		{"Source is an image file", resourceSizeSourceMap["ImageFile"], 0, true},
+		{"Source is a large text file", resourceSizeSourceMap["LargeText"], 0, true},
+		{"Source is an extra large text file", resourceSizeSourceMap["XlargeText"], 0, true},
+
+		{"Source is a blank symlink", resourceSizeSourceMap["BlankSymlink"], 0, true},
+		{"Source is a broken symlink", resourceSizeSourceMap["BrokenSymlink"], 0, true},
+		{"Source is a circular symlink", resourceSizeSourceMap["CircularSymlink"], 0, true},
+		{"Source is a symlink to file", resourceSizeSourceMap["FileSymlink"], 0, true},
+		{"Source is a symlink to directory", resourceSizeSourceMap["DirSymlink"], 309, false},
+
+		{"Source is an empty directory", resourceSizeSourceMap["EmptyDir"], 0, false},
+		{"Source is a directory containing one file", resourceSizeSourceMap["OneFileDir"], 3, false},
+		{"Source is a directory containing only directories", resourceSizeSourceMap["DirsDir"], 0, false},
+		{"Source is a directory containing only symlinks", resourceSizeSourceMap["SymlinksDir"], 29, false},
+		{"Source is a directory containing files, symlinks and directories", resourceSizeSourceMap["MiscDir"], 309, false},
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotSize, err := DirSize(tt.path)
