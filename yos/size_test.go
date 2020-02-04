@@ -61,12 +61,15 @@ func TestFileSize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			preconditionCheck(t, tt.name)
+
 			gotSize, err := GetFileSize(tt.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetFileSize() error = %v, wantErr %v", err, tt.wantErr)
 			} else {
 				expectedErrorCheck(t, err)
 			}
+
 			if gotSize != tt.wantSize {
 				t.Errorf("GetFileSize() gotSize = %v, want %v", gotSize, tt.wantSize)
 			}
@@ -103,12 +106,15 @@ func TestSymlinkSize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			preconditionCheck(t, tt.name)
+
 			gotSize, err := GetSymlinkSize(tt.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetSymlinkSize() error = %v, wantErr %v", err, tt.wantErr)
 			} else {
 				expectedErrorCheck(t, err)
 			}
+
 			if gotSize != tt.wantSize {
 				t.Errorf("GetSymlinkSize() gotSize = %v, want %v", gotSize, tt.wantSize)
 			}
@@ -145,12 +151,15 @@ func TestDirSize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			preconditionCheck(t, tt.name)
+
 			gotSize, err := GetDirSize(tt.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetDirSize() error = %v, wantErr %v", err, tt.wantErr)
 			} else {
 				expectedErrorCheck(t, err)
 			}
+
 			if gotSize != tt.wantSize {
 				t.Errorf("GetDirSize() gotSize = %v, want %v", gotSize, tt.wantSize)
 			}
