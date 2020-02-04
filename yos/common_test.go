@@ -108,9 +108,9 @@ func Test_resolveDirInfo(t *testing.T) {
 		{"Source is a broken symlink", resourceSizeSourceMap["BrokenSymlink"], emptyStr, true},
 		{"Source is a circular symlink", resourceSizeSourceMap["CircularSymlink"], emptyStr, true},
 		{"Source is a symlink to file", resourceSizeSourceMap["FileSymlink"], emptyStr, true},
-		{"Source is a symlink to directory", resourceSizeSourceMap["DirSymlink"], resourceSizeSourceMap["MiscDir"], false},
+		{"Source is a symlink to directory (non-Windows)", resourceSizeSourceMap["DirSymlink"], resourceSizeSourceMap["MiscDir"], false},
 		{"Source is a symlink to symlink to file", resourceSizeSourceMap["LinkFileSymlink"], emptyStr, true},
-		{"Source is a symlink to symlink to directory", resourceSizeSourceMap["LinkDirSymlink"], resourceSizeSourceMap["MiscDir"], false},
+		{"Source is a symlink to symlink to directory (non-Windows)", resourceSizeSourceMap["LinkDirSymlink"], resourceSizeSourceMap["MiscDir"], false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
