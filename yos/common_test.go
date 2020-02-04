@@ -92,3 +92,40 @@ func Test_opError(t *testing.T) {
 		})
 	}
 }
+
+func Test_resolveDirInfo(t *testing.T) {
+	tests := []struct {
+		name     string
+		pathRaw  string
+		wantPath string
+		wantErr  bool
+	}{
+		{"Path is empty", emptyStr, emptyStr, true},
+		{"Source is missing", "__not_exist_item__", emptyStr, true},
+		{"Source is a text file", resourceSizeSourceMap["TextFile"], emptyStr, true},
+		{"Source is an empty directory", resourceSizeSourceMap["EmptyDir"], resourceSizeSourceMap["EmptyDir"], false},
+		{"Source is a directory", resourceSizeSourceMap["MiscDir"], resourceSizeSourceMap["MiscDir"], false},
+		{"Source is a broken symlink", resourceSizeSourceMap["BrokenSymlink"], emptyStr, true},
+		{"Source is a circular symlink", resourceSizeSourceMap["CircularSymlink"], emptyStr, true},
+		{"Source is a symlink to file", resourceSizeSourceMap["FileSymlink"], emptyStr, true},
+		{"Source is a symlink to directory", resourceSizeSourceMap["DirSymlink"], resourceSizeSourceMap["MiscDir"], false},
+		{"Source is a symlink to symlink to file", resourceSizeSourceMap["LinkFileSymlink"], emptyStr, true},
+		{"Source is a symlink to symlink to directory", resourceSizeSourceMap["LinkDirSymlink"], resourceSizeSourceMap["MiscDir"], false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotPath, gotFi, err := resolveDirInfo(tt.pathRaw)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("resolveDirInfo() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !strings.HasSuffix(gotPath, tt.wantPath) {
+				t.Errorf("resolveDirInfo() gotPath = %v, want to end with %v", gotPath, tt.wantPath)
+				return
+			}
+			if !tt.wantErr && (gotFi == nil) {
+				t.Errorf("resolveDirInfo() gotFi = %v, want not nil", gotFi)
+			}
+		})
+	}
+}

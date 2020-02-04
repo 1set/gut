@@ -22,6 +22,8 @@ func init() {
 		"CircularSymlink": JoinPath(resourceSizeRoot, "link-circular"),
 		"FileSymlink":     JoinPath(resourceSizeRoot, "link.txt"),
 		"DirSymlink":      JoinPath(resourceSizeRoot, "link-dir"),
+		"LinkFileSymlink": JoinPath(resourceSizeRoot, "link2.txt"),
+		"LinkDirSymlink":  JoinPath(resourceSizeRoot, "link2-dir"),
 		"EmptyDir":        JoinPath(resourceSizeRoot, "empty-dir"),
 		"OneFileDir":      JoinPath(resourceSizeRoot, "one-file-dir"),
 		"DirsDir":         JoinPath(resourceSizeRoot, "only-dirs"),
