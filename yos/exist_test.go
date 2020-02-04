@@ -29,11 +29,11 @@ func TestIsExistOrNot(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsExist(tt.path); got != tt.exist {
-				t.Errorf("IsExist() = %v, want %v", got, tt.exist)
+			if got := Exist(tt.path); got != tt.exist {
+				t.Errorf("Exist() = %v, want %v", got, tt.exist)
 			}
-			if got := IsNotExist(tt.path); got != !tt.exist {
-				t.Errorf("IsNotExist() = %v, want %v", got, !tt.exist)
+			if got := NotExist(tt.path); got != !tt.exist {
+				t.Errorf("NotExist() = %v, want %v", got, !tt.exist)
 			}
 		})
 	}
@@ -41,13 +41,13 @@ func TestIsExistOrNot(t *testing.T) {
 
 func BenchmarkIsExist(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = IsExist("doc.go")
+		_ = Exist("doc.go")
 	}
 }
 
 func BenchmarkIsNotExist(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = IsNotExist("doc.go")
+		_ = NotExist("doc.go")
 	}
 }
 
@@ -72,9 +72,9 @@ func TestIsFileExist(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotExist := IsFileExist(tt.path)
+			gotExist := ExistFile(tt.path)
 			if gotExist != tt.wantExist {
-				t.Errorf("IsFileExist() gotExist = %v, want %v", gotExist, tt.wantExist)
+				t.Errorf("ExistFile() gotExist = %v, want %v", gotExist, tt.wantExist)
 			}
 		})
 	}
@@ -82,7 +82,7 @@ func TestIsFileExist(t *testing.T) {
 
 func BenchmarkIsFileExist(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = IsFileExist("doc.go")
+		_ = ExistFile("doc.go")
 	}
 }
 
@@ -109,9 +109,9 @@ func TestIsDirExist(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			preconditionCheck(t, tt.name)
 
-			gotExist := IsDirExist(tt.path)
+			gotExist := ExistDir(tt.path)
 			if gotExist != tt.wantExist {
-				t.Errorf("IsDirExist() gotExist = %v, want %v", gotExist, tt.wantExist)
+				t.Errorf("ExistDir() gotExist = %v, want %v", gotExist, tt.wantExist)
 			}
 		})
 	}
@@ -119,7 +119,7 @@ func TestIsDirExist(t *testing.T) {
 
 func BenchmarkIsDirExist(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = IsDirExist(resourceExistRoot)
+		_ = ExistDir(resourceExistRoot)
 	}
 }
 
@@ -144,9 +144,9 @@ func TestIsSymlinkExist(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotExist := IsSymlinkExist(tt.path)
+			gotExist := ExistSymlink(tt.path)
 			if gotExist != tt.wantExist {
-				t.Errorf("IsSymlinkExist() gotExist = %v, want %v", gotExist, tt.wantExist)
+				t.Errorf("ExistSymlink() gotExist = %v, want %v", gotExist, tt.wantExist)
 			}
 		})
 	}
@@ -156,7 +156,7 @@ func BenchmarkIsSymlinkExist(b *testing.B) {
 	path := JoinPath(resourceExistRoot, "symlink.txt")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = IsSymlinkExist(path)
+		_ = ExistSymlink(path)
 	}
 }
 
