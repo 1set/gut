@@ -56,15 +56,18 @@ func CopySymlink(src, dest string) (err error) {
 
 // bufferCopyFile reads content from the source file and write to the destination file with a buffer.
 func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
-	var srcFile, destFile *os.File
-	if srcFile, err = os.Open(src); err != nil {
-		return
-	}
-	defer srcFile.Close()
+	var (
+		srcFile, destFile *os.File
+		srcInfo, destInfo os.FileInfo
+	)
 
-	var srcInfo, destInfo os.FileInfo
+	// check if source file exists and open for read
 	if srcInfo, err = os.Stat(src); err == nil {
-		if !isFileFi(&srcInfo) {
+		if isFileFi(&srcInfo) {
+			if srcFile, err = os.Open(src); err == nil {
+				defer srcFile.Close()
+			}
+		} else {
 			err = opError(opnCopy, src, errNotRegularFile)
 		}
 	}
@@ -105,12 +108,10 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	var nr, nw int
 	buf := make([]byte, bufferSize)
 	for {
-		if nr, err = srcFile.Read(buf); err != nil {
+		if nr, err = srcFile.Read(buf); err != nil || nr == 0 {
 			if err == io.EOF && nr > 0 {
 				err = opError(opnCopy, src, io.ErrUnexpectedEOF)
 			}
-			break
-		} else if nr == 0 {
 			break
 		}
 

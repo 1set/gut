@@ -5,35 +5,35 @@ import (
 	"path/filepath"
 )
 
-// IsExist checks if the file, directory exists.
+// Exist checks if the file, directory exists.
 // If the file is a symbolic link, it will attempt to follow the link and check if the source file exists.
-func IsExist(path string) bool {
+func Exist(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
 }
 
-// IsNotExist checks if the file, directory doesn't exist.
+// NotExist checks if the file, directory doesn't exist.
 // If the file is a symbolic link, it will attempt to follow the link and check if the source file doesn't exist.
-func IsNotExist(path string) bool {
+func NotExist(path string) bool {
 	_, err := os.Stat(path)
 	return os.IsNotExist(err)
 }
 
-// IsFileExist checks if the specified path exists and is a file.
+// ExistFile checks if the specified path exists and is a file.
 // If the path is a symbolic link, it will attempt to follow the link and check.
-func IsFileExist(path string) bool {
+func ExistFile(path string) bool {
 	return checkPathExist(path, os.Stat, isFileFi)
 }
 
-// IsDirExist checks if the specified path exists and is a directory.
+// ExistDir checks if the specified path exists and is a directory.
 // If the path is a symbolic link, it will attempt to follow the link and check.
-func IsDirExist(path string) bool {
+func ExistDir(path string) bool {
 	return checkPathExist(path, os.Stat, isDirFi)
 }
 
-// IsSymlinkExist checks if the specified path exists and is a symbolic link.
+// ExistSymlink checks if the specified path exists and is a symbolic link.
 // It only checks the path itself and makes no attempt to follow the link.
-func IsSymlinkExist(path string) bool {
+func ExistSymlink(path string) bool {
 	return checkPathExist(path, os.Lstat, isSymlinkFi)
 }
 

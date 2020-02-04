@@ -81,21 +81,19 @@ func listCondEntries(root string, cond func(os.FileInfo) (bool, error)) (entries
 		return
 	}
 
-	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if root == path {
-			return nil
+	err = filepath.Walk(root, func(path string, info os.FileInfo, errIn error) (errOut error) {
+		errOut = errIn
+		if root == path || errOut != nil {
+			return
 		}
 		var ok bool
-		if ok, err = cond(info); ok {
+		if ok, errOut = cond(info); ok {
 			entries = append(entries, &FilePathInfo{
 				Path: path,
 				Info: info,
 			})
 		}
-		return err
+		return
 	})
 	return
 }

@@ -36,8 +36,8 @@ func ExampleListMatch() {
 func ExampleIsExist() {
 	switch {
 	case yos.IsOnMacOS():
-		fmt.Println("macOS", yos.IsExist(".DS_Store"))
+		fmt.Println("macOS", yos.Exist(".DS_Store"))
 	case yos.IsOnWindows():
-		fmt.Println("Windows", yos.IsExist("Thumbs.db"))
+		fmt.Println("Windows", yos.Exist("Thumbs.db"))
 	}
 }
