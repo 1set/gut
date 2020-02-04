@@ -19,8 +19,6 @@ var (
 )
 
 func init() {
-	os.Setenv("TESTRSSDIR", "/var/folders/jy/cfbkpfvn6c9255yvvhfsdwzm0000gn/T/gut_test_resource")
-
 	resourceReadWriteDevice = os.Getenv("RAMDISK_WRITE")
 	resourceReadOnlyDevice = os.Getenv("RAMDISK_READONLY")
 	resourceProtectedDevice = os.Getenv("RAMDISK_PROTECT")
