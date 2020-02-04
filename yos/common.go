@@ -29,6 +29,11 @@ var (
 	opnSize    = "size"
 )
 
+// internal use
+var (
+	emptyStr = ""
+)
+
 // underlyingError returns the underlying error for known os error types. forked from: os/error.go
 func underlyingError(err error) error {
 	switch err := err.(type) {
@@ -166,6 +171,32 @@ func refineComparePaths(pathRaw1, pathRaw2 string, check funcCheckFileInfo, errM
 		err = errSameFile
 	} else if isFileFi(&fi1) && fi1.Size() != fi2.Size() {
 		err = errDiffFileSize
+	}
+	return
+}
+
+// resolveDirInfo returns file info of a path if it's a directory or a symbolic link to a directory, otherwise returns an error.
+func resolveDirInfo(pathRaw string) (path string, fi os.FileInfo, err error) {
+	if fi, err = os.Lstat(pathRaw); err == nil {
+		// resolve to real path if the given path is a symbolic link
+		if isSymlinkFi(&fi) {
+			if path, err = filepath.EvalSymlinks(pathRaw); err == nil {
+				// update file info for the real path
+				fi, err = os.Lstat(path)
+			}
+			if err != nil {
+				path = emptyStr
+				return
+			}
+		} else {
+			// simply assign if the raw path isn't a symbolic link to resolve
+			path = pathRaw
+		}
+
+		// check if the final path is a directory
+		if !isDirFi(&fi) {
+			err, path = errNotDirectory, emptyStr
+		}
 	}
 	return
 }

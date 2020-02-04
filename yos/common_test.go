@@ -12,7 +12,6 @@ import (
 )
 
 var (
-	emptyStr                string
 	resourceReadWriteDevice string
 	resourceReadOnlyDevice  string
 	resourceProtectedDevice string
