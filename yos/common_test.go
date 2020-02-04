@@ -12,7 +12,6 @@ import (
 )
 
 var (
-	emptyStr                string
 	resourceReadWriteDevice string
 	resourceReadOnlyDevice  string
 	resourceProtectedDevice string
@@ -89,6 +88,45 @@ func Test_opError(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := opError(tt.args.op, tt.args.path, tt.args.err); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("opError() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_resolveDirInfo(t *testing.T) {
+	tests := []struct {
+		name     string
+		pathRaw  string
+		wantPath string
+		wantErr  bool
+	}{
+		{"Path is empty", emptyStr, emptyStr, true},
+		{"Source is missing", "__not_exist_item__", emptyStr, true},
+		{"Source is a text file", resourceSizeSourceMap["TextFile"], emptyStr, true},
+		{"Source is an empty directory", resourceSizeSourceMap["EmptyDir"], resourceSizeSourceMap["EmptyDir"], false},
+		{"Source is a directory", resourceSizeSourceMap["MiscDir"], resourceSizeSourceMap["MiscDir"], false},
+		{"Source is a broken symlink", resourceSizeSourceMap["BrokenSymlink"], emptyStr, true},
+		{"Source is a circular symlink", resourceSizeSourceMap["CircularSymlink"], emptyStr, true},
+		{"Source is a symlink to file", resourceSizeSourceMap["FileSymlink"], emptyStr, true},
+		{"Source is a symlink to directory (non-Windows)", resourceSizeSourceMap["DirSymlink"], resourceSizeSourceMap["MiscDir"], false},
+		{"Source is a symlink to symlink to file", resourceSizeSourceMap["LinkFileSymlink"], emptyStr, true},
+		{"Source is a symlink to symlink to directory (non-Windows)", resourceSizeSourceMap["LinkDirSymlink"], resourceSizeSourceMap["MiscDir"], false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			preconditionCheck(t, tt.name)
+
+			gotPath, gotFi, err := resolveDirInfo(tt.pathRaw)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("resolveDirInfo() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !strings.HasSuffix(gotPath, tt.wantPath) {
+				t.Errorf("resolveDirInfo() gotPath = %v, want to end with %v", gotPath, tt.wantPath)
+				return
+			}
+			if !tt.wantErr && (gotFi == nil) {
+				t.Errorf("resolveDirInfo() gotFi = %v, want not nil", gotFi)
 			}
 		})
 	}

@@ -12,7 +12,6 @@ import (
 var (
 	errInvalidPath    = errors.New("invalid path")
 	errSameFile       = errors.New("files are identical")
-	errDiffFileSize   = errors.New("different file size")
 	errShortRead      = errors.New("short read")
 	errIsDirectory    = errors.New("is a directory")
 	errNotDirectory   = errors.New("not a directory")
@@ -26,6 +25,12 @@ var (
 	opnCopy    = "copy"
 	opnMove    = "move"
 	opnList    = "list"
+	opnSize    = "size"
+)
+
+// internal use
+var (
+	emptyStr = ""
 )
 
 // underlyingError returns the underlying error for known os error types. forked from: os/error.go
@@ -127,10 +132,7 @@ func refineOpPaths(opName, srcRaw, destRaw string, followLink bool) (src, dest s
 }
 
 // refineComparePaths validates, cleans up path for file comparison.
-func refineComparePaths(pathRaw1, pathRaw2 string, check funcCheckFileInfo, errMode error) (path1, path2 string, err error) {
-	// clean up paths
-	path1, path2 = filepath.Clean(pathRaw1), filepath.Clean(pathRaw2)
-
+func refineComparePaths(pathRaw1, pathRaw2 string) (path1, path2 string, err error) {
 	// validate paths
 	if ystring.IsBlank(pathRaw1) {
 		err = opError(opnCompare, pathRaw1, errInvalidPath)
@@ -138,33 +140,49 @@ func refineComparePaths(pathRaw1, pathRaw2 string, check funcCheckFileInfo, errM
 		err = opError(opnCompare, pathRaw2, errInvalidPath)
 	}
 
-	// quit if got error, or no further check
-	if err != nil || check == nil {
-		return
+	// clean up paths
+	if err == nil {
+		path1, path2 = filepath.Clean(pathRaw1), filepath.Clean(pathRaw2)
 	}
+	return
+}
 
-	// check file mode of path1
-	var fi1, fi2 os.FileInfo
-	if fi1, err = os.Stat(path1); err == nil && !check(&fi1) {
-		err = opError(opnCompare, path1, errMode)
-	}
-	if err != nil {
-		return
-	}
+// resolveDirInfo returns file info of a path if it's a directory or a symbolic link to a directory, otherwise returns an error.
+func resolveDirInfo(pathRaw string) (path string, fi os.FileInfo, err error) {
+	if fi, err = os.Lstat(pathRaw); err == nil {
+		// resolve to real path if the given path is a symbolic link
+		if isSymlinkFi(&fi) {
+			if path, err = filepath.EvalSymlinks(pathRaw); err == nil {
+				// update file info for the real path
+				fi, err = os.Lstat(path)
+			}
+			if err != nil {
+				path = emptyStr
+				return
+			}
+		} else {
+			// simply clean the path if the raw path isn't a symbolic link to resolve
+			path = filepath.Clean(pathRaw)
+		}
 
-	// check file mode of path2
-	if fi2, err = os.Stat(path2); err == nil && !check(&fi2) {
-		err = opError(opnCompare, path2, errMode)
+		// check if the final path is a directory
+		if !isDirFi(&fi) {
+			err, path = errNotDirectory, emptyStr
+		}
 	}
-	if err != nil {
-		return
-	}
+	return
+}
 
-	// check if it's the identical file and file size
-	if os.SameFile(fi1, fi2) {
-		err = errSameFile
-	} else if isFileFi(&fi1) && fi1.Size() != fi2.Size() {
-		err = errDiffFileSize
+// openFileInfo returns file descriptor and info of a path if it's a regular file, otherwise returns an error.
+func openFileInfo(path string) (file *os.File, fi os.FileInfo, err error) {
+	if fi, err = os.Stat(path); err == nil {
+		if isFileFi(&fi) {
+			if file, err = os.Open(path); err == nil {
+				return
+			}
+		} else {
+			err = errNotRegularFile
+		}
 	}
 	return
 }

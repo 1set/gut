@@ -16,7 +16,7 @@ var (
 
 // SameSymlinkContent checks if the two symbolic links have the same destination.
 func SameSymlinkContent(path1, path2 string) (same bool, err error) {
-	if path1, path2, err = refineComparePaths(path1, path2, nil, nil); err != nil {
+	if path1, path2, err = refineComparePaths(path1, path2); err != nil {
 		return
 	}
 
@@ -35,27 +35,37 @@ func SameSymlinkContent(path1, path2 string) (same bool, err error) {
 // SameFileContent checks if the two given files have the same content or are the same file. Symbolic links are followed.
 // Errors are returned if any files doesn't exist or is broken.
 func SameFileContent(path1, path2 string) (same bool, err error) {
-	switch path1, path2, err = refineComparePaths(path1, path2, isFileFi, errNotRegularFile); {
-	case err == errSameFile:
-		same, err = true, nil
-		return
-	case err == errDiffFileSize:
-		same, err = false, nil
-		return
-	case err != nil:
+	if path1, path2, err = refineComparePaths(path1, path2); err != nil {
 		return
 	}
 
-	var file1, file2 *os.File
-	if file1, err = os.Open(path1); err != nil {
-		return
-	}
-	defer file1.Close()
+	var (
+		fi1, fi2     os.FileInfo
+		file1, file2 *os.File
+	)
 
-	if file2, err = os.Open(path2); err != nil {
+	// check file mode of path1
+	if file1, fi1, err = openFileInfo(path1); err == nil {
+		defer file1.Close()
+	} else {
+		err = opError(opnCompare, path1, err)
 		return
 	}
-	defer file2.Close()
+
+	// check file mode of path2
+	if file2, fi2, err = openFileInfo(path2); err == nil {
+		defer file2.Close()
+	} else {
+		err = opError(opnCompare, path2, err)
+		return
+	}
+
+	// quick check if it's the identical file and file size
+	if same = os.SameFile(fi1, fi2); same {
+		return
+	} else if fi1.Size() != fi2.Size() {
+		return
+	}
 
 	buf1, buf2 := make([]byte, fileCompareChunkSize), make([]byte, fileCompareChunkSize)
 ReadThrough:
@@ -94,17 +104,29 @@ ReadThrough:
 	return
 }
 
-// SameDirEntries checks if the two directories have the same entries. Symbolic links will be not be followed, and only compares the contents.
+// SameDirEntries checks if the two directories have the same entries. Symbolic links other than the given paths will be not be followed, and only compares content of links.
 func SameDirEntries(path1, path2 string) (same bool, err error) {
-	switch path1, path2, err = refineComparePaths(path1, path2, isDirFi, errNotDirectory); {
-	case err == errSameFile:
-		same, err = true, nil
+	var (
+		fi1, fi2       os.FileInfo
+		raw1, raw2     = path1, path2
+		items1, items2 []*FilePathInfo
+	)
+
+	// resolve paths if they're symbolic links
+	if path1, fi1, err = resolveDirInfo(path1); err != nil {
+		err = opError(opnCompare, raw1, err)
 		return
-	case err != nil:
+	}
+	if path2, fi2, err = resolveDirInfo(path2); err != nil {
+		err = opError(opnCompare, raw2, err)
 		return
 	}
 
-	var items1, items2 []*FilePathInfo
+	// quick check if it's the identical directory
+	if same = os.SameFile(fi1, fi2); same {
+		return
+	}
+
 	if items1, err = ListAll(path1); err != nil {
 		return
 	}

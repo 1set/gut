@@ -43,7 +43,7 @@ func verifyTestResult(t *testing.T, name string, expected []string, actual []*Fi
 }
 
 func TestListAll(t *testing.T) {
-	for _, path := range []string{"", "  ", "__not_found_folder__", resourceListSymlinkToRoot, resourceListFileInRoot} {
+	for _, path := range []string{"", "  ", "__not_found_folder__", resourceListFileInRoot} {
 		if _, err := ListAll(path); err == nil {
 			t.Errorf("ListAll(%q) got no error, diff from expected", path)
 		} else {
@@ -53,6 +53,9 @@ func TestListAll(t *testing.T) {
 
 	actual, err := ListAll(resourceListRoot)
 	verifyTestResult(t, "ListAll", expectedResultMap["All"], actual, err)
+
+	actual, err = ListAll(resourceListSymlinkToRoot)
+	verifyTestResult(t, "ListAll(Symlink)", expectedResultMap["All"], actual, err)
 }
 
 func BenchmarkListAll(b *testing.B) {
@@ -62,7 +65,7 @@ func BenchmarkListAll(b *testing.B) {
 }
 
 func TestListFile(t *testing.T) {
-	for _, path := range []string{"", "  ", "__not_found_folder__", resourceListSymlinkToRoot, resourceListFileInRoot} {
+	for _, path := range []string{"", "  ", "__not_found_folder__", resourceListFileInRoot} {
 		if _, err := ListFile(path); err == nil {
 			t.Errorf("ListFile(%q) got no error, diff from expected", path)
 		} else {
@@ -72,6 +75,9 @@ func TestListFile(t *testing.T) {
 
 	actual, err := ListFile(resourceListRoot)
 	verifyTestResult(t, "ListFile", expectedResultMap["AllFiles"], actual, err)
+
+	actual, err = ListFile(resourceListSymlinkToRoot)
+	verifyTestResult(t, "ListFile(Symlink)", expectedResultMap["AllFiles"], actual, err)
 }
 
 func BenchmarkListFile(b *testing.B) {
@@ -81,9 +87,7 @@ func BenchmarkListFile(b *testing.B) {
 }
 
 func TestListDir(t *testing.T) {
-	//t.Parallel()
-
-	for _, path := range []string{"", "  ", "__not_found_folder__", resourceListSymlinkToRoot, resourceListFileInRoot} {
+	for _, path := range []string{"", "  ", "__not_found_folder__", resourceListFileInRoot} {
 		if _, err := ListFile(path); err == nil {
 			t.Errorf("ListFile(%q) got no error, diff from expected", path)
 		} else {
@@ -93,6 +97,9 @@ func TestListDir(t *testing.T) {
 
 	actual, err := ListDir(resourceListRoot)
 	verifyTestResult(t, "ListDir", expectedResultMap["AllDirs"], actual, err)
+
+	actual, err = ListDir(resourceListSymlinkToRoot)
+	verifyTestResult(t, "ListDir(Symlink)", expectedResultMap["AllDirs"], actual, err)
 }
 
 func BenchmarkListDir(b *testing.B) {
@@ -102,8 +109,6 @@ func BenchmarkListDir(b *testing.B) {
 }
 
 func TestListMatch(t *testing.T) {
-	//t.Parallel()
-
 	allEntriesPattern := []string{"*"}
 	type args struct {
 		root     string
@@ -119,7 +124,7 @@ func TestListMatch(t *testing.T) {
 		{"Empty root path", args{"", ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], true},
 		{"Root not exist", args{"__not_found_folder__", ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], true},
 		{"Root is a file", args{resourceListFileInRoot, ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], true},
-		{"Root is a symlink to directory", args{resourceListSymlinkToRoot, ListIncludeFile, allEntriesPattern}, expectedResultMap["Empty"], true},
+		{"Root is a symlink to directory", args{resourceListSymlinkToRoot, ListIncludeFile, allEntriesPattern}, expectedResultMap["RootFiles"], false},
 		{"No Flag", args{resourceListRoot, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
 		{"Flag for file", args{resourceListRoot, ListIncludeFile, allEntriesPattern}, expectedResultMap["RootFiles"], false},
 		{"Flag for dir", args{resourceListRoot, ListIncludeDir, allEntriesPattern}, expectedResultMap["RootDirs"], false},
