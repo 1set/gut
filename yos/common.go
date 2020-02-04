@@ -12,7 +12,6 @@ import (
 var (
 	errInvalidPath    = errors.New("invalid path")
 	errSameFile       = errors.New("files are identical")
-	errDiffFileSize   = errors.New("different file size")
 	errShortRead      = errors.New("short read")
 	errIsDirectory    = errors.New("is a directory")
 	errNotDirectory   = errors.New("not a directory")
@@ -169,6 +168,20 @@ func resolveDirInfo(pathRaw string) (path string, fi os.FileInfo, err error) {
 		// check if the final path is a directory
 		if !isDirFi(&fi) {
 			err, path = errNotDirectory, emptyStr
+		}
+	}
+	return
+}
+
+// openFileInfo returns file descriptor and info of a path if it's a regular file, otherwise returns an error.
+func openFileInfo(path string) (file *os.File, fi os.FileInfo, err error) {
+	if fi, err = os.Stat(path); err == nil {
+		if isFileFi(&fi) {
+			if file, err = os.Open(path); err == nil {
+				return
+			}
+		} else {
+			err = errNotRegularFile
 		}
 	}
 	return

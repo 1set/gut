@@ -39,20 +39,24 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 		return
 	}
 
+	var (
+		fi1, fi2     os.FileInfo
+		file1, file2 *os.File
+	)
+
 	// check file mode of path1
-	var fi1, fi2 os.FileInfo
-	if fi1, err = os.Stat(path1); err == nil && !isFileFi(&fi1) {
-		err = opError(opnCompare, path1, errNotRegularFile)
-	}
-	if err != nil {
+	if file1, fi1, err = openFileInfo(path1); err == nil {
+		defer file1.Close()
+	} else {
+		err = opError(opnCompare, path1, err)
 		return
 	}
 
 	// check file mode of path2
-	if fi2, err = os.Stat(path2); err == nil && !isFileFi(&fi2) {
-		err = opError(opnCompare, path2, errNotRegularFile)
-	}
-	if err != nil {
+	if file2, fi2, err = openFileInfo(path2); err == nil {
+		defer file2.Close()
+	} else {
+		err = opError(opnCompare, path2, err)
 		return
 	}
 
@@ -62,17 +66,6 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 	} else if fi1.Size() != fi2.Size() {
 		return
 	}
-
-	var file1, file2 *os.File
-	if file1, err = os.Open(path1); err != nil {
-		return
-	}
-	defer file1.Close()
-
-	if file2, err = os.Open(path2); err != nil {
-		return
-	}
-	defer file2.Close()
 
 	buf1, buf2 := make([]byte, fileCompareChunkSize), make([]byte, fileCompareChunkSize)
 ReadThrough:

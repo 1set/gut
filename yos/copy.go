@@ -62,16 +62,10 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	)
 
 	// check if source file exists and open for read
-	if srcInfo, err = os.Stat(src); err == nil {
-		if isFileFi(&srcInfo) {
-			if srcFile, err = os.Open(src); err == nil {
-				defer srcFile.Close()
-			}
-		} else {
-			err = opError(opnCopy, src, errNotRegularFile)
-		}
-	}
-	if err != nil {
+	if srcFile, srcInfo, err = openFileInfo(src); err == nil {
+		defer srcFile.Close()
+	} else {
+		err = opError(opnCopy, src, err)
 		return
 	}
 
