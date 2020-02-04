@@ -64,7 +64,6 @@ func TestFileSize(t *testing.T) {
 			gotSize, err := GetFileSize(tt.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetFileSize() error = %v, wantErr %v", err, tt.wantErr)
-				return
 			} else {
 				expectedErrorCheck(t, err)
 			}
@@ -90,11 +89,11 @@ func TestSymlinkSize(t *testing.T) {
 		{"Source is a large text file", resourceSizeSourceMap["LargeText"], 0, true},
 		{"Source is an extra large text file", resourceSizeSourceMap["XlargeText"], 0, true},
 
-		{"Source is a blank symlink", resourceSizeSourceMap["BlankSymlink"], 1, false},
-		{"Source is a broken symlink", resourceSizeSourceMap["BrokenSymlink"], 7, false},
-		{"Source is a circular symlink", resourceSizeSourceMap["CircularSymlink"], 13, false},
-		{"Source is a symlink to file", resourceSizeSourceMap["FileSymlink"], 8, false},
-		{"Source is a symlink to directory", resourceSizeSourceMap["DirSymlink"], 4, false},
+		{"Source is a blank symlink (non-Windows)", resourceSizeSourceMap["BlankSymlink"], 1, false},
+		{"Source is a broken symlink (non-Windows)", resourceSizeSourceMap["BrokenSymlink"], 7, false},
+		{"Source is a circular symlink (non-Windows)", resourceSizeSourceMap["CircularSymlink"], 13, false},
+		{"Source is a symlink to file (non-Windows)", resourceSizeSourceMap["FileSymlink"], 8, false},
+		{"Source is a symlink to directory (non-Windows)", resourceSizeSourceMap["DirSymlink"], 4, false},
 
 		{"Source is an empty directory", resourceSizeSourceMap["EmptyDir"], 0, true},
 		{"Source is a directory containing one file", resourceSizeSourceMap["OneFileDir"], 0, true},
@@ -107,7 +106,6 @@ func TestSymlinkSize(t *testing.T) {
 			gotSize, err := GetSymlinkSize(tt.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetSymlinkSize() error = %v, wantErr %v", err, tt.wantErr)
-				return
 			} else {
 				expectedErrorCheck(t, err)
 			}
@@ -137,20 +135,19 @@ func TestDirSize(t *testing.T) {
 		{"Source is a broken symlink", resourceSizeSourceMap["BrokenSymlink"], 0, true},
 		{"Source is a circular symlink", resourceSizeSourceMap["CircularSymlink"], 0, true},
 		{"Source is a symlink to file", resourceSizeSourceMap["FileSymlink"], 0, true},
-		{"Source is a symlink to directory", resourceSizeSourceMap["DirSymlink"], 309, false},
+		{"Source is a symlink to directory (non-Windows)", resourceSizeSourceMap["DirSymlink"], 309, false},
 
 		{"Source is an empty directory", resourceSizeSourceMap["EmptyDir"], 0, false},
 		{"Source is a directory containing one file", resourceSizeSourceMap["OneFileDir"], 3, false},
 		{"Source is a directory containing only directories", resourceSizeSourceMap["DirsDir"], 0, false},
-		{"Source is a directory containing only symlinks", resourceSizeSourceMap["SymlinksDir"], 29, false},
-		{"Source is a directory containing files, symlinks and directories", resourceSizeSourceMap["MiscDir"], 309, false},
+		{"Source is a directory containing only symlinks (non-Windows)", resourceSizeSourceMap["SymlinksDir"], 29, false},
+		{"Source is a directory containing files, symlinks and directories (non-Windows)", resourceSizeSourceMap["MiscDir"], 309, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotSize, err := GetDirSize(tt.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetDirSize() error = %v, wantErr %v", err, tt.wantErr)
-				return
 			} else {
 				expectedErrorCheck(t, err)
 			}
