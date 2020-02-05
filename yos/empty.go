@@ -24,18 +24,16 @@ func IsDirEmpty(path string) (empty bool, err error) {
 	)
 	if path, fi, err = resolveDirInfo(path); err == nil {
 		if isDirFi(&fi) {
-			err = filepath.Walk(path, func(pathIn string, info os.FileInfo, errIn error) (errOut error) {
-				errOut = errIn
-				if path == pathIn || errOut != nil {
-					return
+			err = filepath.Walk(path, func(itemPath string, info os.FileInfo, errItem error) error {
+				if path == itemPath || errItem != nil {
+					return errItem
 				}
-				errOut = errSameFile
-				return
+				return errStepOutDir
 			})
 
 			if err == nil {
 				empty = true
-			} else if err == errSameFile {
+			} else if err == errStepOutDir {
 				err = nil
 			}
 		} else {
