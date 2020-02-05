@@ -57,6 +57,5 @@ func GetDirSize(path string) (size int64, err error) {
 	} else {
 		err = opError(opnSize, raw, err)
 	}
-
 	return
 }

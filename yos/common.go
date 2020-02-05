@@ -26,6 +26,7 @@ var (
 	opnMove    = "move"
 	opnList    = "list"
 	opnSize    = "size"
+	opnEmpty   = "empty"
 )
 
 // internal use
