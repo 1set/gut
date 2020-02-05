@@ -25,22 +25,18 @@ func IsDirEmpty(path string) (empty bool, err error) {
 		root   string
 	)
 	if root, rootFi, err = resolveDirInfo(path); err == nil {
-		if isDirFi(&rootFi) {
-			err = filepath.Walk(root, func(itemPath string, itemFi os.FileInfo, errItem error) error {
-				if os.SameFile(rootFi, itemFi) || errItem != nil {
-					return errItem
-				}
-				// force exit for the first entry other than the root itself
-				return errStepOutDir
-			})
-
-			if err == nil {
-				empty = true
-			} else if err == errStepOutDir {
-				err = nil
+		err = filepath.Walk(root, func(itemPath string, itemFi os.FileInfo, errItem error) error {
+			if os.SameFile(rootFi, itemFi) || errItem != nil {
+				return errItem
 			}
-		} else {
-			err = opError(opnEmpty, root, errNotDirectory)
+			// force exit for the first entry other than the root itself
+			return errStepOutDir
+		})
+
+		if err == nil {
+			empty = true
+		} else if err == errStepOutDir {
+			err = nil
 		}
 	} else {
 		err = opError(opnEmpty, path, err)

@@ -40,20 +40,16 @@ func GetDirSize(path string) (size int64, err error) {
 		root   string
 	)
 	if root, rootFi, err = resolveDirInfo(path); err == nil {
-		if isDirFi(&rootFi) {
-			err = filepath.Walk(root, func(itemPath string, itemFi os.FileInfo, errIn error) (errOut error) {
-				errOut = errIn
-				if os.SameFile(rootFi, itemFi) || errOut != nil {
-					return
-				}
-				if isFileFi(&itemFi) || isSymlinkFi(&itemFi) {
-					size += itemFi.Size()
-				}
+		err = filepath.Walk(root, func(itemPath string, itemFi os.FileInfo, errIn error) (errOut error) {
+			errOut = errIn
+			if os.SameFile(rootFi, itemFi) || errOut != nil {
 				return
-			})
-		} else {
-			err = opError(opnSize, root, errNotDirectory)
-		}
+			}
+			if isFileFi(&itemFi) || isSymlinkFi(&itemFi) {
+				size += itemFi.Size()
+			}
+			return
+		})
 	} else {
 		err = opError(opnSize, path, err)
 	}
