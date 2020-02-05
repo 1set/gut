@@ -17,6 +17,7 @@ var (
 	errNotDirectory   = errors.New("not a directory")
 	errNotRegularFile = errors.New("not a regular file")
 	errNotSymlink     = errors.New("not a symbolic link")
+	errStepOutDir     = errors.New("yos: step out this directory")
 )
 
 // operation names for the Op field of os.PathError.
@@ -26,6 +27,7 @@ var (
 	opnMove    = "move"
 	opnList    = "list"
 	opnSize    = "size"
+	opnEmpty   = "empty"
 )
 
 // internal use

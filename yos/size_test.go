@@ -1,7 +1,10 @@
 package yos
 
 import (
+	"os"
 	"testing"
+
+	"github.com/1set/gut/ystring"
 )
 
 var (
@@ -12,27 +15,29 @@ var (
 func init() {
 	resourceSizeRoot = JoinPath(testResourceRoot, "yos", "size")
 	resourceSizeSourceMap = map[string]string{
-		"EmptyFile":       JoinPath(resourceSizeRoot, "empty.txt"),
-		"TextFile":        JoinPath(resourceSizeRoot, "text.txt"),
-		"ImageFile":       JoinPath(resourceCopyFileRoot, "image.png"),
-		"LargeText":       JoinPath(resourceCopyFileRoot, "large-text.txt"),
-		"XlargeText":      JoinPath(resourceCopyFileRoot, "xlarge-text.txt"),
-		"BlankSymlink":    JoinPath(resourceSizeRoot, "lonely-link"),
-		"BrokenSymlink":   JoinPath(resourceSizeRoot, "link-broken"),
-		"CircularSymlink": JoinPath(resourceSizeRoot, "link-circular"),
-		"FileSymlink":     JoinPath(resourceSizeRoot, "link.txt"),
-		"DirSymlink":      JoinPath(resourceSizeRoot, "link-dir"),
-		"LinkFileSymlink": JoinPath(resourceSizeRoot, "link2.txt"),
-		"LinkDirSymlink":  JoinPath(resourceSizeRoot, "link2-dir"),
-		"EmptyDir":        JoinPath(resourceSizeRoot, "empty-dir"),
-		"OneFileDir":      JoinPath(resourceSizeRoot, "one-file-dir"),
-		"DirsDir":         JoinPath(resourceSizeRoot, "only-dirs"),
-		"SymlinksDir":     JoinPath(resourceSizeRoot, "only-symlinks"),
-		"MiscDir":         JoinPath(resourceSizeRoot, "misc"),
+		"EmptyFile":        JoinPath(resourceSizeRoot, "empty.txt"),
+		"TextFile":         JoinPath(resourceSizeRoot, "text.txt"),
+		"ImageFile":        JoinPath(resourceCopyFileRoot, "image.png"),
+		"LargeText":        JoinPath(resourceCopyFileRoot, "large-text.txt"),
+		"XlargeText":       JoinPath(resourceCopyFileRoot, "xlarge-text.txt"),
+		"BlankSymlink":     JoinPath(resourceSizeRoot, "lonely-link"),
+		"BrokenSymlink":    JoinPath(resourceSizeRoot, "link-broken"),
+		"CircularSymlink":  JoinPath(resourceSizeRoot, "link-circular"),
+		"FileSymlink":      JoinPath(resourceSizeRoot, "link.txt"),
+		"DirSymlink":       JoinPath(resourceSizeRoot, "link-dir"),
+		"EmptyFileSymlink": JoinPath(resourceSizeRoot, "link-empty.txt"),
+		"EmptyDirSymlink":  JoinPath(resourceSizeRoot, "link-empty-dir"),
+		"LinkFileSymlink":  JoinPath(resourceSizeRoot, "link2.txt"),
+		"LinkDirSymlink":   JoinPath(resourceSizeRoot, "link2-dir"),
+		"EmptyDir":         JoinPath(resourceSizeRoot, "empty-dir"),
+		"OneFileDir":       JoinPath(resourceSizeRoot, "one-file-dir"),
+		"DirsDir":          JoinPath(resourceSizeRoot, "only-dirs"),
+		"SymlinksDir":      JoinPath(resourceSizeRoot, "only-symlinks"),
+		"MiscDir":          JoinPath(resourceSizeRoot, "misc"),
 	}
 }
 
-func TestFileSize(t *testing.T) {
+func TestGetFileSize(t *testing.T) {
 	tests := []struct {
 		name     string
 		path     string
@@ -77,7 +82,27 @@ func TestFileSize(t *testing.T) {
 	}
 }
 
-func TestSymlinkSize(t *testing.T) {
+func BenchmarkGetFileSize(b *testing.B) {
+	files := []string{
+		resourceSizeSourceMap["FileSymlink"],
+		resourceSizeSourceMap["EmptyFileSymlink"],
+		resourceSizeSourceMap["TextFile"],
+		resourceSizeSourceMap["EmptyFile"],
+		resourceSizeSourceMap["ImageFile"],
+		resourceSizeSourceMap["LargeText"],
+	}
+	for _, path := range files {
+		name := ystring.TrimBeforeLast(path, string(os.PathSeparator))
+		b.Run(name, func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				_, _ = GetFileSize(path)
+			}
+		})
+	}
+}
+
+func TestGetSymlinkSize(t *testing.T) {
 	tests := []struct {
 		name     string
 		path     string
@@ -122,7 +147,26 @@ func TestSymlinkSize(t *testing.T) {
 	}
 }
 
-func TestDirSize(t *testing.T) {
+func BenchmarkGetSymlinkSize(b *testing.B) {
+	links := []string{
+		resourceSizeSourceMap["BlankSymlink"],
+		resourceSizeSourceMap["BrokenSymlink"],
+		resourceSizeSourceMap["CircularSymlink"],
+		resourceSizeSourceMap["FileSymlink"],
+		resourceSizeSourceMap["DirSymlink"],
+	}
+	for _, path := range links {
+		name := ystring.TrimBeforeLast(path, string(os.PathSeparator))
+		b.Run(name, func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				_, _ = GetSymlinkSize(path)
+			}
+		})
+	}
+}
+
+func TestGetDirSize(t *testing.T) {
 	tests := []struct {
 		name     string
 		path     string
@@ -162,6 +206,27 @@ func TestDirSize(t *testing.T) {
 
 			if gotSize != tt.wantSize {
 				t.Errorf("GetDirSize() gotSize = %v, want %v", gotSize, tt.wantSize)
+			}
+		})
+	}
+}
+
+func BenchmarkGetDirSize(b *testing.B) {
+	dirs := []string{
+		resourceSizeSourceMap["EmptyDir"],
+		resourceSizeSourceMap["OneFileDir"],
+		resourceSizeSourceMap["DirsDir"],
+		resourceSizeSourceMap["SymlinksDir"],
+		resourceSizeSourceMap["MiscDir"],
+		resourceSizeSourceMap["DirSymlink"],
+		resourceSizeSourceMap["EmptyDirSymlink"],
+	}
+	for _, path := range dirs {
+		name := ystring.TrimBeforeLast(path, string(os.PathSeparator))
+		b.Run(name, func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				_, _ = GetDirSize(path)
 			}
 		})
 	}
