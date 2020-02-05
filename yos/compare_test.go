@@ -281,8 +281,10 @@ func TestSameDirEntries(t *testing.T) {
 		{"Contains a broken symlink: Same", JoinPath(rootSource, "broken-symlink"), JoinPath(rootSame, "broken-symlink"), true, false},
 		{"Contains a circular symlink: Itself", JoinPath(rootSource, "circular-symlink"), JoinPath(rootSource, "circular-symlink"), true, false},
 		{"Contains a circular symlink: Same", JoinPath(rootSource, "circular-symlink"), JoinPath(rootSame, "circular-symlink"), true, false},
-		{"Contains a file with no permissions", JoinPath(rootSource, "no-perm-files"), JoinPath(rootSame, "no-perm-files"), false, true},
-		{"Contains a directory with no permissions", JoinPath(rootSource, "no-perm-dirs"), JoinPath(rootSame, "no-perm-dirs"), false, true},
+		{"Contains a file with no permissions (path1)", JoinPath(rootSource, "no-perm-files"), JoinPath(rootSame, "no-perm-files"), false, true},
+		{"Contains a file with no permissions (path2)", JoinPath(rootSame, "no-perm-files"), JoinPath(rootSource, "no-perm-files"), false, true},
+		{"Contains a directory with no permissions (path1)", JoinPath(rootSource, "no-perm-dirs"), JoinPath(rootSame, "no-perm-dirs"), false, true},
+		{"Contains a directory with no permissions (path2)", JoinPath(rootSame, "no-perm-dirs"), JoinPath(rootSource, "no-perm-dirs"), false, true},
 	}
 
 	for _, tt := range tests {
