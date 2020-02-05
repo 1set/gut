@@ -1,7 +1,10 @@
 package yos
 
 import (
+	"os"
 	"testing"
+
+	"github.com/1set/gut/ystring"
 )
 
 func TestIsFileEmpty(t *testing.T) {
@@ -50,6 +53,24 @@ func TestIsFileEmpty(t *testing.T) {
 	}
 }
 
+func BenchmarkIsFileEmpty(b *testing.B) {
+	files := []string{
+		resourceSizeSourceMap["FileSymlink"],
+		resourceSizeSourceMap["EmptyFileSymlink"],
+		resourceSizeSourceMap["TextFile"],
+		resourceSizeSourceMap["EmptyFile"],
+	}
+	for _, path := range files {
+		name := ystring.TrimBeforeLast(path, string(os.PathSeparator))
+		b.Run(name, func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				_, _ = IsFileEmpty(path)
+			}
+		})
+	}
+}
+
 func TestIsDirEmpty(t *testing.T) {
 	tests := []struct {
 		name      string
@@ -91,6 +112,24 @@ func TestIsDirEmpty(t *testing.T) {
 
 			if gotEmpty != tt.wantEmpty {
 				t.Errorf("IsDirEmpty() gotEmpty = %v, want %v", gotEmpty, tt.wantEmpty)
+			}
+		})
+	}
+}
+
+func BenchmarkIsDirEmpty(b *testing.B) {
+	dirs := []string{
+		resourceSizeSourceMap["DirSymlink"],
+		resourceSizeSourceMap["EmptyDirSymlink"],
+		resourceSizeSourceMap["MiscDir"],
+		resourceSizeSourceMap["EmptyDir"],
+	}
+	for _, path := range dirs {
+		name := ystring.TrimBeforeLast(path, string(os.PathSeparator))
+		b.Run(name, func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				_, _ = IsDirEmpty(path)
 			}
 		})
 	}
