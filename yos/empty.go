@@ -5,19 +5,6 @@ import (
 	"path/filepath"
 )
 
-func IsSymlinkBroken(path string) (broken bool, err error) {
-	var fi os.FileInfo
-	if fi, err = os.Lstat(path); err == nil {
-		if isSymlinkFi(&fi) {
-			_, err = filepath.EvalSymlinks(path)
-			broken = err != nil
-		} else {
-			err = opError(opnEmpty, path, errNotSymlink)
-		}
-	}
-	return
-}
-
 func IsFileEmpty(path string) (empty bool, err error) {
 	var fi os.FileInfo
 	if fi, err = os.Stat(path); err == nil {
