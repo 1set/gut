@@ -21,15 +21,16 @@ func IsFileEmpty(path string) (empty bool, err error) {
 // IsDirEmpty indicates if the given directory contains nothing.
 func IsDirEmpty(path string) (empty bool, err error) {
 	var (
-		fi  os.FileInfo
-		raw = path
+		rootFi os.FileInfo
+		root   string
 	)
-	if path, fi, err = resolveDirInfo(path); err == nil {
-		if isDirFi(&fi) {
-			err = filepath.Walk(path, func(itemPath string, info os.FileInfo, errItem error) error {
-				if path == itemPath || errItem != nil {
+	if root, rootFi, err = resolveDirInfo(path); err == nil {
+		if isDirFi(&rootFi) {
+			err = filepath.Walk(root, func(itemPath string, itemFi os.FileInfo, errItem error) error {
+				if os.SameFile(rootFi, itemFi) || errItem != nil {
 					return errItem
 				}
+				// force exit for the first entry other than the root itself
 				return errStepOutDir
 			})
 
@@ -39,10 +40,10 @@ func IsDirEmpty(path string) (empty bool, err error) {
 				err = nil
 			}
 		} else {
-			err = opError(opnEmpty, path, errNotDirectory)
+			err = opError(opnEmpty, root, errNotDirectory)
 		}
 	} else {
-		err = opError(opnEmpty, raw, err)
+		err = opError(opnEmpty, path, err)
 	}
 	return
 }

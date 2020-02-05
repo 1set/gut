@@ -73,22 +73,25 @@ func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathIn
 
 // listCondEntries returns a list of conditional directory entries.
 func listCondEntries(root string, cond func(os.FileInfo) (bool, error)) (entries []*FilePathInfo, err error) {
-	raw := root
-	if root, _, err = resolveDirInfo(root); err != nil {
-		err = opError(opnList, raw, err)
+	var (
+		rootFi   os.FileInfo
+		rootPath string
+	)
+	if rootPath, rootFi, err = resolveDirInfo(root); err != nil {
+		err = opError(opnList, root, err)
 		return
 	}
 
-	err = filepath.Walk(root, func(path string, info os.FileInfo, errIn error) (errOut error) {
+	err = filepath.Walk(rootPath, func(itemPath string, itemFi os.FileInfo, errIn error) (errOut error) {
 		errOut = errIn
-		if root == path || errOut != nil {
+		if os.SameFile(rootFi, itemFi) || errOut != nil {
 			return
 		}
 		var ok bool
-		if ok, errOut = cond(info); ok {
+		if ok, errOut = cond(itemFi); ok {
 			entries = append(entries, &FilePathInfo{
-				Path: path,
-				Info: info,
+				Path: itemPath,
+				Info: itemFi,
 			})
 		}
 		return
