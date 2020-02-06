@@ -8,7 +8,7 @@ A simple one. Just **go** with your **gut** feeling.
 ## Shortcuts
 
 | Symbol            | 🍱 弁当                                                       |
-| ----------------- | ------------------------------------------------------------ |
+| :---------------- | :----------------------------------------------------------- |
 | **Document**      | [![GoDoc](https://godoc.org/github.com/1set/gut?status.svg)](https://godoc.org/github.com/1set/gut) |
 | **License**       | [![License](https://img.shields.io/github/license/1set/gut)](https://github.com/1set/gut/blob/master/LICENSE) |
 | **Build Status**  | [![GitHub Action Ubuntu Build](https://github.com/1set/gut/workflows/Ubuntu/badge.svg)](https://github.com/1set/gut/actions?workflow=Ubuntu) [![GitHub Action macOS Build](https://github.com/1set/gut/workflows/macOS/badge.svg)](https://github.com/1set/gut/actions?workflow=macOS) [![GitHub Action Windows Build](https://github.com/1set/gut/workflows/Windows/badge.svg)](https://github.com/1set/gut/actions?workflow=Windows) |
