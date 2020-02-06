@@ -33,7 +33,7 @@ func ExampleListMatch() {
 }
 
 // This example checks if the annoying thumbnail file exists in the current directory as per the operating system.
-func ExampleIsExist() {
+func ExampleExist() {
 	switch {
 	case yos.IsOnMacOS():
 		fmt.Println("macOS", yos.Exist(".DS_Store"))

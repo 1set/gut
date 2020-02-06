@@ -3,6 +3,7 @@ package yos
 import (
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -12,59 +13,105 @@ type FilePathInfo struct {
 	Info os.FileInfo
 }
 
-// ListAll returns a list of all directory entries in the given directory in lexical order.
+// ListAll returns a list of all entries in the given directory in lexical order. The given directory is not included in the list.
+//
 // It searches recursively, but symbolic links other than the given path will be not be followed.
-// The given directory is not included in the list.
 func ListAll(root string) (entries []*FilePathInfo, err error) {
 	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return true, nil })
 }
 
-// ListFile returns a list of file directory entries in the given directory in lexical order.
+// ListFile returns a list of file entries in the given directory in lexical order. The given directory is not included in the list.
+//
 // It searches recursively, but symbolic links other than the given path will be not be followed.
-// The given directory is not included in the list.
 func ListFile(root string) (entries []*FilePathInfo, err error) {
-	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return !info.IsDir(), nil })
+	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return isFileFi(&info), nil })
 }
 
-// ListDir returns a list of nested directory entries in the given directory in lexical order.
+// ListSymlink returns a list of symbolic link entries in the given directory in lexical order. The given directory is not included in the list.
+//
 // It searches recursively, but symbolic links other than the given path will be not be followed.
-// The given directory is not included in the list.
+func ListSymlink(root string) (entries []*FilePathInfo, err error) {
+	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return isSymlinkFi(&info), nil })
+}
+
+// ListDir returns a list of nested directory entries in the given directory in lexical order. The given directory is not included in the list.
+//
+// It searches recursively, but symbolic links other than the given path will be not be followed.
 func ListDir(root string) (entries []*FilePathInfo, err error) {
-	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return info.IsDir(), nil })
+	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return isDirFi(&info), nil })
 }
 
 // The flags are used by the ListMatch method.
 const (
 	// ListRecursive indicates ListMatch to recursively list directory entries encountered.
 	ListRecursive int = 1 << iota
-	// ListRecursive indicates ListMatch to convert file name to lower case before the pattern matching.
+	// ListToLower indicates ListMatch to convert file name to lower case before the pattern matching.
 	ListToLower
-	// ListRecursive indicates ListMatch to include matched files in the returned list.
-	ListIncludeFile
-	// ListRecursive indicates ListMatch to include matched directories in the returned list.
+	// ListUseRegExp indicates ListMatch to use regular expression for the pattern matching.
+	ListUseRegExp
+	// ListIncludeDir indicates ListMatch to include matched directories in the returned list.
 	ListIncludeDir
+	// ListIncludeFile indicates ListMatch to include matched files in the returned list.
+	ListIncludeFile
+	// ListIncludeSymlink indicates ListMatch to include matched symbolic link in the returned list.
+	ListIncludeSymlink
+)
+
+const (
+	// ListIncludeAll indicates ListMatch to include all the matched in the returned list.
+	ListIncludeAll = ListIncludeDir | ListIncludeFile | ListIncludeSymlink
 )
 
 // ListMatch returns a list of directory entries that matches any given pattern in the directory in lexical order.
-// ListMatch requires the pattern to match all of the filename, not just a substring.
+// ListMatch requires the pattern to match the full file name, not just a substring.
 // Symbolic links other than the given path will be not be followed. The given directory is not included in the list.
 // filepath.ErrBadPattern is returned if any pattern is malformed.
 func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathInfo, err error) {
+	var (
+		useRegExp  = flag&ListUseRegExp != 0
+		rePatterns []*regexp.Regexp
+		patRe      *regexp.Regexp
+	)
+	if useRegExp {
+		rePatterns = make([]*regexp.Regexp, 0, len(patterns))
+		for _, pat := range patterns {
+			if patRe, err = regexp.Compile(pat); err == nil {
+				rePatterns = append(rePatterns, patRe)
+			} else {
+				err = opError(opnList, pat, err)
+				return
+			}
+		}
+	}
+
 	return listCondEntries(root, func(info os.FileInfo) (ok bool, err error) {
 		fileName := info.Name()
 		if flag&ListToLower != 0 {
 			fileName = strings.ToLower(fileName)
 		}
-		isDir := info.IsDir()
-		if (isDir && (flag&ListIncludeDir != 0)) || (!isDir && (flag&ListIncludeFile != 0)) {
-			for _, pattern := range patterns {
-				ok, err = filepath.Match(pattern, fileName)
-				if ok || err != nil {
-					break
+
+		if tf := flag & ListIncludeAll; tf != 0 {
+			if (tf == ListIncludeAll) ||
+				(tf&ListIncludeDir != 0 && isDirFi(&info)) ||
+				(tf&ListIncludeFile != 0 && isFileFi(&info)) ||
+				(tf&ListIncludeSymlink != 0 && isSymlinkFi(&info)) {
+				if useRegExp {
+					for _, pat := range rePatterns {
+						if ok = pat.MatchString(fileName); ok {
+							break
+						}
+					}
+				} else {
+					for _, pat := range patterns {
+						if ok, err = filepath.Match(pat, fileName); ok || err != nil {
+							break
+						}
+					}
 				}
 			}
 		}
-		if err == nil && isDir && (flag&ListRecursive == 0) {
+
+		if err == nil && (flag&ListRecursive == 0) && isDirFi(&info) {
 			err = filepath.SkipDir
 		}
 		return

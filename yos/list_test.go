@@ -86,6 +86,28 @@ func BenchmarkListFile(b *testing.B) {
 	}
 }
 
+func TestListSymlink(t *testing.T) {
+	for _, path := range []string{"", "  ", "__not_found_folder__", resourceListFileInRoot} {
+		if _, err := ListSymlink(path); err == nil {
+			t.Errorf("ListSymlink(%q) got no error, diff from expected", path)
+		} else {
+			expectedErrorCheck(t, err)
+		}
+	}
+
+	actual, err := ListSymlink(resourceListRoot)
+	verifyTestResult(t, "ListSymlink", expectedResultMap["AllSymlinks"], actual, err)
+
+	actual, err = ListSymlink(resourceListSymlinkToRoot)
+	verifyTestResult(t, "ListSymlink(Symlink)", expectedResultMap["AllSymlinks"], actual, err)
+}
+
+func BenchmarkListSymlink(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = ListSymlink(resourceListRoot)
+	}
+}
+
 func TestListDir(t *testing.T) {
 	for _, path := range []string{"", "  ", "__not_found_folder__", resourceListFileInRoot} {
 		if _, err := ListFile(path); err == nil {
@@ -128,24 +150,30 @@ func TestListMatch(t *testing.T) {
 		{"No Flag", args{resourceListRoot, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
 		{"Flag for file", args{resourceListRoot, ListIncludeFile, allEntriesPattern}, expectedResultMap["RootFiles"], false},
 		{"Flag for dir", args{resourceListRoot, ListIncludeDir, allEntriesPattern}, expectedResultMap["RootDirs"], false},
-		{"Flag for file & dir", args{resourceListRoot, ListIncludeFile | ListIncludeDir, allEntriesPattern}, expectedResultMap["RootAll"], false},
+		{"Flag for link", args{resourceListRoot, ListIncludeSymlink, allEntriesPattern}, expectedResultMap["RootSymlinks"], false},
+		{"Flag for all", args{resourceListRoot, ListIncludeAll, allEntriesPattern}, expectedResultMap["RootAll"], false},
 		{"Flag for recursive & file", args{resourceListRoot, ListRecursive | ListIncludeFile, allEntriesPattern}, expectedResultMap["AllFiles"], false},
+		{"Flag for recursive & link", args{resourceListRoot, ListRecursive | ListIncludeSymlink, allEntriesPattern}, expectedResultMap["AllSymlinks"], false},
 		{"Flag for recursive & dir", args{resourceListRoot, ListRecursive | ListIncludeDir, allEntriesPattern}, expectedResultMap["AllDirs"], false},
 		{"Flag with ToLower", args{resourceListRoot, ListIncludeFile | ListToLower, []string{"file*"}}, expectedResultMap["AllFile*Insensitive"], false},
 		{"Flag without ToLower", args{resourceListRoot, ListIncludeFile, []string{"file*"}}, expectedResultMap["AllFile*Sensitive"], false},
 		{"No pattern", args{resourceListRoot, ListIncludeFile, expectedResultMap["Empty"]}, expectedResultMap["Empty"], false},
 		{"Broken pattern", args{resourceListRoot, ListIncludeFile, []string{"*[1-"}}, expectedResultMap["Empty"], true},
+		{"Broken regexp pattern", args{resourceListRoot, ListIncludeFile | ListUseRegExp, []string{"[a"}}, expectedResultMap["Empty"], true},
 		{"Empty pattern", args{resourceListRoot, ListIncludeFile, []string{""}}, expectedResultMap["Empty"], false},
 		{"Pattern for exact match", args{resourceListRoot, ListRecursive | ListIncludeFile, []string{"file1.txt"}}, expectedResultMap["All file1.txt"], false},
 		{"Pattern for exclude", args{resourceListRoot, ListRecursive | ListIncludeFile, []string{"[^.]*"}}, expectedResultMap["AllFiles"], false},
-		{"Pattern match none", args{resourceListRoot, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.pdf"}}, expectedResultMap["Empty"], false},
-		{"Pattern match txt", args{resourceListRoot, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt"}}, expectedResultMap["All *.txt"], false},
-		{"Pattern with slash", args{resourceListRoot, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"/*.txt"}}, expectedResultMap["Empty"], false},
+		{"Pattern match none", args{resourceListRoot, ListRecursive | ListIncludeAll, []string{"*.pdf"}}, expectedResultMap["Empty"], false},
+		{"Pattern match txt", args{resourceListRoot, ListRecursive | ListIncludeAll, []string{"*.txt"}}, expectedResultMap["All *.txt"], false},
+		{"Pattern with slash", args{resourceListRoot, ListRecursive | ListIncludeAll, []string{"/*.txt"}}, expectedResultMap["Empty"], false},
 		{"Pattern with case-sensitive match", args{resourceListRoot, ListIncludeFile, []string{"File*"}}, expectedResultMap["OnlyFile*"], false},
 		{"Pattern with case-insensitive non-match", args{resourceListRoot, ListIncludeFile | ListToLower, []string{"File*"}}, expectedResultMap["Empty"], false},
-		{"Duplicate patterns", args{resourceListRoot, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt", "*.txt", "*.txt"}}, expectedResultMap["All *.txt"], false},
-		{"Multiple matched patterns", args{resourceListRoot, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt", "*.md"}}, expectedResultMap["All *.txt *.md"], false},
-		{"Combine of match and non-match patterns", args{resourceListRoot, ListRecursive | ListIncludeFile | ListIncludeDir, []string{"*.txt", "*.pdf", "*.jpg"}}, expectedResultMap["All *.txt"], false},
+		{"Regexp pattern: ^[fF]ile(.*).txt", args{resourceListRoot, ListRecursive | ListIncludeAll | ListUseRegExp, []string{"^[fF]ile(.*).txt"}}, expectedResultMap["^[fF]ile(.*).txt"], false},
+		{"Regexp pattern: ^file(.*).txt", args{resourceListRoot, ListRecursive | ListIncludeAll | ListUseRegExp, []string{"^file(.*).txt"}}, expectedResultMap["^file(.*).txt"], false},
+		{"Duplicate patterns", args{resourceListRoot, ListRecursive | ListIncludeAll, []string{"*.txt", "*.txt", "*.txt"}}, expectedResultMap["All *.txt"], false},
+		{"Multiple matched patterns", args{resourceListRoot, ListRecursive | ListIncludeAll, []string{"*.txt", "*.md"}}, expectedResultMap["All *.txt *.md"], false},
+		{"Multiple matched regexp patterns", args{resourceListRoot, ListRecursive | ListIncludeAll | ListUseRegExp, []string{".txt$", ".md$"}}, expectedResultMap["All *.txt *.md"], false},
+		{"Combine of match and non-match patterns", args{resourceListRoot, ListRecursive | ListIncludeAll, []string{"*.txt", "*.pdf", "*.jpg"}}, expectedResultMap["All *.txt"], false},
 	}
 
 	for _, tt := range tests {
@@ -208,7 +236,6 @@ var expectedResultMap = map[string][]string{
 	"AllFiles": []string{
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
-		"yos/list/broken_symlink.wtf",
 		"yos/list/deep_folder/deep/deeper/deepest/text_file.txt",
 		"yos/list/file1.txt",
 		"yos/list/file2.txt",
@@ -217,12 +244,15 @@ var expectedResultMap = map[string][]string{
 		"yos/list/simple_folder/file1.txt",
 		"yos/list/simple_folder/file2.txt",
 		"yos/list/simple_folder/file3.txt",
-		"yos/list/symlink_to_dir",
-		"yos/list/symlink_to_file.txt",
 		"yos/list/white space/only one file",
 		"yos/list/white space.txt",
 		"yos/list/测试文件.md",
 		"yos/list/🤙🏝️.md",
+	},
+	"AllSymlinks": []string{
+		"yos/list/broken_symlink.wtf",
+		"yos/list/symlink_to_dir",
+		"yos/list/symlink_to_file.txt",
 	},
 	"AllDirs": []string{
 		"yos/list/deep_folder",
@@ -243,16 +273,18 @@ var expectedResultMap = map[string][]string{
 	"RootFiles": []string{
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
-		"yos/list/broken_symlink.wtf",
 		"yos/list/file1.txt",
 		"yos/list/file2.txt",
 		"yos/list/file3.txt",
 		"yos/list/no_ext_name_file",
-		"yos/list/symlink_to_dir",
-		"yos/list/symlink_to_file.txt",
 		"yos/list/white space.txt",
 		"yos/list/测试文件.md",
 		"yos/list/🤙🏝️.md",
+	},
+	"RootSymlinks": []string{
+		"yos/list/broken_symlink.wtf",
+		"yos/list/symlink_to_dir",
+		"yos/list/symlink_to_file.txt",
 	},
 	"RootDirs": []string{
 		"yos/list/deep_folder",
@@ -288,6 +320,24 @@ var expectedResultMap = map[string][]string{
 		"yos/list/file1.txt",
 		"yos/list/file2.txt",
 		"yos/list/file3.txt",
+	},
+	"^[fF]ile(.*).txt": []string{
+		"yos/list/File0.txt",
+		"yos/list/File4.txt",
+		"yos/list/file1.txt",
+		"yos/list/file2.txt",
+		"yos/list/file3.txt",
+		"yos/list/simple_folder/file1.txt",
+		"yos/list/simple_folder/file2.txt",
+		"yos/list/simple_folder/file3.txt",
+	},
+	"^file(.*).txt": []string{
+		"yos/list/file1.txt",
+		"yos/list/file2.txt",
+		"yos/list/file3.txt",
+		"yos/list/simple_folder/file1.txt",
+		"yos/list/simple_folder/file2.txt",
+		"yos/list/simple_folder/file3.txt",
 	},
 	"AllFile*Sensitive": []string{
 		"yos/list/file1.txt",
