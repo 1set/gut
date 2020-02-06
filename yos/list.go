@@ -3,6 +3,7 @@ package yos
 import (
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -46,6 +47,8 @@ const (
 	ListRecursive int = 1 << iota
 	// ListToLower indicates ListMatch to convert file name to lower case before the pattern matching.
 	ListToLower
+	// ListUseRegExp indicates ListMatch to use regular expression for the pattern matching.
+	ListUseRegExp
 	// ListIncludeDir indicates ListMatch to include matched directories in the returned list.
 	ListIncludeDir
 	// ListIncludeFile indicates ListMatch to include matched files in the returned list.
@@ -60,10 +63,27 @@ const (
 )
 
 // ListMatch returns a list of directory entries that matches any given pattern in the directory in lexical order.
-// ListMatch requires the pattern to match all of the filename, not just a substring.
+// ListMatch requires the pattern to match the full file name, not just a substring.
 // Symbolic links other than the given path will be not be followed. The given directory is not included in the list.
 // filepath.ErrBadPattern is returned if any pattern is malformed.
 func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathInfo, err error) {
+	var (
+		useRegExp  = flag&ListUseRegExp != 0
+		rePatterns []*regexp.Regexp
+		patRe      *regexp.Regexp
+	)
+	if useRegExp {
+		rePatterns = make([]*regexp.Regexp, 0, len(patterns))
+		for _, pat := range patterns {
+			if patRe, err = regexp.Compile(pat); err == nil {
+				rePatterns = append(rePatterns, patRe)
+			} else {
+				err = opError(opnList, pat, err)
+				return
+			}
+		}
+	}
+
 	return listCondEntries(root, func(info os.FileInfo) (ok bool, err error) {
 		fileName := info.Name()
 		if flag&ListToLower != 0 {
@@ -75,10 +95,17 @@ func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathIn
 				(tf&ListIncludeDir != 0 && isDirFi(&info)) ||
 				(tf&ListIncludeFile != 0 && isFileFi(&info)) ||
 				(tf&ListIncludeSymlink != 0 && isSymlinkFi(&info)) {
-				for _, pattern := range patterns {
-					ok, err = filepath.Match(pattern, fileName)
-					if ok || err != nil {
-						break
+				if useRegExp {
+					for _, pat := range rePatterns {
+						if ok = pat.MatchString(fileName); ok {
+							break
+						}
+					}
+				} else {
+					for _, pat := range patterns {
+						if ok, err = filepath.Match(pat, fileName); ok || err != nil {
+							break
+						}
 					}
 				}
 			}
