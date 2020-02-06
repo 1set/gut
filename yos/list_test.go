@@ -128,8 +128,10 @@ func TestListMatch(t *testing.T) {
 		{"No Flag", args{resourceListRoot, 0, allEntriesPattern}, expectedResultMap["Empty"], false},
 		{"Flag for file", args{resourceListRoot, ListIncludeFile, allEntriesPattern}, expectedResultMap["RootFiles"], false},
 		{"Flag for dir", args{resourceListRoot, ListIncludeDir, allEntriesPattern}, expectedResultMap["RootDirs"], false},
+		{"Flag for link", args{resourceListRoot, ListIncludeSymlink, allEntriesPattern}, expectedResultMap["RootSymlinks"], false},
 		{"Flag for all", args{resourceListRoot, ListIncludeAll, allEntriesPattern}, expectedResultMap["RootAll"], false},
 		{"Flag for recursive & file", args{resourceListRoot, ListRecursive | ListIncludeFile, allEntriesPattern}, expectedResultMap["AllFiles"], false},
+		{"Flag for recursive & link", args{resourceListRoot, ListRecursive | ListIncludeSymlink, allEntriesPattern}, expectedResultMap["AllSymlinks"], false},
 		{"Flag for recursive & dir", args{resourceListRoot, ListRecursive | ListIncludeDir, allEntriesPattern}, expectedResultMap["AllDirs"], false},
 		{"Flag with ToLower", args{resourceListRoot, ListIncludeFile | ListToLower, []string{"file*"}}, expectedResultMap["AllFile*Insensitive"], false},
 		{"Flag without ToLower", args{resourceListRoot, ListIncludeFile, []string{"file*"}}, expectedResultMap["AllFile*Sensitive"], false},
@@ -221,6 +223,11 @@ var expectedResultMap = map[string][]string{
 		"yos/list/测试文件.md",
 		"yos/list/🤙🏝️.md",
 	},
+	"AllSymlinks": []string{
+		"yos/list/broken_symlink.wtf",
+		"yos/list/symlink_to_dir",
+		"yos/list/symlink_to_file.txt",
+	},
 	"AllDirs": []string{
 		"yos/list/deep_folder",
 		"yos/list/deep_folder/deep",
@@ -247,6 +254,11 @@ var expectedResultMap = map[string][]string{
 		"yos/list/white space.txt",
 		"yos/list/测试文件.md",
 		"yos/list/🤙🏝️.md",
+	},
+	"RootSymlinks": []string{
+		"yos/list/broken_symlink.wtf",
+		"yos/list/symlink_to_dir",
+		"yos/list/symlink_to_file.txt",
 	},
 	"RootDirs": []string{
 		"yos/list/deep_folder",
