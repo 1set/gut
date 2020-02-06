@@ -44,12 +44,19 @@ func ListDir(root string) (entries []*FilePathInfo, err error) {
 const (
 	// ListRecursive indicates ListMatch to recursively list directory entries encountered.
 	ListRecursive int = 1 << iota
-	// ListRecursive indicates ListMatch to convert file name to lower case before the pattern matching.
+	// ListToLower indicates ListMatch to convert file name to lower case before the pattern matching.
 	ListToLower
-	// ListRecursive indicates ListMatch to include matched files in the returned list.
-	ListIncludeFile
-	// ListRecursive indicates ListMatch to include matched directories in the returned list.
+	// ListIncludeDir indicates ListMatch to include matched directories in the returned list.
 	ListIncludeDir
+	// ListIncludeFile indicates ListMatch to include matched files in the returned list.
+	ListIncludeFile
+	// ListIncludeSymlink indicates ListMatch to include matched symbolic link in the returned list.
+	ListIncludeSymlink
+)
+
+const (
+	// ListIncludeAll indicates ListMatch to include all the matched in the returned list.
+	ListIncludeAll = ListIncludeDir | ListIncludeFile | ListIncludeSymlink
 )
 
 // ListMatch returns a list of directory entries that matches any given pattern in the directory in lexical order.
@@ -62,8 +69,21 @@ func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathIn
 		if flag&ListToLower != 0 {
 			fileName = strings.ToLower(fileName)
 		}
-		isDir := info.IsDir()
-		if (isDir && (flag&ListIncludeDir != 0)) || (!isDir && (flag&ListIncludeFile != 0)) {
+
+		matchType := false
+		if tf := flag & ListIncludeAll; tf != 0 {
+			switch {
+			case tf == ListIncludeAll:
+				matchType = true
+			case tf&ListIncludeDir != 0 && isDirFi(&info):
+				matchType = true
+			case tf&ListIncludeFile != 0 && isFileFi(&info):
+				matchType = true
+			case tf&ListIncludeSymlink != 0 && isSymlinkFi(&info):
+				matchType = true
+			}
+		}
+		if matchType {
 			for _, pattern := range patterns {
 				ok, err = filepath.Match(pattern, fileName)
 				if ok || err != nil {
@@ -71,7 +91,8 @@ func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathIn
 				}
 			}
 		}
-		if err == nil && isDir && (flag&ListRecursive == 0) {
+
+		if err == nil && isDirFi(&info) && (flag&ListRecursive == 0) {
 			err = filepath.SkipDir
 		}
 		return
