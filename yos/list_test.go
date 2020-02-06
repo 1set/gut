@@ -86,6 +86,28 @@ func BenchmarkListFile(b *testing.B) {
 	}
 }
 
+func TestListSymlink(t *testing.T) {
+	for _, path := range []string{"", "  ", "__not_found_folder__", resourceListFileInRoot} {
+		if _, err := ListSymlink(path); err == nil {
+			t.Errorf("ListSymlink(%q) got no error, diff from expected", path)
+		} else {
+			expectedErrorCheck(t, err)
+		}
+	}
+
+	actual, err := ListSymlink(resourceListRoot)
+	verifyTestResult(t, "ListSymlink", expectedResultMap["AllSymlinks"], actual, err)
+
+	actual, err = ListSymlink(resourceListSymlinkToRoot)
+	verifyTestResult(t, "ListSymlink(Symlink)", expectedResultMap["AllSymlinks"], actual, err)
+}
+
+func BenchmarkListSymlink(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = ListSymlink(resourceListRoot)
+	}
+}
+
 func TestListDir(t *testing.T) {
 	for _, path := range []string{"", "  ", "__not_found_folder__", resourceListFileInRoot} {
 		if _, err := ListFile(path); err == nil {
