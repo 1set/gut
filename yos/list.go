@@ -70,24 +70,16 @@ func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathIn
 			fileName = strings.ToLower(fileName)
 		}
 
-		matchType := false
 		if tf := flag & ListIncludeAll; tf != 0 {
-			switch {
-			case tf == ListIncludeAll:
-				matchType = true
-			case tf&ListIncludeDir != 0 && isDirFi(&info):
-				matchType = true
-			case tf&ListIncludeFile != 0 && isFileFi(&info):
-				matchType = true
-			case tf&ListIncludeSymlink != 0 && isSymlinkFi(&info):
-				matchType = true
-			}
-		}
-		if matchType {
-			for _, pattern := range patterns {
-				ok, err = filepath.Match(pattern, fileName)
-				if ok || err != nil {
-					break
+			if (tf == ListIncludeAll) ||
+				(tf&ListIncludeDir != 0 && isDirFi(&info)) ||
+				(tf&ListIncludeFile != 0 && isFileFi(&info)) ||
+				(tf&ListIncludeSymlink != 0 && isSymlinkFi(&info)) {
+				for _, pattern := range patterns {
+					ok, err = filepath.Match(pattern, fileName)
+					if ok || err != nil {
+						break
+					}
 				}
 			}
 		}
