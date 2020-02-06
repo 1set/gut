@@ -12,25 +12,32 @@ type FilePathInfo struct {
 	Info os.FileInfo
 }
 
-// ListAll returns a list of all directory entries in the given directory in lexical order.
+// ListAll returns a list of all entries in the given directory in lexical order. The given directory is not included in the list.
+//
 // It searches recursively, but symbolic links other than the given path will be not be followed.
-// The given directory is not included in the list.
 func ListAll(root string) (entries []*FilePathInfo, err error) {
 	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return true, nil })
 }
 
-// ListFile returns a list of file directory entries in the given directory in lexical order.
+// ListFile returns a list of file entries in the given directory in lexical order. The given directory is not included in the list.
+//
 // It searches recursively, but symbolic links other than the given path will be not be followed.
-// The given directory is not included in the list.
 func ListFile(root string) (entries []*FilePathInfo, err error) {
-	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return !info.IsDir(), nil })
+	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return isFileFi(&info), nil })
 }
 
-// ListDir returns a list of nested directory entries in the given directory in lexical order.
+// ListSymlink returns a list of symbolic link entries in the given directory in lexical order. The given directory is not included in the list.
+//
 // It searches recursively, but symbolic links other than the given path will be not be followed.
-// The given directory is not included in the list.
+func ListSymlink(root string) (entries []*FilePathInfo, err error) {
+	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return isSymlinkFi(&info), nil })
+}
+
+// ListDir returns a list of nested directory entries in the given directory in lexical order. The given directory is not included in the list.
+//
+// It searches recursively, but symbolic links other than the given path will be not be followed.
 func ListDir(root string) (entries []*FilePathInfo, err error) {
-	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return info.IsDir(), nil })
+	return listCondEntries(root, func(info os.FileInfo) (bool, error) { return isDirFi(&info), nil })
 }
 
 // The flags are used by the ListMatch method.
