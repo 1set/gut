@@ -16,16 +16,23 @@ Check current operating system:
 
 File Operations
 
-Overview:
+Basic operations:
 
-	| Operation   | Directory      | File            | Symbolic Link      |
+	| Ops \ Type  | Directory      | File            | Symbolic Link      |
 	| ----------- | -------------- | --------------- | ------------------ |
 	| Check Exist | ExistDir       | ExistFile       | ExistSymlink       |
 	| Check Empty | IsDirEmpty     | IsFileEmpty     | -                  |
 	| Check Same  | SameDirEntries | SameFileContent | SameSymlinkContent |
 	| Get Size    | GetDirSize     | GetFileSize     | GetSymlinkSize     |
+	| List        | ListDir        | ListFile        | ListSymlink        |
 	| Copy        | CopyDir        | CopyFile        | CopySymlink        |
 	| Move        | MoveDir        | MoveFile        | MoveSymlink        |
+
+Additional helpers:
+  - ListMatch
+  - JoinPath
+  - Exist
+  - NotExist
 
 */
 package yos
