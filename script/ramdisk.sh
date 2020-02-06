@@ -217,9 +217,9 @@ function linux_destroy_ramdisk() {
 # Main logic
 printf "Task: [${OS_NAME}] ${ACTION} "
 if [[ $ACTION == "CREATE" ]]; then
-    printf "${ACCESS_TYPE} ramdisk '${DISK_NAME}' of ${DISK_SIZE_MB} MiB\n\n"
+    printf "${ACCESS_TYPE} ramdisk '${DISK_NAME}' of ${DISK_SIZE_MB} MiB\n"
 elif [[ $ACTION == "DESTROY" ]] || [[ $ACTION == "RELOAD" ]]; then
-    printf "ramdisk '${DISK_NAME}'\n\n"
+    printf "ramdisk '${DISK_NAME}'\n"
 fi
 
 if [[ $OS_NAME == "MACOS" ]]; then
