@@ -84,7 +84,7 @@ func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathIn
 			}
 		}
 
-		if err == nil && isDirFi(&info) && (flag&ListRecursive == 0) {
+		if err == nil && (flag&ListRecursive == 0) && isDirFi(&info) {
 			err = filepath.SkipDir
 		}
 		return
