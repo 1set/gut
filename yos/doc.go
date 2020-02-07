@@ -28,11 +28,16 @@ Basic operations:
 	| Copy        | CopyDir        | CopyFile        | CopySymlink        |
 	| Move        | MoveDir        | MoveFile        | MoveSymlink        |
 
-Additional helpers:
+Miscellaneous operations:
   - ListMatch
   - JoinPath
   - Exist
   - NotExist
+
+Sorting helpers for a slice of *FilePathInfo:
+  - SortListByName
+  - SortListBySize
+  - SortListByModTime
 
 */
 package yos
