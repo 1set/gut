@@ -63,9 +63,10 @@ const (
 )
 
 // ListMatch returns a list of directory entries that matches any given pattern in the directory in lexical order.
-// ListMatch requires the pattern to match the full file name, not just a substring.
+//
+// ListMatch requires the pattern to match the full file name, not just a substring. Errors are returned if any pattern is malformed.
+//
 // Symbolic links other than the given path will be not be followed. The given directory is not included in the list.
-// filepath.ErrBadPattern is returned if any pattern is malformed.
 func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathInfo, err error) {
 	var (
 		useRegExp  = flag&ListUseRegExp != 0

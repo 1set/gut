@@ -6,6 +6,7 @@ import (
 )
 
 // GetFileSize returns the size in bytes for a regular file.
+//
 // If the given path is a symbolic link, it will be followed.
 func GetFileSize(path string) (size int64, err error) {
 	var fi os.FileInfo
@@ -33,6 +34,7 @@ func GetSymlinkSize(path string) (size int64, err error) {
 }
 
 // GetDirSize returns total size in bytes for all regular files and symbolic links in a directory.
+//
 // If the given path is a symbolic link, it will be followed, but symbolic links inside the directory won't.
 func GetDirSize(path string) (size int64, err error) {
 	var (
