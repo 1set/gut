@@ -1,5 +1,6 @@
 package yos
 
+// SortListByName implements sort.Interface based on the Info.Name() field of FilePathInfo.
 type SortListByName []*FilePathInfo
 
 func (n SortListByName) Len() int {
@@ -14,6 +15,7 @@ func (n SortListByName) Swap(i, j int) {
 	n[i], n[j] = n[j], n[i]
 }
 
+// SortListBySize implements sort.Interface based on the Info.Size() field of FilePathInfo.
 type SortListBySize []*FilePathInfo
 
 func (s SortListBySize) Len() int {
@@ -28,6 +30,7 @@ func (s SortListBySize) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 
+// SortListByModTime implements sort.Interface based on the Info.ModTime() field of FilePathInfo.
 type SortListByModTime []*FilePathInfo
 
 func (t SortListByModTime) Len() int {
