@@ -38,6 +38,15 @@ func Example() {
 	fmt.Printf("total: %d\nmove : %d\nskip : %d\nfail : %d\n", len(srcFiles), cntMove, cntSkip, len(srcFiles)-cntMove-cntSkip)
 }
 
+// This example copies all files in the current directory to the destination.
+func ExampleCopyDir() {
+	destRoot := "../backup"
+	if err := yos.CopyDir(".", destRoot); err != nil {
+		fmt.Printf("fail to back up current dir to %q: %v\n", destRoot, err)
+		return
+	}
+}
+
 // This example lists all files in the current directory and its sub-directories.
 func ExampleListFile() {
 	entries, err := yos.ListFile(".")
