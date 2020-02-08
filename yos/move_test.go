@@ -35,12 +35,12 @@ func TestMoveFile(t *testing.T) {
 		outputPath string
 		wantErr    bool
 	}{
-		{"Source is empty", emptyStr, JoinPath(destRoot, "text.txt"), emptyStr, emptyStr, true},
-		{"Source doesn't exist", JoinPath(srcRoot, "missing-text.txt"), JoinPath(destRoot, "text.txt"), emptyStr, emptyStr, true},
-		{"Source is a symlink to file", JoinPath(srcRoot, "link.txt"), JoinPath(destRoot, "text.txt"), emptyStr, emptyStr, true},
-		{"Source is a symlink to directory", JoinPath(srcRoot, "link-dir"), JoinPath(destRoot, "text.txt"), emptyStr, emptyStr, true},
-		{"Source is a circular symlink", JoinPath(srcRoot, "link-circular"), JoinPath(destRoot, "text.txt"), emptyStr, emptyStr, true},
-		{"Source is a broken symlink", JoinPath(srcRoot, "link-broken"), JoinPath(destRoot, "text.txt"), emptyStr, emptyStr, true},
+		{"Source is empty", emptyStr, JoinPath(destRoot, "text-no.txt"), emptyStr, emptyStr, true},
+		{"Source doesn't exist", JoinPath(srcRoot, "missing-text.txt"), JoinPath(destRoot, "text-no.txt"), emptyStr, emptyStr, true},
+		{"Source is a symlink to file", JoinPath(srcRoot, "link.txt"), JoinPath(destRoot, "text-no.txt"), emptyStr, emptyStr, true},
+		{"Source is a symlink to directory", JoinPath(srcRoot, "link-dir"), JoinPath(destRoot, "text-no.txt"), emptyStr, emptyStr, true},
+		{"Source is a circular symlink", JoinPath(srcRoot, "link-circular"), JoinPath(destRoot, "text-no.txt"), emptyStr, emptyStr, true},
+		{"Source is a broken symlink", JoinPath(srcRoot, "link-broken"), JoinPath(destRoot, "text-no.txt"), emptyStr, emptyStr, true},
 		{"Source and destination is the same file", JoinPath(srcRoot, "text.txt"), JoinPath(srcRoot, "text.txt"), emptyStr, emptyStr, true},
 		{"Source and destination is the same symlink", JoinPath(srcRoot, "link.txt"), JoinPath(srcRoot, "link.txt"), emptyStr, emptyStr, true},
 		{"Source and destination is the same directory", JoinPath(srcRoot, "empty-dir"), JoinPath(srcRoot, "empty-dir"), emptyStr, emptyStr, true},
@@ -94,7 +94,11 @@ func TestMoveFile(t *testing.T) {
 				expectedErrorCheck(t, err)
 			}
 
-			if !tt.wantErr {
+			if tt.wantErr {
+				if !containsAnySubstr(tt.name, "permission", "the same", "read-only") && ExistFile(tt.destPath) {
+					t.Errorf("MoveFile() fail to clean up broken file: %v", tt.destPath)
+				}
+			} else {
 				same, err := SameFileContent(tt.backupPath, tt.outputPath)
 				if err != nil {
 					t.Errorf("MoveFile() got error while comparing the files: %v, %v, error: %v", tt.backupPath, tt.outputPath, err)

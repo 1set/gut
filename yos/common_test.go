@@ -25,8 +25,17 @@ func init() {
 	testResourceRoot = os.Getenv("TESTRSSDIR")
 }
 
+func containsAnySubstr(str string, substrs ...string) bool {
+	for _, sub := range substrs {
+		if strings.Contains(str, sub) {
+			return true
+		}
+	}
+	return false
+}
+
 func preconditionCheck(t *testing.T, name string) {
-	if (strings.Contains(name, "permission") || strings.Contains(name, "non-Windows")) && IsOnWindows() {
+	if containsAnySubstr(name, "permission", "non-Windows") && IsOnWindows() {
 		t.Skipf("Skipping %q for Windows", name)
 	}
 	if strings.Contains(name, "Cross-device") && (ystring.IsBlank(resourceReadWriteDevice) || ystring.IsBlank(resourceReadOnlyDevice) || ystring.IsBlank(resourceProtectedDevice)) {
