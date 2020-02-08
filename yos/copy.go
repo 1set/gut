@@ -97,6 +97,10 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 		if fe := destFile.Close(); fe != nil {
 			err = fe
 		}
+		// remove destination if got any errors
+		if err != nil {
+			_ = os.Remove(dest)
+		}
 	}()
 
 	var nr, nw int

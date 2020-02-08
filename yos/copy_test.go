@@ -139,7 +139,11 @@ func TestCopyFile(t *testing.T) {
 				expectedErrorCheck(t, err)
 			}
 
-			if !tt.wantErr {
+			if tt.wantErr {
+				if !containsAnySubstr(tt.name, "permission", "the same", "read-only") && ExistFile(tt.destPath) {
+					t.Errorf("CopyFile() fail to clean up broken file: %v", tt.destPath)
+				}
+			} else {
 				same, err := SameFileContent(tt.inputPath, tt.outputPath)
 				if err != nil {
 					t.Errorf("CopyFile() got error while comparing the files: %v, %v, error: %v", tt.inputPath, tt.outputPath, err)
