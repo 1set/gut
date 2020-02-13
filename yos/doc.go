@@ -14,7 +14,7 @@ Check current operating system:
   - IsOnMacOS
 
 Change working directory:
-  - ChExeDir
+  - ChangeExeDir
 
 
 File Operations

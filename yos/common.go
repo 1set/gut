@@ -28,8 +28,8 @@ var (
 	opnList    = "list"
 	opnSize    = "size"
 	opnEmpty   = "empty"
-	opnChdir   = "chexedir"
-	opnMkdir   = "makedir"
+	opnChange  = "change"
+	opnMake    = "make"
 )
 
 // internal use

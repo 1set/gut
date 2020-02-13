@@ -43,15 +43,15 @@ func BenchmarkJoinPath(b *testing.B) {
 }
 
 func TestChExeDir(t *testing.T) {
-	err := ChExeDir()
+	err := ChangeExeDir()
 	if err != nil {
-		t.Errorf("ChExeDir() got unexpected error: %v", err)
+		t.Errorf("ChangeExeDir() got unexpected error: %v", err)
 	}
 }
 
 func BenchmarkChExeDir(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = ChExeDir()
+		_ = ChangeExeDir()
 	}
 }
 

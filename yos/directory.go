@@ -10,16 +10,17 @@ func JoinPath(elem ...string) string {
 	return filepath.Join(elem...)
 }
 
-// ChExeDir changes the current working directory to the directory of the executable that started the current process.
+// ChangeExeDir changes the current working directory to the directory of the executable that started the current process.
+//
 // If a symbolic link is used to start the process, it will be changed to the directory of the executable that the link pointed to.
-func ChExeDir() (err error) {
+func ChangeExeDir() (err error) {
 	var (
 		ap string
 		fi os.FileInfo
 	)
 	// get the path for the executable that started the current process
 	if ap, err = os.Executable(); err != nil {
-		err = opError(opnChdir, ap, err)
+		err = opError(opnChange, ap, err)
 		return
 	}
 
@@ -28,13 +29,13 @@ func ChExeDir() (err error) {
 		ap, err = filepath.EvalSymlinks(ap)
 	}
 	if err != nil {
-		err = opError(opnChdir, ap, err)
+		err = opError(opnChange, ap, err)
 		return
 	}
 
 	// get the executable directory and changes the current working directory to it
 	if err = os.Chdir(filepath.Dir(ap)); err != nil {
-		err = opError(opnChdir, ap, err)
+		err = opError(opnChange, ap, err)
 	}
 	return
 }
@@ -46,7 +47,7 @@ func ChExeDir() (err error) {
 // If the path is already a directory, MakeDir does nothing and returns nil.
 func MakeDir(path string) (err error) {
 	if err = os.MkdirAll(path, defaultDirectoryPermMode); err != nil {
-		err = opError(opnMkdir, path, err)
+		err = opError(opnMake, path, err)
 	}
 	return
 }
