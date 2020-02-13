@@ -17,7 +17,7 @@ func TestIsExistOrNot(t *testing.T) {
 		exist bool
 	}{
 		{"Check missing", "__do_not_exist__", false},
-		{"Check doc file", "doc.go", true},
+		{"Check text file", JoinPath(resourceExistRoot, "origin_file.txt"), true},
 		{"Check current dir", ".", true},
 		{"Check symlink origin", JoinPath(resourceExistRoot, "origin_file.txt"), true},
 		{"Check symlink of file", JoinPath(resourceExistRoot, "symlink.txt"), true},
@@ -38,14 +38,18 @@ func TestIsExistOrNot(t *testing.T) {
 }
 
 func BenchmarkIsExist(b *testing.B) {
+	path := JoinPath(resourceExistRoot, "origin_file.txt")
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = Exist("doc.go")
+		_ = Exist(path)
 	}
 }
 
 func BenchmarkIsNotExist(b *testing.B) {
+	path := JoinPath(resourceExistRoot, "origin_file.txt")
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = NotExist("doc.go")
+		_ = NotExist(path)
 	}
 }
 
@@ -56,7 +60,7 @@ func TestIsFileExist(t *testing.T) {
 		wantExist bool
 	}{
 		{"Check missing", "__do_not_exist__", false},
-		{"Check doc file", "doc.go", true},
+		{"Check text file", JoinPath(resourceExistRoot, "origin_file.txt"), true},
 		{"Check current dir", ".", false},
 		{"Check symlink dir", JoinPath(resourceExistRoot), false},
 		{"Check symlink origin file", JoinPath(resourceExistRoot, "origin_file.txt"), true},
@@ -79,8 +83,10 @@ func TestIsFileExist(t *testing.T) {
 }
 
 func BenchmarkIsFileExist(b *testing.B) {
+	path := JoinPath(resourceExistRoot, "origin_file.txt")
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = ExistFile("doc.go")
+		_ = ExistFile(path)
 	}
 }
 
@@ -91,7 +97,7 @@ func TestIsDirExist(t *testing.T) {
 		wantExist bool
 	}{
 		{"Check missing", "__do_not_exist__", false},
-		{"Check doc file", "doc.go", false},
+		{"Check text file", JoinPath(resourceExistRoot, "origin_file.txt"), false},
 		{"Check current dir", ".", true},
 		{"Check symlink dir", JoinPath(resourceExistRoot), true},
 		{"Check symlink origin file", JoinPath(resourceExistRoot, "origin_file.txt"), false},
@@ -128,7 +134,7 @@ func TestIsSymlinkExist(t *testing.T) {
 		wantExist bool
 	}{
 		{"Check missing", "__do_not_exist__", false},
-		{"Check doc file", "doc.go", false},
+		{"Check text file", JoinPath(resourceExistRoot, "origin_file.txt"), false},
 		{"Check current dir", ".", false},
 		{"Check symlink dir", JoinPath(resourceExistRoot), false},
 		{"Check symlink origin file", JoinPath(resourceExistRoot, "origin_file.txt"), false},
