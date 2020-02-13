@@ -36,9 +36,21 @@ func TestJoinPath(t *testing.T) {
 	}
 }
 
+func BenchmarkJoinPath(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = JoinPath("", "ab", "/cd", "ef/", "gh", ".")
+	}
+}
+
 func TestChExeDir(t *testing.T) {
 	err := ChExeDir()
 	if err != nil {
 		t.Errorf("ChExeDir() got unexpected error: %v", err)
+	}
+}
+
+func BenchmarkChExeDir(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = ChExeDir()
 	}
 }
