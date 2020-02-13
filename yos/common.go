@@ -28,6 +28,7 @@ var (
 	opnList    = "list"
 	opnSize    = "size"
 	opnEmpty   = "empty"
+	opnChdir   = "chexedir"
 )
 
 // internal use

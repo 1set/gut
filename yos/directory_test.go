@@ -35,3 +35,10 @@ func TestJoinPath(t *testing.T) {
 		})
 	}
 }
+
+func TestChExeDir(t *testing.T) {
+	err := ChExeDir()
+	if err != nil {
+		t.Errorf("ChExeDir() got unexpected error: %v", err)
+	}
+}
