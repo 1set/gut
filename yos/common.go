@@ -29,6 +29,7 @@ var (
 	opnSize    = "size"
 	opnEmpty   = "empty"
 	opnChdir   = "chexedir"
+	opnMkdir   = "makedir"
 )
 
 // internal use

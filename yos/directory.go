@@ -38,3 +38,15 @@ func ChExeDir() (err error) {
 	}
 	return
 }
+
+// MakeDir creates a directory named path with 0755 permission bits, along with any necessary parents.
+//
+// 0755 permission bits indicates that the owner can read, write, execute, everyone else can read and execute but not modify.
+//
+// If the path is already a directory, MakeDir does nothing and returns nil.
+func MakeDir(path string) (err error) {
+	if err = os.MkdirAll(path, defaultDirectoryPermMode); err != nil {
+		err = opError(opnMkdir, path, err)
+	}
+	return
+}
