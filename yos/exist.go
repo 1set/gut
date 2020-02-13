@@ -2,7 +2,6 @@ package yos
 
 import (
 	"os"
-	"path/filepath"
 )
 
 // Exist checks if the file, directory exists.
@@ -45,9 +44,4 @@ func ExistSymlink(path string) bool {
 func checkPathExist(path string, stat funcStatFileInfo, check funcCheckFileInfo) bool {
 	fi, err := stat(path)
 	return err == nil && check(&fi)
-}
-
-// JoinPath joins any number of path elements into a single path, adding a separator if necessary.
-func JoinPath(elem ...string) string {
-	return filepath.Join(elem...)
 }
