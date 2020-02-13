@@ -2,7 +2,7 @@
 Package yos is yet another wrapper of platform-independent interface to operating system functionality.
 
 
-System Info
+Environments
 
 Check architecture of current system:
   - IsOn32bitArch
@@ -12,6 +12,9 @@ Check current operating system:
   - IsOnLinux
   - IsOnMacOS
   - IsOnMacOS
+
+Change working directory:
+  - ChExeDir
 
 
 File Operations
@@ -33,6 +36,7 @@ Miscellaneous operations:
   - JoinPath
   - Exist
   - NotExist
+  - MakeDir
 
 Sorting helpers for a slice of *FilePathInfo:
   - SortListByName
