@@ -1,8 +1,6 @@
 package yos
 
 import (
-	"os"
-	"strings"
 	"testing"
 )
 
@@ -19,7 +17,7 @@ func TestIsExistOrNot(t *testing.T) {
 		exist bool
 	}{
 		{"Check missing", "__do_not_exist__", false},
-		{"Check doc file", "doc.go", true},
+		{"Check text file", JoinPath(resourceExistRoot, "origin_file.txt"), true},
 		{"Check current dir", ".", true},
 		{"Check symlink origin", JoinPath(resourceExistRoot, "origin_file.txt"), true},
 		{"Check symlink of file", JoinPath(resourceExistRoot, "symlink.txt"), true},
@@ -40,14 +38,18 @@ func TestIsExistOrNot(t *testing.T) {
 }
 
 func BenchmarkIsExist(b *testing.B) {
+	path := JoinPath(resourceExistRoot, "origin_file.txt")
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = Exist("doc.go")
+		_ = Exist(path)
 	}
 }
 
 func BenchmarkIsNotExist(b *testing.B) {
+	path := JoinPath(resourceExistRoot, "origin_file.txt")
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = NotExist("doc.go")
+		_ = NotExist(path)
 	}
 }
 
@@ -58,7 +60,7 @@ func TestIsFileExist(t *testing.T) {
 		wantExist bool
 	}{
 		{"Check missing", "__do_not_exist__", false},
-		{"Check doc file", "doc.go", true},
+		{"Check text file", JoinPath(resourceExistRoot, "origin_file.txt"), true},
 		{"Check current dir", ".", false},
 		{"Check symlink dir", JoinPath(resourceExistRoot), false},
 		{"Check symlink origin file", JoinPath(resourceExistRoot, "origin_file.txt"), true},
@@ -81,8 +83,10 @@ func TestIsFileExist(t *testing.T) {
 }
 
 func BenchmarkIsFileExist(b *testing.B) {
+	path := JoinPath(resourceExistRoot, "origin_file.txt")
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = ExistFile("doc.go")
+		_ = ExistFile(path)
 	}
 }
 
@@ -93,7 +97,7 @@ func TestIsDirExist(t *testing.T) {
 		wantExist bool
 	}{
 		{"Check missing", "__do_not_exist__", false},
-		{"Check doc file", "doc.go", false},
+		{"Check text file", JoinPath(resourceExistRoot, "origin_file.txt"), false},
 		{"Check current dir", ".", true},
 		{"Check symlink dir", JoinPath(resourceExistRoot), true},
 		{"Check symlink origin file", JoinPath(resourceExistRoot, "origin_file.txt"), false},
@@ -130,7 +134,7 @@ func TestIsSymlinkExist(t *testing.T) {
 		wantExist bool
 	}{
 		{"Check missing", "__do_not_exist__", false},
-		{"Check doc file", "doc.go", false},
+		{"Check text file", JoinPath(resourceExistRoot, "origin_file.txt"), false},
 		{"Check current dir", ".", false},
 		{"Check symlink dir", JoinPath(resourceExistRoot), false},
 		{"Check symlink origin file", JoinPath(resourceExistRoot, "origin_file.txt"), false},
@@ -157,35 +161,5 @@ func BenchmarkIsSymlinkExist(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = ExistSymlink(path)
-	}
-}
-
-func TestJoinPath(t *testing.T) {
-	tests := []struct {
-		name string
-		elem []string
-		want string
-	}{
-		{"Nil", nil, ""},
-		{"Empty", []string{}, ""},
-		{"Single part", []string{"abc"}, "abc"},
-		{"Two parts", []string{"ab", "cd"}, strings.Join([]string{"ab", "cd"}, string(os.PathSeparator))},
-		{"Three parts", []string{"ab", "cd", "ef"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
-		{"Contains heading empty part", []string{"", "cd", "ef"}, strings.Join([]string{"cd", "ef"}, string(os.PathSeparator))},
-		{"Contains heading dot part", []string{".", "cd", "ef"}, strings.Join([]string{"cd", "ef"}, string(os.PathSeparator))},
-		{"Contains trailing empty part", []string{"ab", "cd", ""}, strings.Join([]string{"ab", "cd"}, string(os.PathSeparator))},
-		{"Contains trailing dot part", []string{"ab", "cd", "."}, strings.Join([]string{"ab", "cd"}, string(os.PathSeparator))},
-		{"Contains empty part in the middle", []string{"abc", "", "ef"}, strings.Join([]string{"abc", "ef"}, string(os.PathSeparator))},
-		{"Contains trailing slash", []string{"ab/", "cd/", "ef/"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
-		{"Contains heading slash", []string{"ab", "/cd", "/ef"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
-		{"Contains heading & trailing slash", []string{"ab/", "/cd/", "/ef/"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
-		{"Contains extra slash", []string{"ab//", "//cd//", "//ef/"}, strings.Join([]string{"ab", "cd", "ef"}, string(os.PathSeparator))},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := JoinPath(tt.elem...); got != tt.want {
-				t.Errorf("JoinPath() = %v, want %v", got, tt.want)
-			}
-		})
 	}
 }

@@ -28,6 +28,8 @@ var (
 	opnList    = "list"
 	opnSize    = "size"
 	opnEmpty   = "empty"
+	opnChange  = "change"
+	opnMake    = "make"
 )
 
 // internal use

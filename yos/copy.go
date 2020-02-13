@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	defaultDirectoryFileMode = os.FileMode(0755)
+	defaultDirectoryPermMode = os.FileMode(0755)
 	defaultBufferSize        = 256 * 1024
 )
 
@@ -180,7 +180,7 @@ func copyDir(src, dest string) (err error) {
 		}
 	} else if os.IsNotExist(err) {
 		err = nil
-		if err = os.MkdirAll(dest, defaultDirectoryFileMode); err == nil {
+		if err = os.MkdirAll(dest, defaultDirectoryPermMode); err == nil {
 			originMode := srcInfo.Mode()
 			defer os.Chmod(dest, originMode)
 		}

@@ -252,7 +252,7 @@ func TestCopyDir(t *testing.T) {
 func BenchmarkCopyDir(b *testing.B) {
 	for name, path := range resourceCopyDirSourceMap {
 		outputPath := JoinPath(resourceCopyDirBenchmarkRoot, name)
-		if err := os.MkdirAll(outputPath, defaultDirectoryFileMode); err != nil {
+		if err := os.MkdirAll(outputPath, defaultDirectoryPermMode); err != nil {
 			b.Errorf("failed to create the directory for output: %v, error: %v", outputPath, err)
 			continue
 		}
