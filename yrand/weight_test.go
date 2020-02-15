@@ -7,9 +7,7 @@ import (
 
 func TestWeightedChoice(t *testing.T) {
 	var (
-		times            = 200000
-		tolerance        = 0.125
-		minExpectedTimes = 10.0
+		times = 500000
 	)
 	tests := []struct {
 		name    string
@@ -45,42 +43,50 @@ func TestWeightedChoice(t *testing.T) {
 					t.Errorf("WeightedChoice() got invalid index = %v, want = [0, %v)", gotIdx, len(tt.weights))
 					return
 				}
-
-				result := make(map[int]int)
-				for i := 1; i <= times; i++ {
-					idx, err := WeightedChoice(tt.weights)
-					if err != nil {
-						t.Errorf("WeightedChoice() error = %v, wantErr %v", err, tt.wantErr)
-						return
-					}
-					if _, ok := result[idx]; ok {
-						result[idx] += 1
-					} else {
-						result[idx] = 1
-					}
-				}
-
-				weightSum := 0.0
-				for _, w := range tt.weights {
-					if w > 0 {
-						weightSum += w
-					}
-				}
-
-				for i, w := range tt.weights {
-					if (w <= 0) || ((w / weightSum * float64(times)) < minExpectedTimes) {
-						continue
-					}
-					expected := w / weightSum
-					actual := float64(result[i]) / float64(times)
-					diff := math.Abs(actual/expected - 1)
-					if diff > tolerance {
-						t.Errorf("WeightedChoice() got unexpected result, weights: %v, index:[%d](%.2f), expected: %.3f, actual: %.3f, diff: %.2f%%, tole: %.2f%%",
-							tt.weights, i, w, expected, actual, diff*100, tolerance*100)
-						return
-					}
-				}
+				checkProbDist(t, "WeightedChoice", times, tt.weights, func() (idx int, err error) { return WeightedChoice(tt.weights) })
 			}
 		})
+	}
+}
+
+func checkProbDist(t *testing.T, name string, times int, weights []float64, idxFunc func() (idx int, err error)) {
+	var (
+		tolerance        = 0.125
+		minExpectedTimes = 10.0
+	)
+
+	result := make(map[int]int)
+	for i := 1; i <= times; i++ {
+		idx, err := idxFunc()
+		if err != nil {
+			t.Errorf("%s() got unexpected error = %v", name, err)
+			return
+		}
+		if _, ok := result[idx]; ok {
+			result[idx] += 1
+		} else {
+			result[idx] = 1
+		}
+	}
+
+	weightSum := 0.0
+	for _, w := range weights {
+		if w > 0 {
+			weightSum += w
+		}
+	}
+
+	for i, w := range weights {
+		if (w <= 0) || ((w / weightSum * float64(times)) < minExpectedTimes) {
+			continue
+		}
+		expected := w / weightSum
+		actual := float64(result[i]) / float64(times)
+		diff := math.Abs(actual/expected - 1)
+		if diff > tolerance {
+			t.Errorf("%s() got unexpected result, weights: %v, index:[%d](%.2f), expected: %.3f, actual: %.3f, diff: %.2f%%, tole: %.2f%%",
+				name, weights, i, w, expected, actual, diff*100, tolerance*100)
+			return
+		}
 	}
 }
