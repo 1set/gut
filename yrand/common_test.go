@@ -12,8 +12,8 @@ func TestIsFloatEqual(t *testing.T) {
 		numLarge     = 1e30
 		numLargePlus = numSmall + numLarge
 
-		numSmall1 = 1e30
-		numSmall2 = 2e30
+		numSmall1 = 1e-30
+		numSmall2 = 2e-30
 		numSmall3 = numSmall1 + numSmall2
 		numLarge1 = 1e30
 		numLarge2 = 2e30
@@ -54,15 +54,16 @@ func TestIsFloatEqual(t *testing.T) {
 		{"compare 1e+30 plus 2e+30 with tole=1e-9: 3-2<2", args{numLarge3 - numLarge2, numLarge2, 1e-9}, false},
 		{"compare 1e-30 plus 2e-30 with tole=1e-9: 3-1=2", args{numSmall3 - numSmall1, numSmall2, 1e-9}, true},
 		{"compare 1e-30 plus 2e-30 with tole=1e-9: 3-1>1", args{numSmall3 - numSmall1, numSmall1, 1e-9}, false},
+		{"compare 1e-30 plus 2e-30 with tole=1e-26", args{numSmall3 - numSmall1, numSmall2, 1e-26}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := isFloatEqual(tt.args.a, tt.args.b, tt.args.tolerance); got != tt.want {
-				t.Errorf("isFloatEqual(a,b) = %v, want %v", got, tt.want)
+				t.Errorf("isFloatEqual(a:%f, b:%f) = %v, want %v", tt.args.a, tt.args.b, got, tt.want)
 				return
 			}
 			if got := isFloatEqual(tt.args.b, tt.args.a, tt.args.tolerance); got != tt.want {
-				t.Errorf("isFloatEqual(b,a) = %v, want %v", got, tt.want)
+				t.Errorf("isFloatEqual(b:%f, a:%f) = %v, want %v", tt.args.b, tt.args.a, got, tt.want)
 			}
 		})
 	}
