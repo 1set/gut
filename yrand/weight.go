@@ -8,6 +8,7 @@ import (
 var (
 	errInvalidWeights = errors.New("invalid weight list")
 	errInvalidIndex = errors.New("invalid index")
+	tolerance = 1e-9
 )
 
 func WeightedChoice(weights []float64) (idx int, err error) {
@@ -49,16 +50,17 @@ func WeightedShuffle(weights []float64, yield func(idx int) (err error)) (err er
 		count   = len(weights)
 		cumSum  = make([]float64, 0, count)
 		sum     = 0.0
+		nextSum     = 0.0
 		randNum float64
 	)
 
 	for _, weight := range weights {
-		// check non-positive weight, and weights like [1e-6, 1e30, 1e-3],
-		if (weight <= 0) || (sum+weight == sum) || (sum-weight == sum) {
+		// check non-positive weight, and weights like [1e30, 1e-6, 1e30],
+		if nextSum = sum + weight; (weight <= 0) || !isEqualFloat(nextSum - weight, sum, tolerance) || !isEqualFloat(nextSum - sum, weight, tolerance) {
 			err = errInvalidWeights
 			break
 		}
-		sum += weight
+		sum = nextSum
 		cumSum = append(cumSum, sum)
 	}
 	if err != nil || sum <= 0 {

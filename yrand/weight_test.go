@@ -91,7 +91,7 @@ func TestWeightedShuffle(t *testing.T) {
 				t.Errorf("WeightedShuffle() got error = %v, wantErr = %v", err, tt.wantErr)
 				return
 			} else if (err != nil) && (err != errInvalidWeights) {
-				t.Errorf("WeightedShuffle() got diff error = %v, want = %v", err, errInvalidWeights)
+				t.Errorf("WeightedShuffle() got diff error = %v, want = %v, weights = %v", err, errInvalidWeights, tt.weights)
 			}
 
 			if !tt.wantErr {
