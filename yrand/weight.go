@@ -8,7 +8,7 @@ import (
 var (
 	errInvalidWeights = errors.New("invalid weight list")
 	errInvalidIndex   = errors.New("invalid index")
-	tolerance         = 1e-12
+	tolerance         = 1e-15
 )
 
 func WeightedChoice(weights []float64) (idx int, err error) {
@@ -16,6 +16,7 @@ func WeightedChoice(weights []float64) (idx int, err error) {
 		sum     = 0.0
 		randNum float64
 	)
+	// get sum of weights
 	for _, w := range weights {
 		if w > 0 {
 			sum += w
@@ -26,11 +27,13 @@ func WeightedChoice(weights []float64) (idx int, err error) {
 		return
 	}
 
+	// get random value
 	if randNum, err = Float64(); err != nil {
 		return
 	}
-
 	sum *= randNum
+
+	// find the random pos
 	for i, w := range weights {
 		if w > 0 {
 			sum -= w
@@ -40,7 +43,6 @@ func WeightedChoice(weights []float64) (idx int, err error) {
 			}
 		}
 	}
-
 	idx = len(weights) - 1
 	return
 }
