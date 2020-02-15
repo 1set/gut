@@ -12,7 +12,7 @@ import (
 //
 // If the target doesn't exist but its parent directory does, the source file will be moved to the parent directory with the target name.
 //
-// If there is an error, it'll be of type *os.PathError.
+// If there is an error, it will be of type *os.PathError.
 func MoveFile(src, dest string) (err error) {
 	return moveEntry(
 		src, dest,
@@ -29,7 +29,7 @@ func MoveFile(src, dest string) (err error) {
 //
 // If the target doesn't exist but its parent directory does, the source link will be moved to the parent directory with the target name.
 //
-// If there is an error, it'll be of type *os.PathError.
+// If there is an error, it will be of type *os.PathError.
 func MoveSymlink(src, dest string) (err error) {
 	return moveEntry(
 		src, dest,
@@ -46,7 +46,7 @@ func MoveSymlink(src, dest string) (err error) {
 //
 // If the target doesn't exist but its parent directory does, the source directory will be moved to the parent directory with the target name.
 //
-// It stops and returns immediately if any error occurs, and the error will be of type *os.PathError.
+// MoveDir stops and returns immediately if any error occurs, and the error will be of type *os.PathError.
 func MoveDir(src, dest string) (err error) {
 	return moveEntry(
 		src, dest,

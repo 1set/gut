@@ -19,6 +19,11 @@ func Example() {
 	}
 	sort.Stable(yos.SortListByModTime(srcFiles))
 
+	if err = yos.MakeDir(destRoot); err != nil {
+		fmt.Printf("fail to mkdir %q: %v\n", destRoot, err)
+		return
+	}
+
 	cntMove, cntSkip := 0, 0
 	for _, src := range srcFiles {
 		destPath := yos.JoinPath(destRoot, src.Info.Name())

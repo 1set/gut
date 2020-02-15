@@ -25,8 +25,8 @@ Basic operations:
 	| ----------- | -------------- | --------------- | ------------------ |
 	| Check Exist | ExistDir       | ExistFile       | ExistSymlink       |
 	| Check Empty | IsDirEmpty     | IsFileEmpty     | -                  |
-	| Check Same  | SameDirEntries | SameFileContent | SameSymlinkContent |
 	| Get Size    | GetDirSize     | GetFileSize     | GetSymlinkSize     |
+	| Compare     | SameDirEntries | SameFileContent | SameSymlinkContent |
 	| List        | ListDir        | ListFile        | ListSymlink        |
 	| Copy        | CopyDir        | CopyFile        | CopySymlink        |
 	| Move        | MoveDir        | MoveFile        | MoveSymlink        |

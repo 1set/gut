@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-// IsFileEmpty indicates if the given file is empty.
+// IsFileEmpty checks whether the given file is empty.
 func IsFileEmpty(path string) (empty bool, err error) {
 	var fi os.FileInfo
 	if fi, err = os.Stat(path); err == nil {
@@ -18,7 +18,7 @@ func IsFileEmpty(path string) (empty bool, err error) {
 	return
 }
 
-// IsDirEmpty indicates if the given directory contains nothing.
+// IsDirEmpty checks whether the given directory contains nothing.
 func IsDirEmpty(path string) (empty bool, err error) {
 	var (
 		rootFi os.FileInfo

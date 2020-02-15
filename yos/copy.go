@@ -20,7 +20,7 @@ const (
 //
 // If the target doesn't exist but its parent directory does, the source file will be copied to the parent directory with the target name.
 //
-// If there is an error, it'll be of type *os.PathError.
+// If there is an error, it will be of type *os.PathError.
 func CopyFile(src, dest string) (err error) {
 	if src, dest, err = refineOpPaths(opnCopy, src, dest, true); err == nil {
 		err = bufferCopyFile(src, dest, defaultBufferSize)
@@ -45,8 +45,10 @@ func CopyDir(src, dest string) (err error) {
 }
 
 // CopySymlink copies a symbolic link to a target file.
-// It only copies the contents and makes no attempt to read the referenced file.
-// If there is an error, it'll be of type *os.PathError.
+//
+// CopySymlink only copies the content in the link and makes no attempt to read the file that the link pointed to.
+//
+// If there is an error, it will be of type *os.PathError.
 func CopySymlink(src, dest string) (err error) {
 	if src, dest, err = refineOpPaths(opnCopy, src, dest, false); err == nil {
 		err = copySymlink(src, dest)

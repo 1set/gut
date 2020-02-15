@@ -12,7 +12,7 @@ func JoinPath(elem ...string) string {
 
 // ChangeExeDir changes the current working directory to the directory of the executable that started the current process.
 //
-// If a symbolic link is used to start the process, it will be changed to the directory of the executable that the link pointed to.
+// If a symbolic link is used to start the process, the current working directory will be changed to the directory of the executable that the link pointed to.
 func ChangeExeDir() (err error) {
 	var (
 		ap string
