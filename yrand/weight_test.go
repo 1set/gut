@@ -2,7 +2,6 @@ package yrand
 
 import (
 	"fmt"
-	"math"
 	"testing"
 )
 
@@ -187,10 +186,9 @@ func checkProbDist(t *testing.T, name string, times int, weights []float64, idxF
 		}
 		expected := w / weightSum
 		actual := float64(result[i]) / float64(times)
-		diff := math.Abs(actual/expected - 1)
-		if diff > tolerance {
-			t.Errorf("%s() got unexpected result, weights: %v, index:[%d](%.2f), expected: %.3f, actual: %.3f, diff: %.2f%%, tole: %.2f%%",
-				name, weights, i, w, expected, actual, diff*100, tolerance*100)
+		if !isFloatEqual(actual, expected, tolerance) {
+			t.Errorf("%s() got unexpected result, weights: %v, index:[%d](%.2f), expected: %.3f, actual: %.3f, tole: %.2f%%",
+				name, weights, i, w, expected, actual, tolerance*100)
 			return
 		}
 	}
