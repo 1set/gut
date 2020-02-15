@@ -8,7 +8,7 @@ import (
 var (
 	errInvalidWeights = errors.New("invalid weight list")
 	errInvalidIndex   = errors.New("invalid index")
-	tolerance         = 1e-15
+	tolerance         = 1e-14
 )
 
 func WeightedChoice(weights []float64) (idx int, err error) {

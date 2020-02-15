@@ -12,9 +12,11 @@ func TestIsFloatEqual(t *testing.T) {
 		numLarge     = 1e30
 		numLargePlus = numSmall + numLarge
 
-		numSmall1 = 1e-30
-		numSmall2 = 2e-30
-		numSmall3 = numSmall1 + numSmall2
+		numSmall1  = 1e-30
+		numSmall2  = 2e-30
+		numSmall3  = numSmall1 + numSmall2
+		numSmall3A = 3e-30
+
 		numLarge1 = 1e30
 		numLarge2 = 2e30
 		numLarge3 = numLarge1 + numLarge2
@@ -55,6 +57,8 @@ func TestIsFloatEqual(t *testing.T) {
 		{"compare 1e-30 plus 2e-30 with tole=1e-9: 3-1=2", args{numSmall3 - numSmall1, numSmall2, 1e-9}, true},
 		{"compare 1e-30 plus 2e-30 with tole=1e-9: 3-1>1", args{numSmall3 - numSmall1, numSmall1, 1e-9}, false},
 		{"compare 1e-30 plus 2e-30 with tole=1e-26", args{numSmall3 - numSmall1, numSmall2, 1e-26}, true},
+		{"compare 1e-30+2e-30 and 3e-30 with tole=1e-15", args{numSmall3, numSmall3A, 1e-15}, true},
+		{"compare 1e-30+2e-30 and 3e-30 with tole=1e-16", args{numSmall3, numSmall3A, 1e-16}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
