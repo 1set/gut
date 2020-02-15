@@ -4,7 +4,7 @@ import (
 	"os"
 )
 
-// Exist checks if the file, directory exists.
+// Exist checks whether the given path exists.
 //
 // If the file is a symbolic link, it will attempt to follow the link and check if the source file exists.
 func Exist(path string) bool {
@@ -12,7 +12,7 @@ func Exist(path string) bool {
 	return err == nil
 }
 
-// NotExist checks if the file, directory doesn't exist.
+// NotExist checks whether the given path doesn't exist.
 //
 // If the file is a symbolic link, it will attempt to follow the link and check if the source file doesn't exist.
 func NotExist(path string) bool {
@@ -20,21 +20,21 @@ func NotExist(path string) bool {
 	return os.IsNotExist(err)
 }
 
-// ExistFile checks if the specified path exists and is a file.
+// ExistFile checks whether the specified path exists and is a file.
 //
 // If the path is a symbolic link, it will attempt to follow the link and check.
 func ExistFile(path string) bool {
 	return checkPathExist(path, os.Stat, isFileFi)
 }
 
-// ExistDir checks if the specified path exists and is a directory.
+// ExistDir checks whether the specified path exists and is a directory.
 //
 // If the path is a symbolic link, it will attempt to follow the link and check.
 func ExistDir(path string) bool {
 	return checkPathExist(path, os.Stat, isDirFi)
 }
 
-// ExistSymlink checks if the specified path exists and is a symbolic link.
+// ExistSymlink checks whether the specified path exists and is a symbolic link.
 //
 // It only checks the path itself and makes no attempt to follow the link.
 func ExistSymlink(path string) bool {
