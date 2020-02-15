@@ -68,8 +68,9 @@ func TestWeightedShuffle(t *testing.T) {
 		{"contains extremely larger weight 1", []float64{1e-6, 1e30}, true},
 		{"contains extremely larger weight 2", []float64{1e30, 1e-6}, true},
 		{"contains extremely larger weight 3", []float64{1e30, 1e30, 1e-6}, true},
-		{"contains extremely larger weight 4", []float64{1e-6, 1e30, 1e30}, true},
-		{"contains extremely larger weight 5", []float64{1e-6, 1e30, 1e-3, 1}, true},
+		{"contains extremely larger weight 4", []float64{1e30, 1e-6, 1e30}, true},
+		{"contains extremely larger weight 5", []float64{1e-6, 1e30, 1e30}, true},
+		{"contains extremely larger weight 6", []float64{1e-6, 1e30, 1e-3, 1}, true},
 		{"single weight", []float64{1}, false},
 		{"two diff weights", []float64{1, 3}, false},
 		{"two equal weights", []float64{2, 2}, false},
@@ -87,7 +88,10 @@ func TestWeightedShuffle(t *testing.T) {
 			if err := WeightedShuffle(tt.weights, func(idx int) (err error) {
 				return
 			}); (err != nil) != tt.wantErr {
-				t.Errorf("WeightedShuffle() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("WeightedShuffle() got error = %v, wantErr = %v", err, tt.wantErr)
+				return
+			} else if (err != nil) && (err != errInvalidWeights) {
+				t.Errorf("WeightedShuffle() got diff error = %v, want = %v", err, errInvalidWeights)
 			}
 
 			if !tt.wantErr {

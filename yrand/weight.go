@@ -2,12 +2,12 @@ package yrand
 
 import (
 	"errors"
-	"fmt"
 	"sort"
 )
 
 var (
 	errInvalidWeights = errors.New("invalid weight list")
+	errInvalidIndex = errors.New("invalid index")
 )
 
 func WeightedChoice(weights []float64) (idx int, err error) {
@@ -76,7 +76,7 @@ func WeightedShuffle(weights []float64, yield func(idx int) (err error)) (err er
 		// binary search for the pos and yield it
 		j := sort.Search(count, func(i int) bool { return cumSum[i] > randNum })
 		if !((0 <= j) && (j < count)) {
-			err = fmt.Errorf("invalid weight 3")
+			err = errInvalidIndex
 			break
 		}
 		if err = yield(j); err != nil {
