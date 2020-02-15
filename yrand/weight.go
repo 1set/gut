@@ -12,7 +12,6 @@ var (
 
 func WeightedChoice(weights []float64) (idx int, err error) {
 	var (
-		count   = len(weights)
 		sum     = 0.0
 		randNum float64
 	)
@@ -41,7 +40,7 @@ func WeightedChoice(weights []float64) (idx int, err error) {
 		}
 	}
 
-	idx = count - 1
+	idx = len(weights) - 1
 	return
 }
 
@@ -52,18 +51,19 @@ func WeightedShuffle(weights []float64, yield func(idx int) (err error)) (err er
 		sum     = 0.0
 		randNum float64
 	)
-	if count <= 0 {
-		err = fmt.Errorf("empty weight list")
-		return
-	}
+
 	for _, weight := range weights {
-		// add check here for weights like [1e-6, 1e30, 1e-3],
+		// check non-positive weight, and weights like [1e-6, 1e30, 1e-3],
 		if (weight <= 0) || (sum+weight == sum) || (sum-weight == sum) {
-			err = fmt.Errorf("invalid weight 1&2")
-			return
+			err = errInvalidWeights
+			break
 		}
 		sum += weight
 		cumSum = append(cumSum, sum)
+	}
+	if err != nil || sum <= 0 {
+		err = errInvalidWeights
+		return
 	}
 
 	for range weights {
