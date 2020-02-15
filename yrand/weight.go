@@ -56,7 +56,7 @@ func WeightedShuffle(weights []float64, yield func(idx int) (err error)) (err er
 
 	for _, weight := range weights {
 		// check non-positive weight, and weights like [1e30, 1e-6, 1e30],
-		if nextSum = sum + weight; (weight <= 0) || !isEqualFloat(nextSum-weight, sum, tolerance) || !isEqualFloat(nextSum-sum, weight, tolerance) {
+		if nextSum = sum + weight; (weight <= 0) || !isFloatEqual(nextSum-weight, sum, tolerance) || !isFloatEqual(nextSum-sum, weight, tolerance) {
 			err = errInvalidWeights
 			break
 		}

@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestIsEqualFloat(t *testing.T) {
+func TestIsFloatEqual(t *testing.T) {
 	var (
 		numSmall     = 1e-6
 		numLarge     = 1e30
@@ -57,16 +57,16 @@ func TestIsEqualFloat(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := isEqualFloat(tt.args.a, tt.args.b, tt.args.tolerance); got != tt.want {
-				t.Errorf("isEqualFloat() = %v, want %v", got, tt.want)
+			if got := isFloatEqual(tt.args.a, tt.args.b, tt.args.tolerance); got != tt.want {
+				t.Errorf("isFloatEqual() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func BenchmarkIsEqualFloat(b *testing.B) {
+func BenchmarkIsFloatEqual(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		isEqualFloat(1, 2, 0.01)
+		isFloatEqual(1, 2, 0.01)
 	}
 }
 

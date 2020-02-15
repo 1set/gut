@@ -14,13 +14,13 @@ var (
 	errChoiceEmpty     = errors.New("slice should not be empty")
 )
 
-func isRegularFloat(n float64) bool {
+func isFloatRegular(n float64) bool {
 	return !(math.IsNaN(n) || math.IsInf(n, 1) || math.IsInf(n, -1))
 }
 
 // Checks if two floats are equal within a given tolerance.
-func isEqualFloat(a, b, tolerance float64) bool {
-	if isRegularFloat(a) && isRegularFloat(b) {
+func isFloatEqual(a, b, tolerance float64) bool {
+	if isFloatRegular(a) && isFloatRegular(b) {
 		if a == 0 || b == 0 {
 			return math.Abs(a-b) <= tolerance
 		} else {

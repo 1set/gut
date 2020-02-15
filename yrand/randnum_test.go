@@ -299,7 +299,7 @@ func TestFloat64(t *testing.T) {
 	}
 
 	avg := total / float64(count)
-	if !(isEqualFloat(avg, 0.5, 0.01)) {
+	if !(isFloatEqual(avg, 0.5, 0.01)) {
 		t.Errorf("Float64() got unexpected average = %v", avg)
 	}
 }
@@ -327,7 +327,7 @@ func TestFloat32(t *testing.T) {
 	}
 
 	avg := total / float32(count)
-	if !(isEqualFloat(float64(avg), 0.5, 0.01)) {
+	if !(isFloatEqual(float64(avg), 0.5, 0.01)) {
 		t.Errorf("Float32() got unexpected average = %v", avg)
 	}
 }
