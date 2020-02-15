@@ -8,7 +8,7 @@ import (
 
 func TestWeightedChoice(t *testing.T) {
 	var (
-		times = 500000
+		times = 300000
 	)
 	tests := []struct {
 		name    string
@@ -53,7 +53,7 @@ func TestWeightedChoice(t *testing.T) {
 
 func TestWeightedShuffle(t *testing.T) {
 	var (
-		times = 500000
+		times = 300000
 	)
 	tests := []struct {
 		name    string
@@ -64,7 +64,7 @@ func TestWeightedShuffle(t *testing.T) {
 		{"empty weights", []float64{}, true},
 		{"only zero weights", []float64{0, 0}, true},
 		{"only non-positive weights", []float64{0, 0, -1}, true},
-		{"contains non-positive weights", []float64{-1, 10, 0}, false},
+		{"contains non-positive weights", []float64{-1, 10, 0}, true},
 		{"contains extremely larger weight", []float64{1e-6, 1e30, 1e-3, 1}, true},
 		{"single weight", []float64{1}, false},
 		{"two diff weights", []float64{1, 3}, false},
@@ -107,7 +107,7 @@ func TestWeightedShuffle(t *testing.T) {
 
 func checkProbDist(t *testing.T, name string, times int, weights []float64, idxFunc func() (idx int, err error)) {
 	var (
-		tolerance        = 0.125
+		tolerance        = 0.15
 		minExpectedTimes = 10.0
 	)
 
