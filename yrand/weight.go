@@ -11,6 +11,11 @@ var (
 	tolerance         = 1e-14
 )
 
+// WeightedChoice selects a random index according to the associated weights (or probabilities).
+//
+// Indexes with zero or negative weight value will be ignored.
+//
+// The slice of associated weights must contain at least one positive value.
 func WeightedChoice(weights []float64) (idx int, err error) {
 	var (
 		sum     = 0.0
@@ -47,6 +52,9 @@ func WeightedChoice(weights []float64) (idx int, err error) {
 	return
 }
 
+// WeightedShuffle shuffles the sequence of values according to the associated weights (or probabilities).
+//
+// All values in the slice of associated weights must be positive.
 func WeightedShuffle(weights []float64, yield func(idx int) (err error)) (err error) {
 	var (
 		count   = len(weights)

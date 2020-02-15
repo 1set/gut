@@ -14,7 +14,7 @@ var (
 	errChoiceEmpty     = errors.New("slice should not be empty")
 )
 
-// Checks if two floats are equal within a given tolerance.
+// isFloatEqual checks whether two floats are equal within a given tolerance.
 func isFloatEqual(a, b, tolerance float64) (equal bool) {
 	const pos, neg = 1, -1
 	switch {
@@ -28,7 +28,7 @@ func isFloatEqual(a, b, tolerance float64) (equal bool) {
 	return
 }
 
-// Iterates over an newly generated list of `count` random uint64 numbers in [0, `max`).
+// iterateRandomNumbers iterates over a newly generated list of `count` random uint64 numbers in [0, `max`).
 func iterateRandomNumbers(count int, max uint64, callback func(uint64) error) (err error) {
 	switch {
 	case count <= 0:
