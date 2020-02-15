@@ -14,9 +14,20 @@ var (
 	errChoiceEmpty     = errors.New("slice should not be empty")
 )
 
-// Checks if two float numbers are equal within a given tolerance.
+func isRegularFloat(n float64) bool {
+	return !(math.IsNaN(n) || math.IsInf(n, 1) || math.IsInf(n, -1))
+}
+
+// Checks if two floats are equal within a given tolerance.
 func isEqualFloat(a, b, tolerance float64) bool {
-	return math.Abs(a-b) <= tolerance
+	if isRegularFloat(a) && isRegularFloat(b) {
+		if a == 0 || b == 0 {
+			return math.Abs(a-b) <= tolerance
+		} else {
+			return math.Abs((a-b)/a) <= tolerance
+		}
+	}
+	return false
 }
 
 // Iterates over an newly generated list of `count` random uint64 numbers in [0, `max`).
