@@ -67,6 +67,10 @@ const (
 // Symbolic links other than the given path will be not be followed. The given directory is not included in the list.
 //
 // ListMatch requires the pattern to match the full file name, not just a substring. Errors are returned if any pattern is malformed.
+//
+// There are two types of patterns are supported:
+//   1) wildcard described in filepath.Match(), this is default;
+//   2) regular expression accepted by google/RE2, use the ListUseRegExp flag to enable;
 func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathInfo, err error) {
 	var (
 		useRegExp  = flag&ListUseRegExp != 0
