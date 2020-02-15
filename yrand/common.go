@@ -14,20 +14,18 @@ var (
 	errChoiceEmpty     = errors.New("slice should not be empty")
 )
 
-func isFloatRegular(n float64) bool {
-	return !(math.IsNaN(n) || math.IsInf(n, 1) || math.IsInf(n, -1))
-}
-
 // Checks if two floats are equal within a given tolerance.
-func isFloatEqual(a, b, tolerance float64) bool {
-	if isFloatRegular(a) && isFloatRegular(b) {
-		if a == 0 || b == 0 {
-			return math.Abs(a-b) <= tolerance
-		} else {
-			return math.Abs((a-b)/a) <= tolerance
-		}
+func isFloatEqual(a, b, tolerance float64) (equal bool) {
+	const pos, neg = 1, -1
+	switch {
+	case math.IsNaN(a), math.IsInf(a, pos), math.IsInf(a, neg), math.IsNaN(b), math.IsInf(b, pos), math.IsInf(b, neg):
+		equal = false
+	case a != 0 && b != 0:
+		equal = math.Abs((a-b)/a) <= tolerance
+	default:
+		equal = math.Abs(a-b) <= tolerance
 	}
-	return false
+	return
 }
 
 // Iterates over an newly generated list of `count` random uint64 numbers in [0, `max`).

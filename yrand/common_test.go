@@ -58,7 +58,11 @@ func TestIsFloatEqual(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := isFloatEqual(tt.args.a, tt.args.b, tt.args.tolerance); got != tt.want {
-				t.Errorf("isFloatEqual() = %v, want %v", got, tt.want)
+				t.Errorf("isFloatEqual(a,b) = %v, want %v", got, tt.want)
+				return
+			}
+			if got := isFloatEqual(tt.args.b, tt.args.a, tt.args.tolerance); got != tt.want {
+				t.Errorf("isFloatEqual(b,a) = %v, want %v", got, tt.want)
 			}
 		})
 	}
