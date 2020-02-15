@@ -51,6 +51,22 @@ func TestWeightedChoice(t *testing.T) {
 	}
 }
 
+func BenchmarkWeightedChoiceInvalid(b *testing.B) {
+	weights := []float64{0, -10, 0, 0, -1}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = WeightedChoice(weights)
+	}
+}
+
+func BenchmarkWeightedChoiceValid(b *testing.B) {
+	weights := []float64{2.333, 4.666, 8.888, 10.101}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = WeightedChoice(weights)
+	}
+}
+
 func TestWeightedShuffle(t *testing.T) {
 	var (
 		times = 300000
@@ -65,7 +81,7 @@ func TestWeightedShuffle(t *testing.T) {
 		{"only zero weights", []float64{0, 0}, true},
 		{"only non-positive weights", []float64{0, 0, -1}, true},
 		{"contains non-positive weights", []float64{-1, 10, 0}, true},
-		{"contains extremely larger weight 1", []float64{1e-6, 1e30}, true},
+		{"contains extremely larger weight 1", []float64{1e-6, 1e-1, 2e-2, 1e-3, 1e30}, true},
 		{"contains extremely larger weight 2", []float64{1e30, 1e-6}, true},
 		{"contains extremely larger weight 3", []float64{1e30, 1e30, 1e-6}, true},
 		{"contains extremely larger weight 4", []float64{1e30, 1e-6, 1e30}, true},
@@ -112,6 +128,24 @@ func TestWeightedShuffle(t *testing.T) {
 				})
 			}
 		})
+	}
+}
+
+func BenchmarkWeightedShuffleInvalid(b *testing.B) {
+	weights := []float64{1e-6, 1e-1, 2e-2, 1e-3, 1e30}
+	noop := func(idx int) (err error) { return }
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = WeightedShuffle(weights, noop)
+	}
+}
+
+func BenchmarkWeightedShuffleValid(b *testing.B) {
+	weights := []float64{2.333, 4.666, 8.888, 10.101}
+	noop := func(idx int) (err error) { return }
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = WeightedShuffle(weights, noop)
 	}
 }
 
