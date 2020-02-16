@@ -1,6 +1,7 @@
 package yrand
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 )
@@ -128,6 +129,36 @@ func TestWeightedShuffle(t *testing.T) {
 			}
 		})
 	}
+
+	errSample := errors.New("this is sample error")
+	tests2 := []struct {
+		name      string
+		weights   []float64
+		errReturn error
+		expectCnt int
+		expectErr error
+	}{
+		{"got yield func error", []float64{1, 2, 3, 4, 5, 6, 7, 8}, errSample, 3, errSample},
+		{"quit the shuffle", []float64{1, 2, 3, 4, 5, 6}, QuitShuffle, 2, nil},
+	}
+	for _, tt := range tests2 {
+		t.Run(tt.name, func(t *testing.T) {
+			cnt := 0
+			if err := WeightedShuffle(tt.weights, func(idx int) (err error) {
+				cnt++
+				if cnt >= tt.expectCnt {
+					return tt.errReturn
+				}
+				return nil
+			}); err != tt.expectErr {
+				t.Errorf("WeightedShuffle() got error = %v, want = %v", err, tt.expectErr)
+				return
+			} else if cnt != tt.expectCnt {
+				t.Errorf("WeightedShuffle() quit at count = %v, want = %v", cnt, tt.expectCnt)
+				return
+			}
+		})
+	}
 }
 
 func BenchmarkWeightedShuffleInvalid(b *testing.B) {
@@ -167,7 +198,7 @@ func checkProbDist(t *testing.T, name string, times int, weights []float64, idxF
 		}
 
 		if _, ok := result[idx]; ok {
-			result[idx] += 1
+			result[idx]++
 		} else {
 			result[idx] = 1
 		}

@@ -6,6 +6,10 @@ import (
 )
 
 var (
+	QuitShuffle = errors.New("quit this shuffle")
+)
+
+var (
 	errInvalidWeights = errors.New("invalid weight list")
 	errInvalidIndex   = errors.New("invalid index")
 	tolerance         = 1e-14
@@ -99,6 +103,10 @@ func WeightedShuffle(weights []float64, yield func(idx int) (err error)) (err er
 		for p := j; p < count; p++ {
 			cumSum[p] -= weights[j]
 		}
+	}
+
+	if err == QuitShuffle {
+		err = nil
 	}
 	return
 }
