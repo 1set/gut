@@ -19,6 +19,8 @@ var (
 
 type (
 	// ShuffleIndexFunc is the type of the function called for each random index selected by WeightedShuffle.
+	//
+	// If the function returns QuitShuffle, WeightedShuffle skips the rest and terminates immediately.
 	ShuffleIndexFunc func(idx int) (err error)
 	// ShuffleSwapFunc is the type of the function called by Shuffle to swap the elements with indexes i and j.
 	ShuffleSwapFunc func(i, j int)
@@ -67,8 +69,12 @@ func WeightedChoice(weights []float64) (idx int, err error) {
 
 // WeightedShuffle shuffles the sequence of values according to the associated weights (or probabilities).
 //
-// All values in the slice of associated weights must be positive.
-func WeightedShuffle(weights []float64, indexFunc ShuffleIndexFunc) (err error) {
+// All values in the slice of associated weights must be positive, and values of very different magnitudes are unacceptable.
+//
+// The yieldFunc will be called for each randomly selected index.
+//
+// The complexity is O(n^2) where n = len(weights).
+func WeightedShuffle(weights []float64, yieldFunc ShuffleIndexFunc) (err error) {
 	var (
 		count   = len(weights)
 		cumSum  = make([]float64, 0, count)
@@ -104,7 +110,7 @@ func WeightedShuffle(weights []float64, indexFunc ShuffleIndexFunc) (err error) 
 			err = errInvalidIndex
 			break
 		}
-		if err = indexFunc(j); err != nil {
+		if err = yieldFunc(j); err != nil {
 			break
 		}
 
