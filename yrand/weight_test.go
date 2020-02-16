@@ -27,13 +27,18 @@ func TestWeightedChoice(t *testing.T) {
 		{"contains two larger weights", []float64{1, 100, 100}, false},
 		{"contains non-positive weight", []float64{10, 0, 10}, false},
 		{"contains non-positive weights", []float64{-1, 10, 0}, false},
+		{"contains extremely larger weight", []float64{1e-6, 1e30, 1e-3}, false},
+		{"contains extremely larger weights", []float64{1e30, 1e-6, 1e30}, false},
 		{"three increasing weights", []float64{1, 100, 1000}, false},
 		{"four increasing weights", []float64{2.333, 4.666, 8.888, 10.101}, false},
 		{"five increasing weights", []float64{1, 2, 3, 4, 5}, false},
-		{"contains extremely larger weight", []float64{1e-6, 1e30, 1e-3, 1}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if testing.Short() && len(tt.weights) >= 4 {
+				t.Skipf("skipping large case '%v' in short mode", tt.name)
+			}
+
 			gotIdx, err := WeightedChoice(tt.weights)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("WeightedChoice() error = %v, wantErr %v", err, tt.wantErr)
@@ -102,6 +107,10 @@ func TestWeightedShuffle(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if testing.Short() && len(tt.weights) >= 4 {
+				t.Skipf("skipping large case '%v' in short mode", tt.name)
+			}
+
 			if err := WeightedShuffle(tt.weights, func(idx int) (err error) {
 				return
 			}); (err != nil) != tt.wantErr {
@@ -181,7 +190,7 @@ func BenchmarkWeightedShuffleValid(b *testing.B) {
 
 func checkProbDist(t *testing.T, name string, times int, weights []float64, idxFunc func() (idx int, err error)) {
 	var (
-		tolerance        = 0.15
+		tolerance        = 0.16
 		minExpectedTimes = 10.0
 	)
 
