@@ -11,21 +11,6 @@ var (
 	tolerance         = 1e-14
 )
 
-var (
-	// QuitShuffle is used as a return value from ShuffleIndexFunc to indicate that the execution of WeightedShuffle should be terminated immediately.
-	// It is not returned as an error by any function.
-	QuitShuffle = errors.New("quit this shuffle")
-)
-
-type (
-	// ShuffleIndexFunc is the type of the function called for each random index selected by WeightedShuffle.
-	//
-	// If the function returns QuitShuffle, WeightedShuffle skips the rest and terminates immediately.
-	ShuffleIndexFunc func(idx int) (err error)
-	// ShuffleSwapFunc is the type of the function called by Shuffle to swap the elements with indexes i and j.
-	ShuffleSwapFunc func(i, j int)
-)
-
 // WeightedChoice selects a random index according to the associated weights (or probabilities).
 //
 // Indexes with zero or negative weight value will be ignored.

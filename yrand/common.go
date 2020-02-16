@@ -8,6 +8,22 @@ import (
 )
 
 var (
+	// QuitShuffle is used as a return value from ShuffleIndexFunc to indicate that the execution of WeightedShuffle should be terminated immediately.
+	// It is not returned as an error by any function.
+	QuitShuffle = errors.New("quit this shuffle")
+)
+
+type (
+	// ShuffleIndexFunc is the type of the function called for each random index selected by WeightedShuffle.
+	//
+	// If the function returns QuitShuffle, WeightedShuffle skips the rest and terminates immediately.
+	ShuffleIndexFunc func(idx int) (err error)
+
+	// ShuffleSwapFunc is the type of the function called by Shuffle to swap the elements with indexes i and j.
+	ShuffleSwapFunc func(i, j int)
+)
+
+var (
 	errIterateMax      = errors.New("max value should be greater than one")
 	errIterateCount    = errors.New("count should be positive")
 	errIterateCallback = errors.New("callback should not be nil")
