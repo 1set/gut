@@ -131,8 +131,7 @@ func ExampleWeightedShuffle() {
 	)
 	err := yrand.WeightedShuffle(weights, func(idx int) (err error) {
 		fmt.Print(emojis[idx], " ")
-		count++
-		if count == 3 {
+		if count++; count == 3 {
 			fmt.Println()
 			err = yrand.QuitShuffle
 		}
