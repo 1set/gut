@@ -56,7 +56,6 @@ func BenchmarkStringSHA512_256(b *testing.B) {
 }
 
 func TestStringHash(t *testing.T) {
-	t.Parallel()
 	type hashTestCase struct {
 		name    string
 		content string

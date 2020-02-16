@@ -8,18 +8,43 @@ import (
 )
 
 var (
+	// QuitShuffle is used as a return value from ShuffleIndexFunc to indicate that the execution of WeightedShuffle should be terminated immediately.
+	// It is not returned as an error by any function.
+	QuitShuffle = errors.New("quit this shuffle")
+)
+
+type (
+	// ShuffleIndexFunc is the type of the function called for each random index selected by WeightedShuffle.
+	//
+	// If the function returns QuitShuffle, WeightedShuffle skips the rest and terminates immediately.
+	ShuffleIndexFunc func(idx int) (err error)
+
+	// ShuffleSwapFunc is the type of the function called by Shuffle to swap the elements with indexes i and j.
+	ShuffleSwapFunc func(i, j int)
+)
+
+var (
 	errIterateMax      = errors.New("max value should be greater than one")
 	errIterateCount    = errors.New("count should be positive")
 	errIterateCallback = errors.New("callback should not be nil")
 	errChoiceEmpty     = errors.New("slice should not be empty")
 )
 
-// Checks if two float numbers are equal within a given tolerance.
-func isEqualFloat(a, b, tolerance float64) bool {
-	return math.Abs(a-b) <= tolerance
+// isFloatEqual checks whether two floats are equal within a given tolerance.
+func isFloatEqual(a, b, tolerance float64) (equal bool) {
+	const pos, neg = 1, -1
+	switch {
+	case math.IsNaN(a), math.IsInf(a, pos), math.IsInf(a, neg), math.IsNaN(b), math.IsInf(b, pos), math.IsInf(b, neg):
+		equal = false
+	case a != 0 && b != 0:
+		equal = math.Abs((a-b)/a) <= tolerance
+	default:
+		equal = math.Abs(a-b) <= tolerance
+	}
+	return
 }
 
-// Iterates over an newly generated list of `count` random uint64 numbers in [0, `max`).
+// iterateRandomNumbers iterates over a newly generated list of `count` random uint64 numbers in [0, `max`).
 func iterateRandomNumbers(count int, max uint64, callback func(uint64) error) (err error) {
 	switch {
 	case count <= 0:

@@ -6,7 +6,21 @@ import (
 	"testing"
 )
 
-func TestIsEqualFloat(t *testing.T) {
+func TestIsFloatEqual(t *testing.T) {
+	var (
+		numSmall     = 1e-6
+		numLarge     = 1e30
+		numLargePlus = numSmall + numLarge
+
+		numSmall1  = 1e-30
+		numSmall2  = 2e-30
+		numSmall3  = numSmall1 + numSmall2
+		numSmall3A = 3e-30
+
+		numLarge1 = 1e30
+		numLarge2 = 2e30
+		numLarge3 = numLarge1 + numLarge2
+	)
 	type args struct {
 		a         float64
 		b         float64
@@ -36,19 +50,32 @@ func TestIsEqualFloat(t *testing.T) {
 		{"compare -Inf to NaN with tole=1e-6", args{math.Inf(-1), math.NaN(), 1e-6}, false},
 		{"compare +Inf to 0 with tole=1e-6", args{math.Inf(1), 0, 1e-6}, false},
 		{"compare -Inf to 0 with tole=1e-6", args{math.Inf(-1), 0, 1e-6}, false},
+		{"compare 1e+30 plus 1e-06 with tole=1e-9", args{numLargePlus - numSmall, numLarge, 1e-9}, true},
+		{"compare 1e-06 plus 1e+30 with tole=1e-9", args{numLargePlus - numLarge, numSmall, 1e-9}, false},
+		{"compare 1e+30 plus 2e+30 with tole=1e-9: 3-2=1", args{numLarge3 - numLarge2, numLarge1, 1e-9}, true},
+		{"compare 1e+30 plus 2e+30 with tole=1e-9: 3-2<2", args{numLarge3 - numLarge2, numLarge2, 1e-9}, false},
+		{"compare 1e-30 plus 2e-30 with tole=1e-9: 3-1=2", args{numSmall3 - numSmall1, numSmall2, 1e-9}, true},
+		{"compare 1e-30 plus 2e-30 with tole=1e-9: 3-1>1", args{numSmall3 - numSmall1, numSmall1, 1e-9}, false},
+		{"compare 1e-30 plus 2e-30 with tole=1e-26", args{numSmall3 - numSmall1, numSmall2, 1e-26}, true},
+		{"compare 1e-30+2e-30 and 3e-30 with tole=1e-15", args{numSmall3, numSmall3A, 1e-15}, true},
+		{"compare 1e-30+2e-30 and 3e-30 with tole=1e-16", args{numSmall3, numSmall3A, 1e-16}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := isEqualFloat(tt.args.a, tt.args.b, tt.args.tolerance); got != tt.want {
-				t.Errorf("isEqualFloat() = %v, want %v", got, tt.want)
+			if got := isFloatEqual(tt.args.a, tt.args.b, tt.args.tolerance); got != tt.want {
+				t.Errorf("isFloatEqual(a:%f, b:%f) = %v, want %v", tt.args.a, tt.args.b, got, tt.want)
+				return
+			}
+			if got := isFloatEqual(tt.args.b, tt.args.a, tt.args.tolerance); got != tt.want {
+				t.Errorf("isFloatEqual(b:%f, a:%f) = %v, want %v", tt.args.b, tt.args.a, got, tt.want)
 			}
 		})
 	}
 }
 
-func BenchmarkIsEqualFloat(b *testing.B) {
+func BenchmarkIsFloatEqual(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		isEqualFloat(1, 2, 0.01)
+		isFloatEqual(1, 2, 0.01)
 	}
 }
 

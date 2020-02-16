@@ -5,7 +5,6 @@ import (
 )
 
 func TestInt64Range(t *testing.T) {
-	t.Parallel()
 	type args struct {
 		min int64
 		max int64
@@ -56,7 +55,6 @@ func BenchmarkInt64Range(b *testing.B) {
 }
 
 func TestInt32Range(t *testing.T) {
-	t.Parallel()
 	type args struct {
 		min int32
 		max int32
@@ -102,7 +100,6 @@ func BenchmarkInt32Range(b *testing.B) {
 }
 
 func TestIntRange(t *testing.T) {
-	t.Parallel()
 	type args struct {
 		min int
 		max int
@@ -152,7 +149,6 @@ func BenchmarkIntRange(b *testing.B) {
 }
 
 func TestUint64Range(t *testing.T) {
-	t.Parallel()
 	type args struct {
 		min uint64
 		max uint64
@@ -198,7 +194,6 @@ func BenchmarkUint64Range(b *testing.B) {
 }
 
 func TestUint32Range(t *testing.T) {
-	t.Parallel()
 	type args struct {
 		min uint32
 		max uint32
@@ -243,7 +238,6 @@ func BenchmarkUint32Range(b *testing.B) {
 }
 
 func TestUintRange(t *testing.T) {
-	t.Parallel()
 	type args struct {
 		min uint
 		max uint
@@ -289,7 +283,6 @@ func BenchmarkUintRange(b *testing.B) {
 }
 
 func TestFloat64(t *testing.T) {
-	t.Parallel()
 	count := 100000
 	total := 0.0
 	for i := 0; i < count; i++ {
@@ -306,7 +299,7 @@ func TestFloat64(t *testing.T) {
 	}
 
 	avg := total / float64(count)
-	if !(isEqualFloat(avg, 0.5, 0.01)) {
+	if !(isFloatEqual(avg, 0.5, 0.01)) {
 		t.Errorf("Float64() got unexpected average = %v", avg)
 	}
 }
@@ -318,7 +311,6 @@ func BenchmarkFloat64(b *testing.B) {
 }
 
 func TestFloat32(t *testing.T) {
-	t.Parallel()
 	count := 100000
 	total := float32(0.0)
 	for i := 0; i < count; i++ {
@@ -335,7 +327,7 @@ func TestFloat32(t *testing.T) {
 	}
 
 	avg := total / float32(count)
-	if !(isEqualFloat(float64(avg), 0.5, 0.01)) {
+	if !(isFloatEqual(float64(avg), 0.5, 0.01)) {
 		t.Errorf("Float32() got unexpected average = %v", avg)
 	}
 }

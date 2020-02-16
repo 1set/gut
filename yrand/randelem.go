@@ -10,17 +10,22 @@ var (
 	errShuffleNegative = errors.New("n should be non-negative")
 )
 
-// Shuffle randomizes the order of elements. n is the number of elements. swap swaps the elements with indexes i and j.
-func Shuffle(n int, swap func(i, j int)) (err error) {
+// Shuffle randomizes the order of elements.
+//
+// n is the number of elements. swap swaps the elements with indexes i and j.
+//
+// The algorithm is the Fisher-Yates Shuffle and its complexity is O(n).
+func Shuffle(n int, swap ShuffleSwapFunc) (err error) {
 	if n < 0 {
 		return errShuffleNegative
 	} else if n <= 1 {
 		return
 	}
 
-	randBig := new(big.Int)
-	randBytes := make([]byte, 8)
-
+	var (
+		randBig   = new(big.Int)
+		randBytes = make([]byte, 8)
+	)
 	for i := uint64(n - 1); i > 0; {
 		if _, err = rand.Read(randBytes); err != nil {
 			return
