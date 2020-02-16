@@ -22,9 +22,10 @@ func Shuffle(n int, swap ShuffleSwapFunc) (err error) {
 		return
 	}
 
-	randBig := new(big.Int)
-	randBytes := make([]byte, 8)
-
+	var (
+		randBig   = new(big.Int)
+		randBytes = make([]byte, 8)
+	)
 	for i := uint64(n - 1); i > 0; {
 		if _, err = rand.Read(randBytes); err != nil {
 			return
