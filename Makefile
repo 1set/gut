@@ -1,5 +1,6 @@
 GOCMD=go
-GOFMT=goreturns
+GOFMT1=gofmt
+GOFMT2=goreturns
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
@@ -16,7 +17,8 @@ default:
 doc:
 	$(GODOC) -all ./$(PACKAGE)
 fmt:
-	$(GOFMT) -l -w ./$(PACKAGE)
+	$(GOFMT1) -s -w ./$(PACKAGE)
+	$(GOFMT2) -l -w ./$(PACKAGE)
 build:
 	$(GOCMD) build -v ./$(PACKAGE)
 test:
