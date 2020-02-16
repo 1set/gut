@@ -10,7 +10,11 @@ var (
 	errShuffleNegative = errors.New("n should be non-negative")
 )
 
-// Shuffle randomizes the order of elements. n is the number of elements. swap swaps the elements with indexes i and j.
+// Shuffle randomizes the order of elements.
+//
+// n is the number of elements. swap swaps the elements with indexes i and j.
+//
+// The algorithm is the Fisher-Yates Shuffle and its complexity is O(n).
 func Shuffle(n int, swap ShuffleSwapFunc) (err error) {
 	if n < 0 {
 		return errShuffleNegative
