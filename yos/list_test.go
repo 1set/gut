@@ -199,8 +199,8 @@ func BenchmarkListMatch(b *testing.B) {
 }
 
 var expectedResultMap = map[string][]string{
-	"Empty": []string{},
-	"All": []string{
+	"Empty": {},
+	"All": {
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
 		"yos/list/broken_symlink.wtf",
@@ -233,7 +233,7 @@ var expectedResultMap = map[string][]string{
 		"yos/list/测试文件.md",
 		"yos/list/🤙🏝️.md",
 	},
-	"AllFiles": []string{
+	"AllFiles": {
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
 		"yos/list/deep_folder/deep/deeper/deepest/text_file.txt",
@@ -249,12 +249,12 @@ var expectedResultMap = map[string][]string{
 		"yos/list/测试文件.md",
 		"yos/list/🤙🏝️.md",
 	},
-	"AllSymlinks": []string{
+	"AllSymlinks": {
 		"yos/list/broken_symlink.wtf",
 		"yos/list/symlink_to_dir",
 		"yos/list/symlink_to_file.txt",
 	},
-	"AllDirs": []string{
+	"AllDirs": {
 		"yos/list/deep_folder",
 		"yos/list/deep_folder/deep",
 		"yos/list/deep_folder/deep/deeper",
@@ -270,7 +270,7 @@ var expectedResultMap = map[string][]string{
 		"yos/list/simple_folder",
 		"yos/list/white space",
 	},
-	"RootFiles": []string{
+	"RootFiles": {
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
 		"yos/list/file1.txt",
@@ -281,12 +281,12 @@ var expectedResultMap = map[string][]string{
 		"yos/list/测试文件.md",
 		"yos/list/🤙🏝️.md",
 	},
-	"RootSymlinks": []string{
+	"RootSymlinks": {
 		"yos/list/broken_symlink.wtf",
 		"yos/list/symlink_to_dir",
 		"yos/list/symlink_to_file.txt",
 	},
-	"RootDirs": []string{
+	"RootDirs": {
 		"yos/list/deep_folder",
 		"yos/list/empty_folder",
 		"yos/list/folder_like_file.txt",
@@ -294,7 +294,7 @@ var expectedResultMap = map[string][]string{
 		"yos/list/simple_folder",
 		"yos/list/white space",
 	},
-	"RootAll": []string{
+	"RootAll": {
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
 		"yos/list/broken_symlink.wtf",
@@ -314,14 +314,14 @@ var expectedResultMap = map[string][]string{
 		"yos/list/测试文件.md",
 		"yos/list/🤙🏝️.md",
 	},
-	"AllFile*Insensitive": []string{
+	"AllFile*Insensitive": {
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
 		"yos/list/file1.txt",
 		"yos/list/file2.txt",
 		"yos/list/file3.txt",
 	},
-	"^[fF]ile(.*).txt": []string{
+	"^[fF]ile(.*).txt": {
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
 		"yos/list/file1.txt",
@@ -331,7 +331,7 @@ var expectedResultMap = map[string][]string{
 		"yos/list/simple_folder/file2.txt",
 		"yos/list/simple_folder/file3.txt",
 	},
-	"^file(.*).txt": []string{
+	"^file(.*).txt": {
 		"yos/list/file1.txt",
 		"yos/list/file2.txt",
 		"yos/list/file3.txt",
@@ -339,16 +339,16 @@ var expectedResultMap = map[string][]string{
 		"yos/list/simple_folder/file2.txt",
 		"yos/list/simple_folder/file3.txt",
 	},
-	"AllFile*Sensitive": []string{
+	"AllFile*Sensitive": {
 		"yos/list/file1.txt",
 		"yos/list/file2.txt",
 		"yos/list/file3.txt",
 	},
-	"All file1.txt": []string{
+	"All file1.txt": {
 		"yos/list/file1.txt",
 		"yos/list/simple_folder/file1.txt",
 	},
-	"All *.txt": []string{
+	"All *.txt": {
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
 		"yos/list/deep_folder/deep/deeper/deepest/text_file.txt",
@@ -362,7 +362,7 @@ var expectedResultMap = map[string][]string{
 		"yos/list/symlink_to_file.txt",
 		"yos/list/white space.txt",
 	},
-	"All *.txt *.md": []string{
+	"All *.txt *.md": {
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
 		"yos/list/deep_folder/deep/deeper/deepest/text_file.txt",
@@ -378,11 +378,11 @@ var expectedResultMap = map[string][]string{
 		"yos/list/测试文件.md",
 		"yos/list/🤙🏝️.md",
 	},
-	"OnlyFile*": []string{
+	"OnlyFile*": {
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
 	},
-	"SortByModTime": []string{
+	"SortByModTime": {
 		"yos/list/deep_folder/deep/deeper/deepest/text_file.txt",
 		"yos/list/simple_folder/file1.txt",
 		"yos/list/simple_folder/file2.txt",
@@ -398,7 +398,7 @@ var expectedResultMap = map[string][]string{
 		"yos/list/file2.txt",
 		"yos/list/file3.txt",
 	},
-	"SortByName": []string{
+	"SortByName": {
 		"yos/list/File0.txt",
 		"yos/list/File4.txt",
 		"yos/list/file1.txt",
@@ -414,7 +414,7 @@ var expectedResultMap = map[string][]string{
 		"yos/list/测试文件.md",
 		"yos/list/🤙🏝️.md",
 	},
-	"SortBySize": []string{
+	"SortBySize": {
 		"yos/list/white space/only one file",
 		"yos/list/file1.txt",
 		"yos/list/file2.txt",
