@@ -107,3 +107,38 @@ func ExampleChoiceString() {
 
 	fmt.Println("I 🍴", food)
 }
+
+// This example chooses a random person according to associated weights.
+func ExampleWeightedChoice() {
+	var (
+		candidates = []string{"Knuth", "Morris", "Pratt"}
+		weights    = []float64{0.8, 0.1, 0.1}
+	)
+	idx, err := yrand.WeightedChoice(weights)
+	if err != nil {
+		fmt.Println("got error:", err)
+		return
+	}
+	fmt.Println("Luckiest Guy:", candidates[idx])
+}
+
+// This example chooses three random emojis according to associated weights.
+func ExampleWeightedShuffle() {
+	var (
+		emojis  = []string{"🍔", "🥪", "🌮", "🌯", "🥞", "🍪", "🥮", "🥠"}
+		weights = []float64{8, 7, 6, 5, 2, 2, 1, 1}
+		count   = 0
+	)
+	err := yrand.WeightedShuffle(weights, func(idx int) (err error) {
+		fmt.Print(emojis[idx], " ")
+		if count++; count == 3 {
+			fmt.Println()
+			err = yrand.QuitShuffle
+		}
+		return
+	})
+	if err != nil {
+		fmt.Println("got error:", err)
+		return
+	}
+}

@@ -44,15 +44,13 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 		file1, file2 *os.File
 	)
 
-	// check file mode of path1
+	// check file mode of path1, and then path2
 	if file1, fi1, err = openFileInfo(path1); err == nil {
 		defer file1.Close()
 	} else {
 		err = opError(opnCompare, path1, err)
 		return
 	}
-
-	// check file mode of path2
 	if file2, fi2, err = openFileInfo(path2); err == nil {
 		defer file2.Close()
 	} else {
@@ -68,7 +66,7 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 	}
 
 	buf1, buf2 := make([]byte, fileCompareChunkSize), make([]byte, fileCompareChunkSize)
-ReadThrough:
+CompareContent:
 	for {
 		nr1, err1 := file1.Read(buf1)
 		nr2, err2 := file2.Read(buf2)
@@ -78,7 +76,7 @@ ReadThrough:
 			switch {
 			case nr1 == 0 && nr2 == 0:
 				same = true
-				break ReadThrough
+				break CompareContent
 			case nr1 > 0:
 				err = opError(opnCompare, path1, io.ErrUnexpectedEOF)
 			case nr2 > 0:
@@ -139,7 +137,7 @@ func SameDirEntries(path1, path2 string) (same bool, err error) {
 		return
 	}
 
-IterateItems:
+CompareEntries:
 	for idx := 0; idx < num1; idx++ {
 		entry1, entry2 := items1[idx], items2[idx]
 
@@ -156,12 +154,12 @@ IterateItems:
 		switch entryMode1 & os.ModeType {
 		case os.ModeSymlink:
 			if same, err = SameSymlinkContent(entry1.Path, entry2.Path); err != nil || !same {
-				break IterateItems
+				break CompareEntries
 			}
 		case os.ModeDir:
 		case 0:
 			if same, err = SameFileContent(entry1.Path, entry2.Path); err != nil || !same {
-				break IterateItems
+				break CompareEntries
 			}
 		}
 	}

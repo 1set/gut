@@ -66,7 +66,7 @@ func WeightedShuffle(weights []float64, yieldFunc ShuffleIndexFunc) (err error) 
 		count   = len(weights)
 		cumSum  = make([]float64, 0, count)
 		sum     = 0.0
-		nextSum = 0.0
+		nextSum float64
 		randNum float64
 	)
 
