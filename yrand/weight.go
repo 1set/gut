@@ -6,13 +6,22 @@ import (
 )
 
 var (
-	QuitShuffle = errors.New("quit this shuffle")
-)
-
-var (
 	errInvalidWeights = errors.New("invalid weight list")
 	errInvalidIndex   = errors.New("invalid index")
 	tolerance         = 1e-14
+)
+
+var (
+	// QuitShuffle is used as a return value from ShuffleIndexFunc to indicate that the execution of WeightedShuffle should be terminated immediately.
+	// It is not returned as an error by any function.
+	QuitShuffle = errors.New("quit this shuffle")
+)
+
+type (
+	// ShuffleIndexFunc is the type of the function called for each random index selected by WeightedShuffle.
+	ShuffleIndexFunc func(idx int) (err error)
+	// ShuffleSwapFunc is the type of the function called by Shuffle to swap the elements with indexes i and j.
+	ShuffleSwapFunc func(i, j int)
 )
 
 // WeightedChoice selects a random index according to the associated weights (or probabilities).
@@ -59,7 +68,7 @@ func WeightedChoice(weights []float64) (idx int, err error) {
 // WeightedShuffle shuffles the sequence of values according to the associated weights (or probabilities).
 //
 // All values in the slice of associated weights must be positive.
-func WeightedShuffle(weights []float64, yield func(idx int) (err error)) (err error) {
+func WeightedShuffle(weights []float64, indexFunc ShuffleIndexFunc) (err error) {
 	var (
 		count   = len(weights)
 		cumSum  = make([]float64, 0, count)
@@ -95,7 +104,7 @@ func WeightedShuffle(weights []float64, yield func(idx int) (err error)) (err er
 			err = errInvalidIndex
 			break
 		}
-		if err = yield(j); err != nil {
+		if err = indexFunc(j); err != nil {
 			break
 		}
 

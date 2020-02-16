@@ -11,7 +11,7 @@ var (
 )
 
 // Shuffle randomizes the order of elements. n is the number of elements. swap swaps the elements with indexes i and j.
-func Shuffle(n int, swap func(i, j int)) (err error) {
+func Shuffle(n int, swap ShuffleSwapFunc) (err error) {
 	if n < 0 {
 		return errShuffleNegative
 	} else if n <= 1 {
