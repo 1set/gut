@@ -122,13 +122,22 @@ func TestWeightedShuffle(t *testing.T) {
 				t.Skipf("skipping large case '%v' in short mode", tt.name)
 			}
 
+			cnt, maxCnt := 0, len(tt.weights)
 			if err := WeightedShuffle(tt.weights, func(idx int) (err error) {
+				cnt++
+				if (idx < 0) || (idx >= maxCnt) {
+					t.Errorf("WeightedShuffle() got invalid index = %v, want = [0, %v)", idx, maxCnt)
+				}
 				return
 			}); (err != nil) != tt.wantErr {
 				t.Errorf("WeightedShuffle() got error = %v, wantErr = %v", err, tt.wantErr)
 				return
 			} else if (err != nil) && (err != errInvalidWeights) {
 				t.Errorf("WeightedShuffle() got diff error = %v, want = %v, weights = %v", err, errInvalidWeights, tt.weights)
+				return
+			} else if (err != nil) && (cnt != maxCnt) {
+				t.Errorf("WeightedShuffle() got not enough indexes = %v, want = %v", cnt, maxCnt)
+				return
 			}
 
 			if !tt.wantErr && len(tt.weights) <= 32 {

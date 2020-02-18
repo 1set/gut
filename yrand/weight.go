@@ -20,8 +20,8 @@ var (
 // The complexity is O(n) where n = len(weights).
 func WeightedChoice(weights []float64) (idx int, err error) {
 	var (
-		sum     = 0.0
-		randNum float64
+		sum = 0.0
+		rnd float64
 	)
 	// get sum of weights
 	for _, w := range weights {
@@ -35,10 +35,10 @@ func WeightedChoice(weights []float64) (idx int, err error) {
 	}
 
 	// get random value
-	if randNum, err = Float64(); err != nil {
+	if rnd, err = Float64(); err != nil {
 		return
 	}
-	sum *= randNum
+	sum *= rnd
 
 	// find the random pos
 	for i, w := range weights {
