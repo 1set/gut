@@ -128,14 +128,13 @@ func TestWeightedShuffle(t *testing.T) {
 			}
 
 			cnt, maxCnt := 0, len(tt.weights)
-			err := WeightedShuffle(tt.weights, func(idx int) (err error) {
+			switch err := WeightedShuffle(tt.weights, func(idx int) (err error) {
 				cnt++
 				if (idx < 0) || (idx >= maxCnt) {
 					t.Errorf("WeightedShuffle() got invalid index = %v, want = [0, %v)", idx, maxCnt)
 				}
 				return
-			})
-			switch {
+			}); {
 			case (err != nil) != tt.wantErr:
 				t.Errorf("WeightedShuffle() got error = %v, wantErr = %v", err, tt.wantErr)
 				return
