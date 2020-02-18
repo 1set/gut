@@ -7,6 +7,17 @@ import (
 	"testing"
 )
 
+func getLargeWeights(count, scale int) (weights []float64) {
+	for i := 1; i <= count; i++ {
+		num := 99 + math.Pi*float64(scale)*math.Log2(float64(i+1))
+		if i%4 == 0 {
+			num = math.Log10(num)
+		}
+		weights = append(weights, num)
+	}
+	return
+}
+
 func TestWeightedChoice(t *testing.T) {
 	var (
 		times = 300000
@@ -33,6 +44,8 @@ func TestWeightedChoice(t *testing.T) {
 		{"three increasing weights", []float64{1, 100, 1000}, false},
 		{"four increasing weights", []float64{2.333, 4.666, 8.888, 10.101}, false},
 		{"five increasing weights", []float64{1, 2, 3, 4, 5}, false},
+		{"thirty-two large number weights", getLargeWeights(32, 100000), false},
+		{"1k large number weights", getLargeWeights(1024, 1000000), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -46,7 +59,7 @@ func TestWeightedChoice(t *testing.T) {
 				return
 			}
 
-			if !tt.wantErr {
+			if !tt.wantErr && len(tt.weights) <= 32 {
 				if !(0 <= gotIdx && gotIdx < len(tt.weights)) {
 					t.Errorf("WeightedChoice() got invalid index = %v, want = [0, %v)", gotIdx, len(tt.weights))
 					return
@@ -74,15 +87,6 @@ func BenchmarkWeightedChoiceValid(b *testing.B) {
 }
 
 func TestWeightedShuffle(t *testing.T) {
-	var largeWeights []float64
-	for i := 1; i <= 512; i++ {
-		num := 99 + math.Pi*1000000*math.Log2(float64(i+1))
-		if i%4 == 0 {
-			num = math.Log10(num)
-		}
-		largeWeights = append(largeWeights, num)
-	}
-
 	var (
 		times = 300000
 	)
@@ -114,7 +118,8 @@ func TestWeightedShuffle(t *testing.T) {
 		{"four increasing weights", []float64{2.333, 4.666, 8.888, 10.101}, false},
 		{"five increasing weights", []float64{1, 2, 3, 4, 5}, false},
 		{"eight repeated weights", []float64{1, 2, 1, 2, 1, 2, 1, 2}, false},
-		{"many large number weights", largeWeights, false},
+		{"thirty-two large number weights", getLargeWeights(32, 100000), false},
+		{"1k large number weights", getLargeWeights(1024, 1000000), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -123,19 +128,21 @@ func TestWeightedShuffle(t *testing.T) {
 			}
 
 			cnt, maxCnt := 0, len(tt.weights)
-			if err := WeightedShuffle(tt.weights, func(idx int) (err error) {
+			err := WeightedShuffle(tt.weights, func(idx int) (err error) {
 				cnt++
 				if (idx < 0) || (idx >= maxCnt) {
 					t.Errorf("WeightedShuffle() got invalid index = %v, want = [0, %v)", idx, maxCnt)
 				}
 				return
-			}); (err != nil) != tt.wantErr {
+			})
+			switch {
+			case (err != nil) != tt.wantErr:
 				t.Errorf("WeightedShuffle() got error = %v, wantErr = %v", err, tt.wantErr)
 				return
-			} else if (err != nil) && (err != errInvalidWeights) {
+			case (err != nil) && (err != errInvalidWeights):
 				t.Errorf("WeightedShuffle() got diff error = %v, want = %v, weights = %v", err, errInvalidWeights, tt.weights)
 				return
-			} else if (err == nil) && (cnt != maxCnt) {
+			case (err == nil) && (cnt != maxCnt):
 				t.Errorf("WeightedShuffle() got not enough indexes = %v, want = %v", cnt, maxCnt)
 				return
 			}

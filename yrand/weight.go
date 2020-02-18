@@ -7,8 +7,6 @@ import (
 
 var (
 	errInvalidWeights = errors.New("invalid weight list")
-	errInvalidIndex   = errors.New("invalid index")
-	tolerance         = 1e-7
 )
 
 // WeightedChoice selects a random index according to the associated weights (or probabilities).
