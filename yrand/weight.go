@@ -1,8 +1,8 @@
 package yrand
 
 import (
+	"container/list"
 	"errors"
-	"sort"
 )
 
 var (
@@ -62,48 +62,58 @@ func WeightedChoice(weights []float64) (idx int, err error) {
 //
 // The complexity is O(n^2) where n = len(weights).
 func WeightedShuffle(weights []float64, yieldFunc ShuffleIndexFunc) (err error) {
+	type weightNode struct {
+		index  int
+		weight float64
+	}
 	var (
-		count   = len(weights)
-		cumSum  = make([]float64, 0, count)
-		sum     = 0.0
-		nextSum float64
-		randNum float64
+		rnd float64
+		sum = 0.0
+		el  *list.Element
+		wl  = list.New()
 	)
 
-	for _, weight := range weights {
-		// check non-positive weight, and weights like [1e30, 1e-6, 1e30],
-		if nextSum = sum + weight; (weight <= 0) || !isFloatEqual(nextSum-weight, sum, tolerance) || !isFloatEqual(nextSum-sum, weight, tolerance) {
-			err = errInvalidWeights
-			break
-		}
-		sum = nextSum
-		cumSum = append(cumSum, sum)
-	}
-	if err != nil || sum <= 0 {
+	// check if it's an empty or invalid weight list
+	if len(weights) == 0 {
 		err = errInvalidWeights
 		return
 	}
+	for i, w := range weights {
+		if w <= 0 {
+			err = errInvalidWeights
+			return
+		}
+		_ = wl.PushBack(&weightNode{index: i, weight: w})
+	}
 
 	for range weights {
-		// get random pos
-		if randNum, err = Float64(); err != nil {
-			break
-		}
-		randNum *= cumSum[count-1]
-
-		// binary search for the pos and yield it
-		j := sort.Search(count, func(i int) bool { return cumSum[i] > randNum })
-		if !((0 <= j) && (j < count)) {
-			err = errInvalidIndex
-			break
-		}
-		if err = yieldFunc(j); err != nil {
-			break
+		sum = 0.0
+		for el = wl.Front(); el != nil; el = el.Next() {
+			w := el.Value.(*weightNode)
+			sum += w.weight
 		}
 
-		// remove weight from rest of the sum list
-		for p := j; p < count; p++ {
-			cumSum[p] -= weights[j]
+		// get random value
+		if rnd, err = Float64(); err != nil {
+			break
+		}
+		sum *= rnd
+
+		// find the random pos
+		for el = wl.Front(); el != nil; el = el.Next() {
+			wn := el.Value.(*weightNode)
+			if sum -= wn.weight; sum < 0 {
+				break
+			}
+		}
+		if el == nil {
+			el = wl.Back()
+		}
+
+		// yield it and remove for next iteration
+		wn := wl.Remove(el).(*weightNode)
+		if err = yieldFunc(wn.index); err != nil {
+			break
 		}
 	}
 

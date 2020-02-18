@@ -75,9 +75,9 @@ func BenchmarkWeightedChoiceValid(b *testing.B) {
 
 func TestWeightedShuffle(t *testing.T) {
 	var largeWeights []float64
-	for i := 1; i <= 256; i++ { // FAILED: 512
-		num := 99 + math.Pi * 1000000 * math.Log2(float64(i + 1))
-		if i % 4 == 0 {
+	for i := 1; i <= 512; i++ {
+		num := 99 + math.Pi*1000000*math.Log2(float64(i+1))
+		if i%4 == 0 {
 			num = math.Log10(num)
 		}
 		largeWeights = append(largeWeights, num)
@@ -96,12 +96,12 @@ func TestWeightedShuffle(t *testing.T) {
 		{"only zero weights", []float64{0, 0}, true},
 		{"only non-positive weights", []float64{0, 0, -1}, true},
 		{"contains non-positive weights", []float64{-1, 10, 0}, true},
-		{"contains extremely larger weight 1", []float64{1e-6, 1e-1, 2e-2, 1e-3, 1e30}, true},
-		{"contains extremely larger weight 2", []float64{1e30, 1e-6}, true},
-		{"contains extremely larger weight 3", []float64{1e30, 1e30, 1e-6}, true},
-		{"contains extremely larger weight 4", []float64{1e30, 1e-6, 1e30}, true},
-		{"contains extremely larger weight 5", []float64{1e-6, 1e30, 1e30}, true},
-		{"contains extremely larger weight 6", []float64{1e-6, 1e30, 1e-3, 1}, true},
+		{"contains extremely larger weight 1", []float64{1e-6, 1e-1, 2e-2, 1e-3, 1e30}, false},
+		{"contains extremely larger weight 2", []float64{1e30, 1e-6}, false},
+		{"contains extremely larger weight 3", []float64{1e30, 1e30, 1e-6}, false},
+		{"contains extremely larger weight 4", []float64{1e30, 1e-6, 1e30}, false},
+		{"contains extremely larger weight 5", []float64{1e-6, 1e30, 1e30}, false},
+		{"contains extremely larger weight 6", []float64{1e-6, 1e30, 1e-3, 1}, false},
 		{"single weight", []float64{1}, false},
 		{"two diff weights", []float64{1, 3}, false},
 		{"two equal weights", []float64{2, 2}, false},
@@ -113,7 +113,7 @@ func TestWeightedShuffle(t *testing.T) {
 		{"three increasing weights", []float64{1, 100, 1000}, false},
 		{"four increasing weights", []float64{2.333, 4.666, 8.888, 10.101}, false},
 		{"five increasing weights", []float64{1, 2, 3, 4, 5}, false},
-		{"six repeated weights", []float64{1, 2, 1, 2, 1, 2}, false},
+		{"eight repeated weights", []float64{1, 2, 1, 2, 1, 2, 1, 2}, false},
 		{"many large number weights", largeWeights, false},
 	}
 	for _, tt := range tests {
@@ -191,7 +191,7 @@ func BenchmarkWeightedShuffleInvalid(b *testing.B) {
 }
 
 func BenchmarkWeightedShuffleValid(b *testing.B) {
-	weights := []float64{2.333, 4.666, 8.888, 10.101}
+	weights := []float64{2.333, 4.666, 8.888, 10.101, 12.3333}
 	noop := func(idx int) (err error) { return }
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
