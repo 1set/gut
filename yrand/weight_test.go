@@ -3,6 +3,7 @@ package yrand
 import (
 	"errors"
 	"fmt"
+	"math"
 	"testing"
 )
 
@@ -73,6 +74,15 @@ func BenchmarkWeightedChoiceValid(b *testing.B) {
 }
 
 func TestWeightedShuffle(t *testing.T) {
+	var largeWeights []float64
+	for i := 1; i <= 256; i++ { // FAILED: 512
+		num := 99 + math.Pi * 1000000 * math.Log2(float64(i + 1))
+		if i % 4 == 0 {
+			num = math.Log10(num)
+		}
+		largeWeights = append(largeWeights, num)
+	}
+
 	var (
 		times = 300000
 	)
@@ -104,6 +114,7 @@ func TestWeightedShuffle(t *testing.T) {
 		{"four increasing weights", []float64{2.333, 4.666, 8.888, 10.101}, false},
 		{"five increasing weights", []float64{1, 2, 3, 4, 5}, false},
 		{"six repeated weights", []float64{1, 2, 1, 2, 1, 2}, false},
+		{"many large number weights", largeWeights, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -120,7 +131,7 @@ func TestWeightedShuffle(t *testing.T) {
 				t.Errorf("WeightedShuffle() got diff error = %v, want = %v, weights = %v", err, errInvalidWeights, tt.weights)
 			}
 
-			if !tt.wantErr {
+			if !tt.wantErr && len(tt.weights) <= 32 {
 				checkProbDist(t, "WeightedShuffle", times, tt.weights, func() (idx int, err error) {
 					savedIdx, cnt := 0, 0
 					err = WeightedShuffle(tt.weights, func(idx int) error {
