@@ -135,7 +135,7 @@ func TestWeightedShuffle(t *testing.T) {
 			} else if (err != nil) && (err != errInvalidWeights) {
 				t.Errorf("WeightedShuffle() got diff error = %v, want = %v, weights = %v", err, errInvalidWeights, tt.weights)
 				return
-			} else if (err != nil) && (cnt != maxCnt) {
+			} else if (err == nil) && (cnt != maxCnt) {
 				t.Errorf("WeightedShuffle() got not enough indexes = %v, want = %v", cnt, maxCnt)
 				return
 			}
