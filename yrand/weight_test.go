@@ -216,8 +216,8 @@ func getLargeWeights(count, scale int) (weights []float64) {
 
 func checkProbDist(t *testing.T, name string, times int, weights []float64, idxFunc func() (idx int, err error)) {
 	var (
-		tolerance        = 0.16
-		minExpectedTimes = 10.0
+		tolerance        = 0.2
+		minExpectedTimes = 20.0
 	)
 
 	result := make(map[int]int)
