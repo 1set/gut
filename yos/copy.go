@@ -10,6 +10,7 @@ import (
 const (
 	defaultDirectoryPermMode = os.FileMode(0755)
 	defaultBufferSize        = 256 * 1024
+	defaultNewFileFlag       = os.O_RDWR | os.O_CREATE | os.O_TRUNC
 )
 
 // CopyFile copies a file to a target file or directory. Symbolic links are followed.
@@ -92,7 +93,7 @@ func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 		bufferSize = 1 << uint(bits.Len64(uint64(fileSize)))
 	}
 
-	if destFile, err = os.OpenFile(dest, os.O_RDWR|os.O_CREATE|os.O_TRUNC, srcInfo.Mode()); err != nil {
+	if destFile, err = os.OpenFile(dest, defaultNewFileFlag, srcInfo.Mode()); err != nil {
 		return
 	}
 	defer func() {

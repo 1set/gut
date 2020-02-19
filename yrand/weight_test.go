@@ -37,7 +37,7 @@ func TestWeightedChoice(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if testing.Short() && len(tt.weights) >= 4 {
+			if testing.Short() && len(tt.weights) >= 6 {
 				t.Skipf("skipping large case '%v' in short mode", tt.name)
 			}
 
@@ -111,7 +111,7 @@ func TestWeightedShuffle(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if testing.Short() && len(tt.weights) >= 4 {
+			if testing.Short() && len(tt.weights) >= 6 {
 				t.Skipf("skipping large case '%v' in short mode", tt.name)
 			}
 
@@ -223,7 +223,7 @@ func getLargeWeights(count, scale int) (weights []float64) {
 func checkProbDist(t *testing.T, name string, times int, weights []float64, idxFunc func() (idx int, err error)) {
 	var (
 		tolerance        = 0.2
-		minExpectedTimes = 20.0
+		minExpectedTimes = 30.0
 	)
 
 	result := make(map[int]int)

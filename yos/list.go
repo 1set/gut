@@ -73,44 +73,34 @@ const (
 //   2) regular expression accepted by google/RE2, use the ListUseRegExp flag to enable;
 func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathInfo, err error) {
 	var (
-		useRegExp  = flag&ListUseRegExp != 0
-		rePatterns []*regexp.Regexp
-		patRe      *regexp.Regexp
+		rePatterns   []*regexp.Regexp
+		typeFlag     = flag & ListIncludeAll
+		useRegExp    = flag&ListUseRegExp != 0
+		useLowerName = flag&ListToLower != 0
 	)
 	if useRegExp {
-		rePatterns = make([]*regexp.Regexp, 0, len(patterns))
-		for _, pat := range patterns {
-			if patRe, err = regexp.Compile(pat); err == nil {
-				rePatterns = append(rePatterns, patRe)
-			} else {
-				err = opError(opnList, pat, err)
-				return
-			}
+		if rePatterns, err = compileRegexpList(patterns); err != nil {
+			return
 		}
 	}
 
 	return listCondEntries(root, func(info os.FileInfo) (ok bool, err error) {
 		fileName := info.Name()
-		if flag&ListToLower != 0 {
+		if useLowerName {
 			fileName = strings.ToLower(fileName)
 		}
 
-		if tf := flag & ListIncludeAll; tf != 0 {
-			if (tf == ListIncludeAll) ||
-				(tf&ListIncludeDir != 0 && isDirFi(&info)) ||
-				(tf&ListIncludeFile != 0 && isFileFi(&info)) ||
-				(tf&ListIncludeSymlink != 0 && isSymlinkFi(&info)) {
-				if useRegExp {
-					for _, pat := range rePatterns {
-						if ok = pat.MatchString(fileName); ok {
-							break
-						}
+		if isFileTypeMatched(&info, typeFlag) {
+			if useRegExp {
+				for _, pat := range rePatterns {
+					if ok = pat.MatchString(fileName); ok {
+						break
 					}
-				} else {
-					for _, pat := range patterns {
-						if ok, err = filepath.Match(pat, fileName); ok || err != nil {
-							break
-						}
+				}
+			} else {
+				for _, pat := range patterns {
+					if ok, err = filepath.Match(pat, fileName); ok || err != nil {
+						break
 					}
 				}
 			}
@@ -148,5 +138,20 @@ func listCondEntries(root string, cond func(os.FileInfo) (bool, error)) (entries
 		}
 		return
 	})
+	return
+}
+
+// isFileTypeMatched checks whether the file type is matched with the flag.
+func isFileTypeMatched(info *os.FileInfo, flag int) (match bool) {
+	switch {
+	case flag == ListIncludeAll:
+		match = true
+	case flag&ListIncludeDir != 0 && isDirFi(info):
+		match = true
+	case flag&ListIncludeFile != 0 && isFileFi(info):
+		match = true
+	case flag&ListIncludeSymlink != 0 && isSymlinkFi(info):
+		match = true
+	}
 	return
 }

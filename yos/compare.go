@@ -65,40 +65,7 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 		return
 	}
 
-	buf1, buf2 := make([]byte, fileCompareChunkSize), make([]byte, fileCompareChunkSize)
-CompareContent:
-	for {
-		nr1, err1 := file1.Read(buf1)
-		nr2, err2 := file2.Read(buf2)
-
-		switch {
-		case err1 == io.EOF && err2 == io.EOF:
-			switch {
-			case nr1 == 0 && nr2 == 0:
-				same = true
-				break CompareContent
-			case nr1 > 0:
-				err = opError(opnCompare, path1, io.ErrUnexpectedEOF)
-			case nr2 > 0:
-				err = opError(opnCompare, path2, io.ErrUnexpectedEOF)
-			}
-		case err1 != nil:
-			err = opError(opnCompare, path1, err1)
-		case err2 != nil:
-			err = opError(opnCompare, path2, err2)
-		case nr1 < nr2:
-			err = opError(opnCompare, path1, errShortRead)
-		case nr2 < nr1:
-			err = opError(opnCompare, path2, errShortRead)
-		}
-		if err != nil {
-			break
-		}
-
-		if same = bytes.Equal(buf1[:nr1], buf2[:nr2]); !same {
-			break
-		}
-	}
+	same, err = compareReaderContent(file1, file2, path1, path2)
 	return
 }
 
@@ -109,7 +76,6 @@ func SameDirEntries(path1, path2 string) (same bool, err error) {
 		raw1, raw2     = path1, path2
 		items1, items2 []*FilePathInfo
 	)
-
 	// resolve paths if they're symbolic links
 	if path1, fi1, err = resolveDirInfo(path1); err != nil {
 		err = opError(opnCompare, raw1, err)
@@ -157,12 +123,50 @@ CompareEntries:
 				break CompareEntries
 			}
 		case os.ModeDir:
+			// ignore the directory structure here, since it's already compared by the relative path logic before
 		case 0:
 			if same, err = SameFileContent(entry1.Path, entry2.Path); err != nil || !same {
 				break CompareEntries
 			}
 		}
 	}
+	return
+}
 
+func compareReaderContent(rd1, rd2 io.Reader, path1, path2 string) (same bool, err error) {
+	buf1, buf2 := make([]byte, fileCompareChunkSize), make([]byte, fileCompareChunkSize)
+CompareContent:
+	for {
+		nr1, err1 := rd1.Read(buf1)
+		nr2, err2 := rd2.Read(buf2)
+
+		switch {
+		case err1 == io.EOF && err2 == io.EOF:
+			switch {
+			case nr1 == 0 && nr2 == 0:
+				same = true
+				break CompareContent
+			case nr1 > 0:
+				err = opError(opnCompare, path1, io.ErrUnexpectedEOF)
+			case nr2 > 0:
+				err = opError(opnCompare, path2, io.ErrUnexpectedEOF)
+			}
+		case err1 != nil:
+			err = opError(opnCompare, path1, err1)
+		case err2 != nil:
+			err = opError(opnCompare, path2, err2)
+		case nr1 < nr2:
+			err = opError(opnCompare, path1, errShortRead)
+		case nr2 < nr1:
+			err = opError(opnCompare, path2, errShortRead)
+		}
+		if err != nil {
+			break
+		}
+
+		if same = bytes.Equal(buf1[:nr1], buf2[:nr2]); !same {
+			break
+		}
+	}
 	return
 }
