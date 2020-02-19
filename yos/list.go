@@ -90,10 +90,7 @@ func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathIn
 			fileName = strings.ToLower(fileName)
 		}
 
-		if (typeFlag == ListIncludeAll) ||
-			(typeFlag&ListIncludeDir != 0 && isDirFi(&info)) ||
-			(typeFlag&ListIncludeFile != 0 && isFileFi(&info)) ||
-			(typeFlag&ListIncludeSymlink != 0 && isSymlinkFi(&info)) {
+		if isFileTypeMatched(&info, typeFlag) {
 			if useRegExp {
 				for _, pat := range rePatterns {
 					if ok = pat.MatchString(fileName); ok {
@@ -141,5 +138,20 @@ func listCondEntries(root string, cond func(os.FileInfo) (bool, error)) (entries
 		}
 		return
 	})
+	return
+}
+
+// isFileTypeMatched checks whether the file type is matched with the flag.
+func isFileTypeMatched(info *os.FileInfo, flag int) (match bool) {
+	switch {
+	case flag == ListIncludeAll:
+		match = true
+	case flag&ListIncludeDir != 0 && isDirFi(info):
+		match = true
+	case flag&ListIncludeFile != 0 && isFileFi(info):
+		match = true
+	case flag&ListIncludeSymlink != 0 && isSymlinkFi(info):
+		match = true
+	}
 	return
 }
