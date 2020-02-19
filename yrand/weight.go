@@ -66,7 +66,7 @@ func WeightedShuffle(weights []float64, yieldFunc ShuffleIndexFunc) (err error) 
 	}
 	var (
 		rnd float64
-		sum = 0.0
+		sum float64
 		el  *list.Element
 		wl  = list.New()
 	)
