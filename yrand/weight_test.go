@@ -2,7 +2,6 @@ package yrand
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"testing"
 )
@@ -117,8 +116,14 @@ func TestWeightedShuffle(t *testing.T) {
 			}
 
 			cnt, maxCnt := 0, len(tt.weights)
+			cntMap := make(map[int]byte)
 			switch err := WeightedShuffle(tt.weights, func(idx int) (err error) {
 				cnt++
+				if _, ok := cntMap[idx]; ok {
+					t.Errorf("WeightedShuffle() got duplicate index = %v", idx)
+				} else {
+					cntMap[idx] = 1
+				}
 				if (idx < 0) || (idx >= maxCnt) {
 					t.Errorf("WeightedShuffle() got invalid index = %v, want = [0, %v)", idx, maxCnt)
 				}
@@ -141,9 +146,7 @@ func TestWeightedShuffle(t *testing.T) {
 					err = WeightedShuffle(tt.weights, func(idx int) error {
 						if cnt == 0 {
 							savedIdx = idx
-						}
-						if !(0 <= idx && idx < len(tt.weights)) {
-							return fmt.Errorf("invalid index: %v", idx)
+							return QuitShuffle
 						}
 						cnt++
 						return nil
