@@ -73,9 +73,10 @@ const (
 //   2) regular expression accepted by google/RE2, use the ListUseRegExp flag to enable;
 func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathInfo, err error) {
 	var (
+		rePatterns   []*regexp.Regexp
+		typeFlag     = flag & ListIncludeAll
 		useRegExp    = flag&ListUseRegExp != 0
 		useLowerName = flag&ListToLower != 0
-		rePatterns   []*regexp.Regexp
 	)
 	if useRegExp {
 		if rePatterns, err = compileRegexpList(patterns); err != nil {
@@ -89,22 +90,20 @@ func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathIn
 			fileName = strings.ToLower(fileName)
 		}
 
-		if tf := flag & ListIncludeAll; tf != 0 {
-			if (tf == ListIncludeAll) ||
-				(tf&ListIncludeDir != 0 && isDirFi(&info)) ||
-				(tf&ListIncludeFile != 0 && isFileFi(&info)) ||
-				(tf&ListIncludeSymlink != 0 && isSymlinkFi(&info)) {
-				if useRegExp {
-					for _, pat := range rePatterns {
-						if ok = pat.MatchString(fileName); ok {
-							break
-						}
+		if (typeFlag == ListIncludeAll) ||
+			(typeFlag&ListIncludeDir != 0 && isDirFi(&info)) ||
+			(typeFlag&ListIncludeFile != 0 && isFileFi(&info)) ||
+			(typeFlag&ListIncludeSymlink != 0 && isSymlinkFi(&info)) {
+			if useRegExp {
+				for _, pat := range rePatterns {
+					if ok = pat.MatchString(fileName); ok {
+						break
 					}
-				} else {
-					for _, pat := range patterns {
-						if ok, err = filepath.Match(pat, fileName); ok || err != nil {
-							break
-						}
+				}
+			} else {
+				for _, pat := range patterns {
+					if ok, err = filepath.Match(pat, fileName); ok || err != nil {
+						break
 					}
 				}
 			}
