@@ -153,9 +153,11 @@ func TestWeightedShuffle(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestWeightedShuffleQuit(t *testing.T) {
 	errSample := errors.New("this is sample error")
-	tests2 := []struct {
+	tests := []struct {
 		name      string
 		weights   []float64
 		errReturn error
@@ -165,7 +167,8 @@ func TestWeightedShuffle(t *testing.T) {
 		{"got yield func error", []float64{1, 2, 3, 4, 5, 6, 7, 8}, errSample, 3, errSample},
 		{"quit the shuffle", []float64{1, 2, 3, 4, 5, 6}, QuitShuffle, 2, nil},
 	}
-	for _, tt := range tests2 {
+
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cnt := 0
 			if err := WeightedShuffle(tt.weights, func(idx int) (err error) {
