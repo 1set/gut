@@ -22,7 +22,7 @@ fmt:
 build:
 	$(GOCMD) build -v ./$(PACKAGE)
 test:
-	$(GOTEST) -v -race -cover -covermode=atomic -coverprofile=coverage.out ./$(PACKAGE)
+	$(GOTEST) -v -race -short -cover -covermode=atomic -coverprofile=coverage.out ./$(PACKAGE)
 	cat coverage.out >> coverage.txt
 testdev:
 	$(GOTEST) -race -short -cover -covermode=atomic -count 1 ./$(PACKAGE)
