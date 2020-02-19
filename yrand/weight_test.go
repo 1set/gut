@@ -7,17 +7,6 @@ import (
 	"testing"
 )
 
-func getLargeWeights(count, scale int) (weights []float64) {
-	for i := 1; i <= count; i++ {
-		num := 99 + math.Pi*float64(scale)*math.Log2(float64(i+1))
-		if i%4 == 0 {
-			num = math.Log10(num)
-		}
-		weights = append(weights, num)
-	}
-	return
-}
-
 func TestWeightedChoice(t *testing.T) {
 	var (
 		times = 300000
@@ -214,6 +203,17 @@ func BenchmarkWeightedShuffleValid(b *testing.B) {
 	}
 }
 
+func getLargeWeights(count, scale int) (weights []float64) {
+	for i := 1; i <= count; i++ {
+		num := 99 + math.Pi*float64(scale)*math.Log2(float64(i+1))
+		if i%4 == 0 {
+			num = math.Log10(num)
+		}
+		weights = append(weights, num)
+	}
+	return
+}
+
 func checkProbDist(t *testing.T, name string, times int, weights []float64, idxFunc func() (idx int, err error)) {
 	var (
 		tolerance        = 0.16
@@ -247,10 +247,10 @@ func checkProbDist(t *testing.T, name string, times int, weights []float64, idxF
 	}
 
 	for i, w := range weights {
-		if (w <= 0) || ((w / weightSum * float64(times)) < minExpectedTimes) {
+		expected := w / weightSum
+		if (w <= 0) || ((expected * float64(times)) < minExpectedTimes) {
 			continue
 		}
-		expected := w / weightSum
 		actual := float64(result[i]) / float64(times)
 		if !isFloatEqual(actual, expected, tolerance) {
 			t.Errorf("%s() got unexpected result, weights: %v, index:[%d](%.2f), expected: %.3f, actual: %.3f, tole: %.2f%%",
