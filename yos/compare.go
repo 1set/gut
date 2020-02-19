@@ -76,7 +76,6 @@ func SameDirEntries(path1, path2 string) (same bool, err error) {
 		raw1, raw2     = path1, path2
 		items1, items2 []*FilePathInfo
 	)
-
 	// resolve paths if they're symbolic links
 	if path1, fi1, err = resolveDirInfo(path1); err != nil {
 		err = opError(opnCompare, raw1, err)
@@ -124,6 +123,7 @@ CompareEntries:
 				break CompareEntries
 			}
 		case os.ModeDir:
+			// ignore the directory structure here, since it's already compared by the relative path logic before
 		case 0:
 			if same, err = SameFileContent(entry1.Path, entry2.Path); err != nil || !same {
 				break CompareEntries
