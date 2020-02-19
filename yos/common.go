@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"regexp"
 	"syscall"
 
 	"github.com/1set/gut/ystring"
@@ -186,6 +187,21 @@ func openFileInfo(path string) (file *os.File, fi os.FileInfo, err error) {
 			}
 		} else {
 			err = errNotRegularFile
+		}
+	}
+	return
+}
+
+// compileRegexpList compiles a list of string patterns into regexp patterns.
+func compileRegexpList(strPats []string) (rePats []*regexp.Regexp, err error) {
+	var rp *regexp.Regexp
+	rePats = make([]*regexp.Regexp, 0, len(strPats))
+	for _, sp := range strPats {
+		if rp, err = regexp.Compile(sp); err == nil {
+			rePats = append(rePats, rp)
+		} else {
+			err = opError(opnList, sp, err)
+			break
 		}
 	}
 	return

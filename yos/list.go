@@ -73,25 +73,19 @@ const (
 //   2) regular expression accepted by google/RE2, use the ListUseRegExp flag to enable;
 func ListMatch(root string, flag int, patterns ...string) (entries []*FilePathInfo, err error) {
 	var (
-		useRegExp  = flag&ListUseRegExp != 0
-		rePatterns []*regexp.Regexp
-		patRe      *regexp.Regexp
+		useRegExp    = flag&ListUseRegExp != 0
+		useLowerName = flag&ListToLower != 0
+		rePatterns   []*regexp.Regexp
 	)
 	if useRegExp {
-		rePatterns = make([]*regexp.Regexp, 0, len(patterns))
-		for _, pat := range patterns {
-			if patRe, err = regexp.Compile(pat); err == nil {
-				rePatterns = append(rePatterns, patRe)
-			} else {
-				err = opError(opnList, pat, err)
-				return
-			}
+		if rePatterns, err = compileRegexpList(patterns); err != nil {
+			return
 		}
 	}
 
 	return listCondEntries(root, func(info os.FileInfo) (ok bool, err error) {
 		fileName := info.Name()
-		if flag&ListToLower != 0 {
+		if useLowerName {
 			fileName = strings.ToLower(fileName)
 		}
 
