@@ -66,7 +66,7 @@ func WeightedShuffle(weights []float64, yieldFunc ShuffleIndexFunc) (err error) 
 	}
 	var (
 		rnd float64
-		sum = 0.0
+		sum float64
 		el  *list.Element
 		wl  = list.New()
 	)
@@ -81,13 +81,13 @@ func WeightedShuffle(weights []float64, yieldFunc ShuffleIndexFunc) (err error) 
 			err = errInvalidWeights
 			return
 		}
-		_ = wl.PushBack(&weightNode{index: i, weight: w})
+		_ = wl.PushBack(weightNode{index: i, weight: w})
 	}
 
 	for range weights {
 		sum = 0.0
 		for el = wl.Front(); el != nil; el = el.Next() {
-			w := el.Value.(*weightNode)
+			w := el.Value.(weightNode)
 			sum += w.weight
 		}
 
@@ -99,7 +99,7 @@ func WeightedShuffle(weights []float64, yieldFunc ShuffleIndexFunc) (err error) 
 
 		// find the random pos
 		for el = wl.Front(); el != nil; el = el.Next() {
-			wn := el.Value.(*weightNode)
+			wn := el.Value.(weightNode)
 			if sum -= wn.weight; sum < 0 {
 				break
 			}
@@ -109,7 +109,7 @@ func WeightedShuffle(weights []float64, yieldFunc ShuffleIndexFunc) (err error) 
 		}
 
 		// yield it and remove for next iteration
-		wn := wl.Remove(el).(*weightNode)
+		wn := wl.Remove(el).(weightNode)
 		if err = yieldFunc(wn.index); err != nil {
 			break
 		}
