@@ -70,6 +70,7 @@ func SameFileContent(path1, path2 string) (same bool, err error) {
 }
 
 // SameDirEntries checks if the two directories have the same entries. Symbolic links other than the given paths will be not be followed, and only compares content of links.
+//nolint:gocyclo // Checks in this function are all necessary, no redundant checks.
 func SameDirEntries(path1, path2 string) (same bool, err error) {
 	var (
 		fi1, fi2       os.FileInfo

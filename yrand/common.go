@@ -10,6 +10,7 @@ import (
 var (
 	// QuitShuffle is used as a return value from ShuffleIndexFunc to indicate that the execution of WeightedShuffle should be terminated immediately.
 	// It is not returned as an error by any function.
+	//nolint:golint // this is not a real error returned by any functions, it works as a flag instead.
 	QuitShuffle = errors.New("quit this shuffle")
 )
 

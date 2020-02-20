@@ -58,6 +58,7 @@ func CopySymlink(src, dest string) (err error) {
 }
 
 // bufferCopyFile reads content from the source file and write to the destination file with a buffer.
+//nolint:gocyclo // buffer copy is a complicated thing indeed.
 func bufferCopyFile(src, dest string, bufferSize int64) (err error) {
 	var (
 		srcFile, destFile *os.File
@@ -161,6 +162,7 @@ func copySymlink(src, dest string) (err error) {
 }
 
 // copyDir copies all entries of source directory to destination directory recursively.
+//nolint:gocyclo // copy directory refers itself with copy file and copy symlink, it's hard to reduce the complexity.
 func copyDir(src, dest string) (err error) {
 	var srcInfo, destInfo os.FileInfo
 
