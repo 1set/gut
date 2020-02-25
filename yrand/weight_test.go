@@ -222,7 +222,7 @@ func getLargeWeights(count, scale int) (weights []float64) {
 
 func checkProbDist(t *testing.T, name string, times int, weights []float64, idxFunc func() (idx int, err error)) {
 	var (
-		tolerance        = 0.2
+		tolerance        = 0.16
 		minExpectedTimes = 30.0
 	)
 
@@ -254,7 +254,7 @@ func checkProbDist(t *testing.T, name string, times int, weights []float64, idxF
 
 	for i, w := range weights {
 		expected := w / weightSum
-		if (w <= 0) || ((expected * float64(times)) < minExpectedTimes) {
+		if (w <= 0) || ((expected * float64(times)) < minExpectedTimes) || (expected < 0.05) {
 			continue
 		}
 		actual := float64(result[i]) / float64(times)
