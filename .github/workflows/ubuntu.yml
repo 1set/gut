@@ -2,12 +2,11 @@ name: Ubuntu
 on:
   push:
     paths-ignore:
-    - '**.md'
+      - "**.md"
   schedule:
-    - cron:  '0 21 * * 0'
+    - cron: "0 21 * * 0"
 
 jobs:
-
   build:
     name: Build on Ubuntu
     runs-on: ${{ matrix.vm-os }}
@@ -16,68 +15,78 @@ jobs:
       fail-fast: false
       matrix:
         vm-os: [ubuntu-latest]
-        go-version: [1.11.13, 1.12.17, 1.13.8]
+        go-version: [1.11.13, 1.12.17, 1.13.9, 1.14.1]
 
     steps:
-    - name: Set up Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{ matrix.go-version }}
-      id: go
+      - name: Set up Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v1
+        with:
+          go-version: ${{ matrix.go-version }}
+        id: go
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v1
-      with:
-        fetch-depth: 2
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 2
 
-    - name: Get dependencies
-      shell: bash
-      run: |
-        go get -v -t -d ./...
-        if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-        fi
+      - name: Get dependencies
+        shell: bash
+        run: |
+          go get -v -t -d ./...
+          if [ -f Gopkg.toml ]; then
+              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+              dep ensure
+          fi
 
-    - name: Build & Test
-      shell: bash
-      run: script/build.sh ci
+      - name: Build & Test
+        shell: bash
+        run: script/build.sh ci
 
-    - name: Upload report to Codecov
-      uses: codecov/codecov-action@v1.0.3
-      with:
-        token: ${{secrets.codecov_token}}
-        file: ./coverage.txt
+      - name: Upload report to Codecov
+        uses: codecov/codecov-action@v1.0.3
+        with:
+          token: ${{secrets.codecov_token}}
+          file: ./coverage.txt
 
-    - name: Upload report to Codacy
-      shell: bash
-      run: |
-        export GOPATH=$(go env GOPATH)
-        export GOBIN=$GOPATH/bin
-        export PATH=$PATH:$GOBIN
-        go get github.com/schrej/godacov
-        godacov -t $CODACY_PROJECT_TOKEN -r ./coverage.txt -c $GITHUB_SHA
-      env:
-        CODACY_PROJECT_TOKEN: ${{ secrets.codacy_token }}
+      - name: Upload report to Codacy
+        shell: bash
+        run: |
+          export GOPATH=$(go env GOPATH)
+          export GOBIN=$GOPATH/bin
+          export PATH=$PATH:$GOBIN
+          go get github.com/schrej/godacov
+          godacov -t $CODACY_PROJECT_TOKEN -r ./coverage.txt -c $GITHUB_SHA
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.codacy_token }}
 
-    - name: Upload report to Code Climate
-      shell: bash
-      run: |
-        source script/prepare.sh
-        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > cc-test-reporter
-        chmod +x ./cc-test-reporter
-        ./cc-test-reporter before-build
-        go test -race -cover -coverprofile=c.out ./...
-        ./cc-test-reporter format-coverage -t gocov
-        ./cc-test-reporter upload-coverage
-        source script/cleanup.sh
-      env:
-        CC_TEST_REPORTER_ID: ${{ secrets.cc_report_id }}
+      - name: Upload report to Code Climate
+        shell: bash
+        run: |
+          source script/prepare.sh
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > cc-test-reporter
+          chmod +x ./cc-test-reporter
+          ./cc-test-reporter before-build
+          go test -race -cover -coverprofile=c.out ./...
+          ./cc-test-reporter format-coverage -t gocov
+          ./cc-test-reporter upload-coverage
+          source script/cleanup.sh
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.cc_report_id }}
 
-    - name: Upload report to DeepSource
-      shell: bash
-      run: |
-        curl https://deepsource.io/cli | sh
-        ./bin/deepsource report --analyzer test-coverage --key go --value-file ./coverage.txt
-      env:
-        DEEPSOURCE_DSN: ${{ secrets.deepsource_dsn }}
+      - name: Upload report to DeepSource
+        shell: bash
+        run: |
+          curl https://deepsource.io/cli | sh
+          ./bin/deepsource report --analyzer test-coverage --key go --value-file ./coverage.txt
+        env:
+          DEEPSOURCE_DSN: ${{ secrets.deepsource_dsn }}
+
+      - name: Notify me via IFTTT if it fails on ${{ matrix.vm-os }}
+        if: failure() && endsWith(github.ref, '/master')
+        uses: cixo/ifttt-trigger@v0.3
+        with:
+          key: ${{ secrets.ifttt_maker_key }}
+          event: github_1set_build
+          value1: ${{ github.repository }} for ${{ matrix.vm-os }}
+          value2: ${{ github.event_name }}
+          value3: ${{ job.status }}

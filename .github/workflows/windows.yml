@@ -2,12 +2,11 @@ name: Windows
 on:
   push:
     paths-ignore:
-    - '**.md'
+      - "**.md"
   schedule:
-    - cron:  '0 21 * * 0'
+    - cron: "0 21 * * 0"
 
 jobs:
-
   build:
     name: Build on Windows
     runs-on: ${{ matrix.vm-os }}
@@ -16,29 +15,39 @@ jobs:
       fail-fast: false
       matrix:
         vm-os: [windows-latest]
-        go-version: [1.11.13, 1.12.17, 1.13.8]
+        go-version: [1.11.13, 1.12.17, 1.13.9, 1.14.1]
 
     steps:
-    - name: Set up Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{ matrix.go-version }}
-      id: go
+      - name: Set up Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v1
+        with:
+          go-version: ${{ matrix.go-version }}
+        id: go
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v1
-      with:
-        fetch-depth: 2
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 2
 
-    - name: Get dependencies
-      shell: bash
-      run: |
-        go get -v -t -d ./...
-        if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-        fi
+      - name: Get dependencies
+        shell: bash
+        run: |
+          go get -v -t -d ./...
+          if [ -f Gopkg.toml ]; then
+              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+              dep ensure
+          fi
 
-    - name: Build & Test
-      shell: bash
-      run: script/build.sh ci
+      - name: Build & Test
+        shell: bash
+        run: script/build.sh ci
+
+      - name: Notify me via IFTTT if it fails on ${{ matrix.vm-os }}
+        if: failure() && endsWith(github.ref, '/master')
+        uses: cixo/ifttt-trigger@v0.3
+        with:
+          key: ${{ secrets.ifttt_maker_key }}
+          event: github_1set_build
+          value1: ${{ github.repository }} for ${{ matrix.vm-os }}
+          value2: ${{ github.event_name }}
+          value3: ${{ job.status }}
