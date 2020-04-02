@@ -82,11 +82,11 @@ jobs:
           DEEPSOURCE_DSN: ${{ secrets.deepsource_dsn }}
 
       - name: Notify me via IFTTT if it fails on ${{ matrix.vm-os }}
-        if: failure() && endsWith(github.ref, '/master'))
+        if: failure() && endsWith(github.ref, '/master')
         uses: cixo/ifttt-trigger@v0.3
         with:
           key: ${{ secrets.ifttt_maker_key }}
           event: github_1set_build
-          value1: ${{ github.repository }} on ${{ matrix.vm-os }}
+          value1: ${{ github.repository }} for ${{ matrix.vm-os }}
           value2: ${{ github.event_name }}
           value3: ${{ job.status }}
