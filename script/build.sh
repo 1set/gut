@@ -18,10 +18,9 @@ fi
 printf "\n###### Prepare ######\n"
 source "$SCRIPT_DIR"/prepare.sh
 
-set -eu
-
 printf "\n====== Begin at %s, OS: %s, Mode: %s - %s ======\n" "$(date '+%Y-%m-%d %H:%M:%S %z')" "$OS_NAME" "$CHOICE" "$TARGET"
 
+set -u
 COUNT=0
 for FOLDER in $TARGET; do
     PACKAGE="${FOLDER##*/}"
@@ -51,7 +50,7 @@ for FOLDER in $TARGET; do
     dev)
         make fmt PACKAGE="$PACKAGE"
         make testdev PACKAGE="$PACKAGE"
-#        make benchdev PACKAGE="$PACKAGE"
+        #        make benchdev PACKAGE="$PACKAGE"
         ;;
     fastdev)
         make fmt PACKAGE="$PACKAGE"
@@ -65,6 +64,7 @@ for FOLDER in $TARGET; do
 
     COUNT=$((COUNT + 1))
 done
+set +u
 
 printf "\n###### Clean Up ######\n"
 

@@ -23,30 +23,32 @@ fi
 export OS_NAME="$platform_name"
 
 # create ram disk
-if [[ $OS_NAME == "MACOS" ]]; then
-    "$SCRIPT_DIR"/ramdisk.sh destroy GutWriteDisk || true
-    "$SCRIPT_DIR"/ramdisk.sh destroy GutReadOnlyDisk || true
-    "$SCRIPT_DIR"/ramdisk.sh destroy GutProtectedDisk || true
+if [[ -z ${SKIP_RAMDISK} ]]; then
+    if [[ $OS_NAME == "MACOS" ]]; then
+        "$SCRIPT_DIR"/ramdisk.sh destroy GutWriteDisk || true
+        "$SCRIPT_DIR"/ramdisk.sh destroy GutReadOnlyDisk || true
+        "$SCRIPT_DIR"/ramdisk.sh destroy GutProtectedDisk || true
 
-    "$SCRIPT_DIR"/ramdisk.sh create GutWriteDisk 64
-    "$SCRIPT_DIR"/ramdisk.sh create GutReadOnlyDisk 16 ReadOnly
-    "$SCRIPT_DIR"/ramdisk.sh create GutProtectedDisk 16
+        "$SCRIPT_DIR"/ramdisk.sh create GutWriteDisk 64
+        "$SCRIPT_DIR"/ramdisk.sh create GutReadOnlyDisk 16 ReadOnly
+        "$SCRIPT_DIR"/ramdisk.sh create GutProtectedDisk 16
 
-    export RAMDISK_WRITE=/Volumes/GutWriteDisk
-    export RAMDISK_READONLY=/Volumes/GutReadOnlyDisk
-    export RAMDISK_PROTECT=/Volumes/GutProtectedDisk
-elif [[ $OS_NAME == "LINUX" ]]; then
-    sudo "$SCRIPT_DIR"/ramdisk.sh destroy GutWriteDisk || true
-    sudo "$SCRIPT_DIR"/ramdisk.sh destroy GutReadOnlyDisk || true
-    sudo "$SCRIPT_DIR"/ramdisk.sh destroy GutProtectedDisk || true
+        export RAMDISK_WRITE=/Volumes/GutWriteDisk
+        export RAMDISK_READONLY=/Volumes/GutReadOnlyDisk
+        export RAMDISK_PROTECT=/Volumes/GutProtectedDisk
+    elif [[ $OS_NAME == "LINUX" ]]; then
+        sudo "$SCRIPT_DIR"/ramdisk.sh destroy GutWriteDisk || true
+        sudo "$SCRIPT_DIR"/ramdisk.sh destroy GutReadOnlyDisk || true
+        sudo "$SCRIPT_DIR"/ramdisk.sh destroy GutProtectedDisk || true
 
-    sudo "$SCRIPT_DIR"/ramdisk.sh create GutWriteDisk 64
-    sudo "$SCRIPT_DIR"/ramdisk.sh create GutReadOnlyDisk 16 ReadOnly
-    sudo "$SCRIPT_DIR"/ramdisk.sh create GutProtectedDisk 16
+        sudo "$SCRIPT_DIR"/ramdisk.sh create GutWriteDisk 64
+        sudo "$SCRIPT_DIR"/ramdisk.sh create GutReadOnlyDisk 16 ReadOnly
+        sudo "$SCRIPT_DIR"/ramdisk.sh create GutProtectedDisk 16
 
-    export RAMDISK_WRITE=/mnt/GutWriteDisk
-    export RAMDISK_READONLY=/mnt/GutReadOnlyDisk
-    export RAMDISK_PROTECT=/mnt/GutProtectedDisk
+        export RAMDISK_WRITE=/mnt/GutWriteDisk
+        export RAMDISK_READONLY=/mnt/GutReadOnlyDisk
+        export RAMDISK_PROTECT=/mnt/GutProtectedDisk
+    fi
 fi
 
 # uncompress test resource to temp dir

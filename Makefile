@@ -1,6 +1,7 @@
 GOCMD=go
 GOFMT1=gofmt
 GOFMT2=goreturns
+GOFMT3=goimports
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
@@ -19,6 +20,7 @@ doc:
 fmt:
 	$(GOFMT1) -s -w ./$(PACKAGE)
 	$(GOFMT2) -l -w ./$(PACKAGE)
+	$(GOFMT3) -l -w ./$(PACKAGE)
 build:
 	$(GOCMD) build -v ./$(PACKAGE)
 test:

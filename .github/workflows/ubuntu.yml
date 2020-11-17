@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         vm-os: [ubuntu-latest]
-        go-version: [1.11.13, 1.12.17, 1.13.9, 1.14.1]
+        go-version: [1.13.15, 1.14.11, 1.15.4]
 
     steps:
       - name: Set up Go ${{ matrix.go-version }}
