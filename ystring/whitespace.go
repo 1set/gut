@@ -15,6 +15,14 @@ func IsNotEmpty(s string) bool {
 	return len(s) > 0
 }
 
+// NotEmptyOrDefault returns the string if it is not empty, or returns the fallback.
+func NotEmptyOrDefault(s, fallback string) string {
+	if len(s) > 0 {
+		return s
+	}
+	return fallback
+}
+
 // IsBlank checks if the string contains only whitespaces.
 func IsBlank(s string) bool {
 	return len(strings.TrimSpace(s)) == 0
@@ -23,6 +31,14 @@ func IsBlank(s string) bool {
 // IsNotBlank checks if the string contains any non-whitespace characters.
 func IsNotBlank(s string) bool {
 	return len(strings.TrimSpace(s)) > 0
+}
+
+// NotBlankOrDefault returns the string if it is not blank, or returns the fallback.
+func NotBlankOrDefault(s, fallback string) string {
+	if len(strings.TrimSpace(s)) > 0 {
+		return s
+	}
+	return fallback
 }
 
 // Shrink returns a string that replaces consecutive whitespace characters in s with the sep string.
