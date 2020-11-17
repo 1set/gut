@@ -7,19 +7,16 @@ import (
 
 func TestNewLine(t *testing.T) {
 	var (
-		winStyle  = "\r\n"
-		unixStyle = "\n"
+		winNewLine  = "\r\n"
+		unixNewLine = "\n"
 	)
 
-	currentOsName := os.Getenv("OS_NAME")
-
-	if currentOsName == "WINDOWS" && NewLine != winStyle {
-		t.Errorf("NewLine on Windows got = %q, want = %q", NewLine, winStyle)
-	}
-	if currentOsName == "MACOS" && NewLine != unixStyle {
-		t.Errorf("NewLine on macOS got = %q, want = %q", NewLine, unixStyle)
-	}
-	if currentOsName == "LINUX" && NewLine != unixStyle {
-		t.Errorf("NewLine on Linux got = %q, want = %q", NewLine, unixStyle)
+	switch currentOsName := os.Getenv("OS_NAME"); {
+	case currentOsName == "WINDOWS" && NewLine != winNewLine:
+		t.Errorf("NewLine on Windows got = %q, want = %q", NewLine, winNewLine)
+	case currentOsName == "MACOS" && NewLine != unixNewLine:
+		t.Errorf("NewLine on macOS got = %q, want = %q", NewLine, unixNewLine)
+	case currentOsName == "LINUX" && NewLine != unixNewLine:
+		t.Errorf("NewLine on Linux got = %q, want = %q", NewLine, unixNewLine)
 	}
 }
