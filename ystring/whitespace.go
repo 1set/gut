@@ -7,17 +7,17 @@ import (
 
 // IsEmpty checks if the string is empty.
 func IsEmpty(s string) bool {
-	return len(s) == 0
+	return s == ""
 }
 
 // IsNotEmpty checks if the string is not empty.
 func IsNotEmpty(s string) bool {
-	return len(s) > 0
+	return s != ""
 }
 
 // NotEmptyOrDefault returns the string if it is not empty, or returns the fallback.
 func NotEmptyOrDefault(s, fallback string) string {
-	if len(s) > 0 {
+	if s != "" {
 		return s
 	}
 	return fallback
@@ -25,17 +25,17 @@ func NotEmptyOrDefault(s, fallback string) string {
 
 // IsBlank checks if the string contains only whitespaces.
 func IsBlank(s string) bool {
-	return len(strings.TrimSpace(s)) == 0
+	return strings.TrimSpace(s) == ""
 }
 
 // IsNotBlank checks if the string contains any non-whitespace characters.
 func IsNotBlank(s string) bool {
-	return len(strings.TrimSpace(s)) > 0
+	return strings.TrimSpace(s) != ""
 }
 
 // NotBlankOrDefault returns the string if it is not blank, or returns the fallback.
 func NotBlankOrDefault(s, fallback string) string {
-	if len(strings.TrimSpace(s)) > 0 {
+	if strings.TrimSpace(s) != "" {
 		return s
 	}
 	return fallback
