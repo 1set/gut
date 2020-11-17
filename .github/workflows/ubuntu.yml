@@ -59,20 +59,6 @@ jobs:
         env:
           CODACY_PROJECT_TOKEN: ${{ secrets.codacy_token }}
 
-      - name: Upload report to Code Climate
-        shell: bash
-        run: |
-          source script/prepare.sh
-          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > cc-test-reporter
-          chmod +x ./cc-test-reporter
-          ./cc-test-reporter before-build
-          go test -race -cover -coverprofile=c.out ./...
-          ./cc-test-reporter format-coverage -t gocov
-          ./cc-test-reporter upload-coverage
-          source script/cleanup.sh
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.cc_report_id }}
-
       - name: Upload report to DeepSource
         shell: bash
         run: |

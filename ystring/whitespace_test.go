@@ -6,6 +6,7 @@ import (
 
 func TestIsEmptyOrNot(t *testing.T) {
 	t.Parallel()
+	fallback := "this is fallback string"
 	tests := []struct {
 		name  string
 		s     string
@@ -17,6 +18,7 @@ func TestIsEmptyOrNot(t *testing.T) {
 		{"String contains whitespaces", " \t\n \t   ", false},
 		{"String contains letters", "hello", false},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := IsEmpty(tt.s); got != tt.empty {
@@ -24,6 +26,16 @@ func TestIsEmptyOrNot(t *testing.T) {
 			}
 			if got := IsNotEmpty(tt.s); got != !tt.empty {
 				t.Errorf("IsNotEmpty() got = %v, want %v", got, !tt.empty)
+			}
+
+			if tt.empty {
+				if got := NotEmptyOrDefault(tt.s, fallback); got != fallback {
+					t.Errorf("NotEmptyOrDefault() got = %q, want %q", got, fallback)
+				}
+			} else {
+				if got := NotEmptyOrDefault(tt.s, fallback); got != tt.s {
+					t.Errorf("NotEmptyOrDefault() got = %q, want %q", got, tt.s)
+				}
 			}
 		})
 	}
@@ -41,8 +53,15 @@ func BenchmarkIsNotEmpty(b *testing.B) {
 	}
 }
 
+func BenchmarkNotEmptyOrDefault(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = NotEmptyOrDefault("lovely developer", "fallback default value")
+	}
+}
+
 func TestIsBlankOrNot(t *testing.T) {
 	t.Parallel()
+	fallback := "this is fallback string"
 	tests := []struct {
 		name  string
 		s     string
@@ -54,6 +73,7 @@ func TestIsBlankOrNot(t *testing.T) {
 		{"String contains whitespaces", " \t\n \t \f \n\v ", true},
 		{"String contains letters", "hello", false},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := IsBlank(tt.s); got != tt.blank {
@@ -61,6 +81,16 @@ func TestIsBlankOrNot(t *testing.T) {
 			}
 			if got := IsNotBlank(tt.s); got != !tt.blank {
 				t.Errorf("IsNotBlank() got = %v, want %v", got, !tt.blank)
+			}
+
+			if tt.blank {
+				if got := NotBlankOrDefault(tt.s, fallback); got != fallback {
+					t.Errorf("NotBlankOrDefault() got = %q, want %q", got, fallback)
+				}
+			} else {
+				if got := NotBlankOrDefault(tt.s, fallback); got != tt.s {
+					t.Errorf("NotBlankOrDefault() got = %q, want %q", got, tt.s)
+				}
 			}
 		})
 	}
@@ -75,6 +105,12 @@ func BenchmarkIsBlank(b *testing.B) {
 func BenchmarkIsNotBlank(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = IsNotBlank("lovely developer")
+	}
+}
+
+func BenchmarkNotBlankOrDefault(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = NotBlankOrDefault("lovely developer", "fallback default value")
 	}
 }
 
